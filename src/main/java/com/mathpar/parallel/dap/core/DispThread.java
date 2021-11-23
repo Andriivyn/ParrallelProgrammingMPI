@@ -1,0 +1,916 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.mathpar.parallel.dap.core;
+
+import com.mathpar.log.MpiLogger;
+import com.mathpar.number.Element;
+import com.mathpar.number.Ring;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.mathpar.parallel.dap.QR.Utils;
+import com.mathpar.parallel.dap.test.MemoryManager;
+import mpi.MPI;
+import mpi.MPIException;
+import mpi.Status;
+import org.javatuples.Pair;
+
+public class DispThread {
+
+    private final static MpiLogger LOGGER = MpiLogger.getLogger(DispThread.class);
+
+    ArrayList<Amin> pine;
+    long sleepTime;
+    long executeTime;
+    static Integer myRank;
+    public CalcThread counter;
+    Thread disp;
+    Set<Integer> freeProcs;
+    ArrayList<ArrayList<Drop>>[] terminal;
+    Map<Integer, ArrayList<Drop>> reftoTerminal;
+    Map<Integer, ArrayList<Drop>> aerodrome;
+    ArrayList<Drop> ownTrack;
+    private Element[] result;
+    private Object[] receivedResult;
+    ArrayList<Drop> listOfTail;
+
+    Queue<Integer> waitingFromOthers;
+    List<Integer> waitingOutput;
+    Queue<Integer> approvedOutput;
+    boolean recv;
+    int waitfrom;
+
+    int childsLevel;
+    int totalLevel;
+
+    static boolean flagOfMyDeparture = false;
+    int mode;
+    static int myLevel;
+    static int myLevelH;
+    static int sentLevel;
+    static int trackLevel;
+
+    int firstParent;
+    static long usedMemory;
+    long currentMemory;
+    // Map<Integer, Long> timecount;
+    long sleepSendTime = 0;
+
+    long receiveTaskTime = 0;
+    int [] listcount;
+    boolean sendFreeToDaughter;
+    int flagOfDelay;
+    static String checkline = "";
+    //static long timegettask = 0;
+    int flagOfDaughterLevel = 0;
+
+
+    public DispThread(long sTime, String[] args, Ring ring) throws MPIException {
+        pine = new ArrayList<>();
+        sleepTime = sTime;
+        executeTime = 0;
+        myRank = MPI.COMM_WORLD.getRank();
+        freeProcs = new HashSet<>();
+        terminal = new ArrayList[21];
+        childsLevel = 20;
+        totalLevel = 20;
+        trackLevel = 20;
+        mode = 0;
+        receivedResult = null;
+        myLevel = 20;
+        myLevelH = 20;
+        sentLevel = 20;
+        usedMemory = 0;
+        listOfTail = new ArrayList<>();
+        firstParent = -1;
+        sendFreeToDaughter = false;
+        flagOfDelay = 0;
+        waitingFromOthers = new LinkedList<>();
+        recv = false;
+        waitingOutput = new LinkedList<>();
+        approvedOutput = new LinkedList<>();
+
+        for (int i = 0; i < terminal.length; i++) {
+            terminal[i] = new ArrayList<>();
+        }
+
+        aerodrome = new HashMap<>();
+        //timecount = new HashMap<>();
+        ownTrack = new ArrayList<>();
+        reftoTerminal = new ConcurrentHashMap<>();
+
+        waitfrom = myRank;
+        disp = Thread.currentThread();
+        disp.setPriority(10);
+        disp.setName("disp");
+        counter = new CalcThread(pine, ownTrack, ring);
+        listcount = new int[21];
+        for (int i = 0; i < listcount.length ; i++) {
+            listcount[i] = 0;
+        }
+        //result = new ArrayList<>();
+    }
+
+    private void rootWork(int[] nodes, int startType, int key, byte[] config, Element[] data) {
+        for (int i = 1; i < nodes.length; i++) {
+            freeProcs.add(nodes[i]);
+        }
+        Drop drop = Drop.doNewDrop(startType, key, config, -1, 0, 0, 0, data);
+
+        //drop.setVars();
+
+        counter.putDropInTrack(drop);
+    }
+
+    private void exit() {
+        mode = -1;
+        //counter.DoneThread();
+    }
+
+    private void receiveTask(int prank) throws MPIException, IOException, ClassNotFoundException {
+        Drop drop = (Drop) Transport.recvObject(prank, Transport.Tag.TASK);
+        //LOGGER.info("revc drop type " + drop.type + " number = " + drop.number);
+        if(receiveTaskTime==0)
+            receiveTaskTime = System.currentTimeMillis() - executeTime;
+
+        listcount[drop.recNum]+=1;
+
+
+        if (firstParent == -1 && drop.procId != myRank && myRank != 0)
+            firstParent = drop.procId;
+
+        addParent(drop);
+        counter.putDropInTrack(drop);
+      // LOGGER.info("drop.resultForOutFunctionLength = " + drop.resultForOutFunctionLength);
+        flagOfMyDeparture = false;
+        waitingFromOthers.remove(prank);
+        recv = false;
+        waitfrom = myRank;
+        flagOfDelay = 20;
+    }
+
+    private void receiveFreeProcs(int cnt, int daughter) throws MPIException {
+        LOGGER.trace("bef recv free");
+        int[] freeProcsAr = Transport.receiveIntArray(cnt, daughter, Transport.Tag.FREE_PROC);
+
+        for (int i = 0; i < freeProcsAr.length; i++) {
+            freeProcs.add(freeProcsAr[i]);
+
+        }
+      /*  LOGGER.info("recv free procs from  " + daughter + " ," + Arrays.toString(freeProcsAr) + "free size = "
+                + freeProcs.size() + " totallevel = " + totalLevel + " mylevel = " + myLevel +" childslevel = "
+                + childsLevel +  "tracklevel = " + trackLevel);
+*/
+    }
+
+    private void procLevel(int cnt, Integer daughter) throws MPIException {
+        int[] tmr = Transport.receiveIntArray(cnt, daughter, Transport.Tag.PROC_STATE);
+        //LOGGER.info("recv procLevel = " + tmr[0]+ "from" + daughter);
+
+        ArrayList list = reftoTerminal.get(daughter);
+
+
+        terminal[tmr[0]].add(list);
+
+        if (!terminal[tmr[1]].remove(list))
+            terminal[20].remove(list);
+
+
+        if (tmr[0] < childsLevel) {
+            childsLevel = tmr[0];
+        }
+        else if(tmr[1]==childsLevel)
+        {
+            for (int l = 0; l < terminal.length; l++) {
+                if (terminal[l].size()!=0) {
+                    childsLevel = l;
+                    break;
+                } else if (l == terminal.length - 1) {
+                    childsLevel = 20;
+                }
+            }
+        }
+    }
+
+    private void endProgramme(int cntProc, int[] nodes) throws MPIException {
+        /*for (int i = 0; i < res.length; i++) {
+            LOGGER.info("RESULT = " + res[i]);
+        }*/
+
+        result = counter.result;
+        int[] tmpAr = {24};
+        for (int j = 1; j < cntProc; j++) {
+            Transport.iSendIntArray(tmpAr, nodes[j], Transport.Tag.FINAL);
+          //  LOGGER.info("send end signal to = " + nodes[j]);
+        }
+        mode = -1;
+        // counter.DoneThread();
+
+    }
+
+    private void receiveResult(Integer daughter) throws MPIException, IOException {
+        if (receivedResult != null) {
+            deleteDaughter((int) receivedResult[0], (int) receivedResult[1], (Drop) receivedResult[2]);
+        }
+
+        Object[] tmp = Transport.recvObjects(4, daughter, Transport.Tag.RESULT);
+        //LOGGER.info("received result from daughter = " + daughter);
+        int amin = (int) tmp[1];
+        int drop = (int) tmp[2];
+        int level = (int) tmp[3];
+        Drop currentDrop = pine.get(amin).branch.get(drop);
+        currentDrop.outData = (Element[]) tmp[0];
+        counter.putDropInTrack(currentDrop);
+        LOGGER.trace("track size = " + ownTrack.size());
+
+        if (deleteDaughter(daughter, level, currentDrop)) {
+            receivedResult = null;
+        } else {
+            receivedResult = new Object[3];
+            receivedResult[0] = daughter;
+            receivedResult[1] = level;
+            receivedResult[2] = currentDrop;
+        }
+
+        waitingFromOthers.remove(daughter);
+        recv = false;
+        waitfrom = myRank;
+    }
+
+
+    private void addDaugter(int daughtProcs, Drop drop) {
+        if (reftoTerminal.containsKey(daughtProcs)) {
+            reftoTerminal.get(daughtProcs).add(drop);
+        } else {
+            ArrayList<Drop> history = new ArrayList<>();
+            history.add(drop);
+            terminal[20].add(history);
+
+            reftoTerminal.put(daughtProcs, history);
+        }
+    }
+
+    private boolean deleteDaughter(Integer daughter, int level, Drop drop) {
+        ArrayList<Drop> list = reftoTerminal.get(daughter);
+        if (list.size() == 1) {
+            if (terminal[level].remove(list) || terminal[20].remove(list)) {
+                reftoTerminal.remove(daughter);
+
+                if (childsLevel == level && terminal[level].size() == 0) {
+                    for (int l = childsLevel + 1; l < terminal.length; l++) {
+                        if (terminal[level].size()!=0) {
+                            childsLevel = l;
+                            break;
+                        } else if (l == terminal.length - 1) {
+                            childsLevel = 20;
+                        }
+                    }
+                }
+                return true;
+            }
+        } else {
+            Drop resRem = null;
+            for (int j = 0; j < list.size(); j++) {
+                if (list.get(j).equals(drop)) {
+                    resRem = list.remove(j);
+                    if (resRem != null)
+                        return true;
+                    break;
+                }
+            }
+
+        }
+        return false;
+    }
+
+    public void deleteParent(int procId, int aminId, int dropId) {
+        ArrayList<Drop> list = aerodrome.get(procId);
+        for (int j = 0; j < list.size(); j++) {
+            if (list.get(j).dropId == dropId && list.get(j).aminId == aminId) {
+                list.remove(j);
+            }
+        }
+        if (list.isEmpty()) {
+            aerodrome.remove(procId);
+        }
+    }
+
+    public void addParent(Drop drop) {
+        if (!aerodrome.keySet().contains(drop.procId)) {
+            ArrayList<Drop> am = new ArrayList<Drop>();
+            am.add(drop);
+            aerodrome.put(drop.procId, am);
+        } else {
+            aerodrome.get(drop.procId).add(drop);
+        }
+    }
+
+    public static boolean isEmptyVokzal() {
+        return myLevel == 20 && myLevelH == 20;
+    }
+
+
+    private synchronized boolean sendDrops(int destination) throws MPIException, IOException {
+        if (isEmptyVokzal()) {
+            return false;
+        }
+        Drop drop = counter.getTask(1);
+
+        if (drop != null) {
+            sendDrop(drop, destination);
+            sendFreeProc(destination);
+            return true;
+        }
+        return false;
+    }
+
+    private void sendDrop(Drop drop, int destination) throws IOException, MPIException {
+        synchronized (drop) {
+            Drop curTask;
+            drop.numberOfDaughterProc = destination;
+            addDaugter(destination, drop);
+            curTask = Drop.doNewDrop(drop.type, drop.key, drop.config, drop.aminId, drop.dropId, drop.procId, drop.recNum, drop.inData);
+            //LOGGER.info("send drop to = " + destination + ", list of free = " + freeProcs.toString());
+
+            curTask.fullDrop = drop.fullDrop;
+            //long time = System.currentTimeMillis();
+            Transport.sendObject(curTask, destination, Transport.Tag.TASK);
+
+            //LOGGER.info("send drop type = "+curTask.type+" to = " + destination + " drop num = " + curTask.number );
+
+            //LOGGER.info("time = "+(System.currentTimeMillis()-time)+"send drop to = " + destination + ", list of free = " + freeProcs.toString());
+        }
+    }
+
+    private void sendRequestToSendDrops() throws IOException, MPIException {
+
+        if (myLevel <= childsLevel && myLevel > 0 && counter.vokzal[myLevel].size() != 0) {
+            freeProcs.remove(myRank);
+            flagOfMyDeparture = false;
+            if (freeProcs.size() != 0) {
+
+                int vokzalSize = counter.vokzal[myLevel].size();
+                if (vokzalSize == 0 || isEmptyVokzal()) {
+                    return;
+                }
+
+                int procToSend;
+
+                for (int i = 0; i < freeProcs.size() && counter.vokzal[myLevel].size() != 0; i++) {
+                   // LOGGER.info("freeProcs.size() = " + freeProcs.size());
+                    procToSend = (int) freeProcs.toArray()[i];
+                    if (!isWaitingForReceiving()) {
+                        if (myRank == 0) {
+                            sendDrops(procToSend);
+                        } else if (myRank % 2 == 0) {
+                            procToSend = freeProcs.stream().filter(p -> p % 2 == 1).findAny().orElse(-1);
+                            if (procToSend != -1)
+                                sendDrops(procToSend);
+                        }
+                    }
+                    if (myRank != 0 && (procToSend == -1 || myRank % 2 == 1)) {
+                        if (procToSend == -1) procToSend = (int) freeProcs.toArray()[i];
+                        if (sendRequestToApproveSending(procToSend)) {
+                          //  LOGGER.info("send request to send drop to "+ procToSend);
+                            freeProcs.remove(procToSend);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void sendFreeProc(int destination) throws MPIException {
+        if (freeProcs.contains(destination)) {
+            freeProcs.remove(destination);
+            LOGGER.trace("remove " + destination);
+        }
+        int vokzalSize = counter.vokzal[myLevel].size();
+        int chunk = vokzalSize == 0 ? freeProcs.size() : (freeProcs.size()) / (vokzalSize + 2);
+        Iterator<Integer> freeProcIterator = freeProcs.iterator();
+        if (chunk >= 1) {
+            int[] daughtProcs = new int[chunk];
+
+            for (int j = 0; j < daughtProcs.length; j++) {
+                daughtProcs[j] = freeProcIterator.next();
+                freeProcIterator.remove();
+            }
+           // LOGGER.info("send free with drop to "+ destination + " " + Arrays.toString(daughtProcs));
+
+            Transport.iSendIntArray(daughtProcs, destination, Transport.Tag.FREE_PROC);
+        }
+    }
+
+
+    public static <K, V> K getKey(Map<K, V> map, V value) {
+        for (K key : map.keySet()) {
+            if (value.equals(map.get(key))) {
+                return key;
+            }
+        }
+        return null;
+    }
+
+    private void sendFreeToDaughter() throws MPIException {
+        int k, i = 0;
+        int level = childsLevel;
+        if(flagOfDaughterLevel == 0){
+            flagOfDaughterLevel = 1;
+        } else{
+            flagOfDaughterLevel = 0;
+            for(int j = childsLevel; j<terminal.length;j++)
+            {
+                if(terminal[j].size()!= 0) {level = j;break;}
+            }
+        }
+        int tsize = terminal[level].size();
+        while (freeProcs.size() != 0 && i < tsize) {
+            k = freeProcs.size() < tsize ? 1 : freeProcs.size() / tsize;
+            int[] procsToSend = new int[k];
+            Iterator<Integer> iterator = freeProcs.iterator();
+            for (int j = 0; j < k; j++) {
+                procsToSend[j] = iterator.next();
+                iterator.remove();
+            }
+            Object key = getKey(reftoTerminal, terminal[level].get(i));
+            if (key != null) {
+                int destination = (int) key;
+                Transport.iSendIntArray(procsToSend, destination, Transport.Tag.FREE_PROC);
+                //LOGGER.info("send free to " + destination + ", " + Arrays.toString(procsToSend));
+            }
+            i++;
+        }
+    }
+
+    public boolean isEmptyTerminal() {
+        for (int i = 0; i < terminal.length; i++) {
+            for (int j = 0; j < terminal[i].size(); j++) {
+                if (terminal[i].get(j).size() != 0)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    private void sendFreeProcs() throws MPIException, IOException {
+       /* if(myRank == 0){
+       // String line = "sendFreeToDaughter = "+sendFreeToDaughter + " ,myLevel = "+ myLevel + " childsLevel = "
+       //         +childsLevel + " , isEmptyVokzal() = "+ isEmptyVokzal() + " trackLevel = " + trackLevel
+       //         + " firstParent = " +firstParent + " , freeProcs.size = "+ freeProcs.size() + " ,terminal[childsLevel].size() =  " + terminal[childsLevel].size();
+        if(!checkline.equals(line)) {
+            checkline = line;
+            LOGGER.info(checkline);
+            for(int i = 0; i<terminal.length;i++)
+            {
+                if(terminal[i].size()!= 0) LOGGER.info("i = " + i + "  " + terminal[i].size());
+            }
+        }
+        }*/
+        if ((!sendFreeToDaughter||myRank==0)&& ((myLevel - childsLevel) >= 2
+                || (isEmptyVokzal() && trackLevel == 20)) && terminal[childsLevel].size() != 0) {
+            doMeFree();
+            if (freeProcs.size() != 0) {
+                sendFreeToDaughter();
+                sendFreeToDaughter = true;
+            }
+        } else if (firstParent != -1 && isEmptyVokzal() && myRank != 0) {
+            if(flagOfDelay!=0) { flagOfDelay--; /*LOGGER.info("flagOfDelay = " + flagOfDelay + " mylevel = " + myLevel+"tracklevel = " + trackLevel);*/return;}
+            doMeFree();
+            if (freeProcs.size() != 0) {
+                int[] free = freeProcs.stream().mapToInt(Integer::intValue).toArray();
+               /* LOGGER.info("send free to parent to " + firstParent + " " + freeProcs.toString() + " mylevel = "
+                        + myLevel + " totallevel = "+totalLevel+" childslevel = " + childsLevel +  "tracklevel = " + trackLevel );
+                for(int i = 0; i<terminal.length;i++)
+                {
+                    if(terminal[i].size()!= 0) LOGGER.info("i = " + i + "  " + terminal[i].size());
+                }*/
+                Transport.iSendIntArray(free, firstParent, Transport.Tag.FREE_PROC);
+                freeProcs.clear();
+                sendFreeToDaughter = false;
+            }
+        }
+    }
+
+
+    private void doMeFree() {
+        if (counter.IamFree && !flagOfMyDeparture && isEmptyVokzal() && trackLevel == 20) {
+            // LOGGER.warn("do free !!!" );
+            freeProcs.add(myRank);
+            DispThread.flagOfMyDeparture = true;
+        }
+    }
+
+    private void sendLevel() throws MPIException {
+        // LOGGER.info("Try to send level");
+        if (isEmptyVokzal() && childsLevel == 20 && counter.ownTrack.size() == 0) {
+            totalLevel = 20;
+        } else {
+            totalLevel = Math.min(myLevel, Math.min(childsLevel, trackLevel));
+        }
+
+        if (totalLevel != sentLevel) {
+            int[] state = {totalLevel, sentLevel};
+
+            for (int i = 0; i < aerodrome.size(); i++) {
+                // LOGGER.trace("send my level totalLevel = " + totalLevel + "  sentLevel = " + sentLevel + "to "+aerodrome.keySet().toArray()[i]);
+                int destination = (int) aerodrome.keySet().toArray()[i];
+                Transport.iSendIntArray(state, destination, Transport.Tag.PROC_STATE);
+            }
+            sentLevel = totalLevel;
+        }
+    }
+
+    private void tagAction(Status info) throws MPIException, IOException, ClassNotFoundException {
+        //  LOGGER.info("in tag action");
+        int tagIndex = info.getTag();
+        Transport.Tag tag = Transport.Tag.values()[tagIndex];
+        int cnt = info.getCount(MPI.INT);
+        int prank = info.getSource();
+        switch (tag) {
+            case TASK:
+                receiveTask(prank);
+                break;
+
+            case FREE_PROC:
+                receiveFreeProcs(cnt, prank);
+                break;
+
+            case PROC_STATE:
+                procLevel(cnt, prank);
+                break;
+
+            case RESULT:
+                receiveResult(prank);
+                //     LOGGER.info("after recv res");
+                break;
+            case FINAL: {
+                Transport.receiveIntArray(cnt, prank, Transport.Tag.FINAL);
+                //LOGGER.info("recv end signal");
+                exit();
+                break;
+            }
+
+            case REQUEST_TO_APPROVE:
+                receiveRequestToApproveReceiving(prank);
+                break;
+
+            case APPROVAL:
+                receiveApprovalForSending(prank);
+                break;
+
+            case CANCEL:
+                receiveCancel(prank);
+                break;
+        }
+    }
+
+    private boolean sendRequestToApproveSending(int prank) throws MPIException {
+        // Pair<Integer, HardWorkType> sendingType = new Pair<>(prank, type);
+
+        if (waitingOutput.contains(prank))
+            return false;
+
+        int[] data = new int[]{myRank};
+
+        Transport.iSendIntArray(data, prank, Transport.Tag.REQUEST_TO_APPROVE);
+       // LOGGER.info("send request to " + prank);
+
+        waitingOutput.add(prank);
+
+        return true;
+    }
+
+    private void receiveRequestToApproveReceiving(int prank) throws MPIException {
+        int[] data = Transport.receiveIntArray(1, prank, Transport.Tag.REQUEST_TO_APPROVE);
+        waitingFromOthers.add(data[0]);
+        //LOGGER.info(String.format("receive Request To Approve Receiving from " + prank));
+    }
+
+    private void approveReceiving() throws MPIException {
+        if (waitingFromOthers.isEmpty()) {
+            recv = false;
+            return;
+        }
+        if (waitfrom == waitingFromOthers.element() || -1 * waitfrom == waitingFromOthers.element()) return;
+
+        recv = true;
+        int[] data = new int[]{myRank};
+        int destination = waitingFromOthers.element();
+        //int destination = waitingFromOthers.poll();
+
+        waitfrom = destination;
+        Transport.iSendIntArray(data, destination, Transport.Tag.APPROVAL);
+       // LOGGER.info(String.format("approveReceiving to " + destination + "recv = " + recv + " waitfrom" + waitfrom));
+
+    }
+
+    private void cancelSending(int destination) throws MPIException {
+        int[] data = new int[]{destination};
+        Transport.iSendIntArray(data, destination, Transport.Tag.CANCEL);
+       // LOGGER.trace("send cancel to " + destination);
+        freeProcs.add(destination);
+    }
+
+    private void receiveApprovalForSending(int prank) throws MPIException {
+        int[] data = Transport.receiveIntArray(1, prank, Transport.Tag.APPROVAL);
+        approvedOutput.add(data[0]);
+       // LOGGER.trace("recv approve from " + prank);
+    }
+
+    private void receiveCancel(int prank) throws MPIException {
+        int[] resp = Transport.receiveIntArray(1, prank, Transport.Tag.CANCEL);
+
+        waitingFromOthers.remove(prank);
+        recv = false;
+
+        waitfrom = myRank;
+       // LOGGER.trace("recv cancel from " + prank);
+    }
+
+
+    private boolean isWaitingForReceiving() {
+        return recv;
+    }
+
+
+    private boolean sendResultsToParent(int parent) throws MPIException {
+        synchronized (counter.aerodromeResults) {
+            Iterator<Drop> iterator = counter.aerodromeResults.iterator();
+            while (iterator.hasNext()) {
+                Drop dropRes = iterator.next();
+
+                int parentAmin = dropRes.aminId;
+                if (!dropRes.isItLeaf()) {
+                    pine.set(dropRes.aminId, null);
+                    parentAmin = dropRes.getNumbOfMyAmine();
+                }
+                if (dropRes.procId == parent) {
+                    Object[] res = {dropRes.outData, parentAmin, dropRes.dropId, sentLevel};
+                    //long time = System.currentTimeMillis();
+                    Transport.sendObjects(res, dropRes.procId, Transport.Tag.RESULT);
+                   // LOGGER.info("send result to " + dropRes.procId /*+ " time = " + (System.currentTimeMillis()-time)*/);
+                    iterator.remove();
+                    deleteParent(dropRes.procId, parentAmin, dropRes.dropId);
+
+                    currentMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+                    if (currentMemory > usedMemory)
+                        usedMemory = currentMemory;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private void sendRequestsForResultsSending() throws MPIException {
+        synchronized (counter.aerodromeResults) {
+            Iterator<Drop> iterator = counter.aerodromeResults.iterator();
+            for (int i = 0; i < counter.aerodromeResults.size(); i++) {
+                Drop dropResult = counter.aerodromeResults.get(i);
+                if (!isWaitingForReceiving()) {
+                    if (myRank == 0 || (myRank % 2 == 0 && dropResult.procId % 2 == 1)) {
+                        sendResultsToParent(dropResult.procId);
+                    } else {
+                        LOGGER.trace("send request for sending result to " + dropResult.procId);
+                        sendRequestToApproveSending(dropResult.procId);
+                    }
+                }
+            }
+        }
+    }
+
+
+    private void resetFields() throws MPIException {
+        pine.clear();
+        aerodrome.clear();
+        reftoTerminal.clear();
+        myRank = MPI.COMM_WORLD.getRank();
+        freeProcs.clear();
+        childsLevel = 20;
+        totalLevel = 20;
+        mode = 0;
+        myLevel = 20;
+        myLevelH = 20;
+        sentLevel = 20;
+        counter.flToExit = false;
+        counter.finish = false;
+        firstParent = -1;
+        counter.myRank = MPI.COMM_WORLD.getRank();
+        counter.IamFree = false;
+        listOfTail.clear();
+        receivedResult = null;
+        currentMemory = 0;
+        usedMemory = 0;
+        counter.clear();
+        counter.currentMemory = 0;
+        for (int i = 0; i < terminal.length; i++) {
+            if (terminal[i].size() != 0)
+                terminal[i].clear();
+        }
+        waitingFromOthers.clear();
+
+        recv = false;
+        waitingOutput.clear();
+        approvedOutput.clear();
+        trackLevel = 20;
+        //countCycleDisp = 0;
+        counter.counterCycle = 0;
+        waitfrom = myRank;
+        sleepSendTime = 0;
+        for (int i = 0; i < listcount.length ; i++) {
+            listcount[i] = 0;
+        }
+        receiveTaskTime=0;
+        sendFreeToDaughter = false;
+        flagOfDelay = 0;
+    }
+
+    private void clear() {
+//        LOGGER.info(String.format("DONE. Pine=%d/%d aerodrom=%d track=%d terminal=%d refs=%d",
+//                pine.stream().filter(Objects::nonNull).count(),
+//                pine.size(),
+//                aerodrome.size(),
+//                ownTrack.size(),
+//
+//                reftoTerminal.size()
+//        ));
+        pine.clear();
+        aerodrome.clear();
+        reftoTerminal.clear();
+        freeProcs.clear();
+        listOfTail.clear();
+        counter.clear();
+        for (int i = 0; i < terminal.length; i++) {
+            if (terminal[i].size() != 0)
+                terminal[i].clear();
+        }
+        System.gc();
+    }
+
+    public void execute(int startType, int key, String[] args, Element[] data, Ring ring) throws InterruptedException, ClassNotFoundException, MPIException, IOException {
+        execute(startType, key, new byte[0], args, data, ring);
+    }
+
+    public void execute(int startType, int key, byte[] config, String[] args, Element[] data, Ring ring) throws mpi.MPIException, InterruptedException, IOException, ClassNotFoundException {
+        long oldTime, currentTime;
+
+        int all = MPI.COMM_WORLD.getSize();
+        int[] nodes = new int[all];
+        for (int i = 0; i < all; i++) {
+            nodes[i] = i;
+        }
+
+        resetFields();
+        int cntProc = nodes.length;
+
+        int rootNumb = nodes[0];
+
+        if (myRank == rootNumb) {
+            rootWork(nodes, startType, key, config, data);
+        }
+
+        executeTime = System.currentTimeMillis();
+        oldTime = executeTime - 2000;
+        /*if (myRank == rootNumb) {
+            LOGGER.info("DDP start with total nodes=" + cntProc);
+            LOGGER.info("sleep time = " + sleepTime);
+            LOGGER.info("**freeProcs.size = " + freeProcs.size());
+        }*/
+
+        //LOGGER.info(" start with terminal =" + reftoTerminal.size());
+        long startTime, endTime, allTime = 0;
+        while (mode != -1) {
+            startTime = System.currentTimeMillis();
+            if (myRank == 0 && counter.finish) {
+                endProgramme(cntProc, nodes);
+            }
+
+            Status info = null;
+            do {
+                info = Transport.probeAny();
+                //if (myRank == 1) LOGGER.trace("probe = " + info);
+                if (info != null) {
+                    tagAction(info);
+                    LOGGER.trace(String.format(" recv = " + recv + " waitfrom = " + waitfrom));
+                    LOGGER.trace(String.format(" waitingFromOthers = " + waitingFromOthers.toString()));
+                    LOGGER.trace(String.format(" waitingOutput = " + waitingOutput));
+                    LOGGER.trace(String.format(" approvedOutput = " + approvedOutput.toString()));
+                }
+            } while (info != null);
+
+
+            if (waitfrom < 0) {
+                recv = true;
+                waitfrom = -1 * waitfrom;
+                LOGGER.trace(" waitfrom<0 " + waitfrom + recv);
+            }
+            // if(myRank==0) LOGGER.trace("bef do lite job");
+            makeRequestsForSending();
+            doLiteJob();
+
+
+            if (!isWaitingForReceiving()) {
+               // if (myRank == 1) LOGGER.trace(String.format("!isWaitingForReceiving in"));
+                doHardWork();
+                approveReceiving();
+                //LOGGER.trace(String.format("!isWaitingForReceiving out"));
+            }
+
+            //периодичность диспетчера
+
+            endTime = System.currentTimeMillis();
+            disp.sleep(sleepTime);
+            allTime += endTime - startTime;
+        }
+
+        clear();
+
+        executeTime = System.currentTimeMillis() - executeTime;
+        if (myRank == rootNumb) {
+            LOGGER.info("DAP done. executeTime = " + executeTime);
+            //LOGGER.info("Number of cycle of dispatcher = " + countCycleDisp);
+            // LOGGER.info("Number of cycle of counter = " + counter.counterCycle);
+
+            // LOGGER.info("sleepSendTime dispatcher = " +  sleepSendTime);
+           // LOGGER.info("Time of working dispatcher = " + (allTime - sleepSendTime));
+            //LOGGER.info(getResult()[0]);
+            LOGGER.info("Used memory = " + getUsedMemory());
+
+        }
+
+        /*String s = "";
+        for (int i = 0; i < listcount.length; i++) {
+            if(listcount[i]!=0)
+                s = s + " rec "+i + " - " + listcount[i] + ", ";
+        }
+        LOGGER.info("myRank = "+ myRank+ "\n allTime of working dispatcher = " + allTime
+                +"\n allTime of working counter = " + counter.calcWorkTime
+                +"\n allTime of waiting counter = " + counter.calcWaitTime
+                +"\n execute time = " + executeTime
+                +"\n time before receiving first task = " + receiveTaskTime
+                +"\n number of receiving task " + s);*/
+    }
+
+    private void doLiteJob() throws IOException, MPIException {
+        if (!(approvedOutput.isEmpty() && waitingFromOthers.isEmpty() && waitingOutput.isEmpty())) {
+            if (isWaitingForReceiving() && approvedOutput.stream().allMatch(a -> a > myRank)
+                    && waitingOutput.stream().allMatch(a -> a > myRank) && waitingFromOthers.stream().allMatch(a -> a > myRank)) {
+                recv = false;
+                waitfrom = -1 * waitfrom;
+                LOGGER.trace(" waitfrom  recv change  " + waitfrom + recv);
+            }
+        }
+
+
+        if (aerodrome.size() != 0) {
+            sendLevel();
+        }
+        sendFreeProcs();
+    }
+
+    private void makeRequestsForSending() throws MPIException, IOException {
+        if (freeProcs.size() != 0) {
+            sendRequestToSendDrops();
+        }
+
+        if (counter.aerodromeResults.size() != 0) {
+            sendRequestsForResultsSending();
+        }
+    }
+
+
+    private void doHardWork() throws IOException, MPIException {
+        Iterator<Integer> iterator = approvedOutput.iterator();
+
+        boolean sent;
+        while (iterator.hasNext()) {
+
+            Integer destination = iterator.next();
+
+            sent = sendResultsToParent(destination);
+
+            if (!sent)
+                sent = sendDrops(destination);
+
+            if (!sent) cancelSending(destination);
+
+            waitingOutput.remove(destination);
+            iterator.remove();
+        }
+    }
+
+    public Element[] getResult() {
+        return result;
+    }
+
+    public long getUsedMemory() {
+        return usedMemory / (1024 * 1024);
+    }
+
+}
