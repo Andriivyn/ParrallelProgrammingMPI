@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.mathpar.func.parser.SymbolTest
+-------------------------------------------------------------------------------
+Tests run: 28, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 sec - in com.mathpar.func.parser.SymbolTest

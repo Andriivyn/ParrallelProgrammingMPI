@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.mathpar.matrix.LDU.ETDTest
+-------------------------------------------------------------------------------
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.569 sec - in com.mathpar.matrix.LDU.ETDTest

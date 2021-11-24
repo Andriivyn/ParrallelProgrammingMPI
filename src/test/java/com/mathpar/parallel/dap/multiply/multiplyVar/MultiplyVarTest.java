@@ -3,6 +3,7 @@ package com.mathpar.parallel.dap.multiply.multiplyVar;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
+import com.mathpar.parallel.dap.core.Amin;
 import org.junit.Test;
 
 import java.util.Random;
@@ -45,7 +46,7 @@ public class MultiplyVarTest {
         //assertFalse(drop.canHaveAdditionalData());
 
 
-        Element[] result = drop.inputFunction(input, , ring);
+        Element[] result = drop.inputFunction(input, new Amin(drop, 1, 0), ring);
 
         drop._setInData(result);
 
