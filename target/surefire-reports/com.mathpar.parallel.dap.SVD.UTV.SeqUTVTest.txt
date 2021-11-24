@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.mathpar.parallel.dap.SVD.UTV.SeqUTVTest
--------------------------------------------------------------------------------
-Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.117 sec - in com.mathpar.parallel.dap.SVD.UTV.SeqUTVTest

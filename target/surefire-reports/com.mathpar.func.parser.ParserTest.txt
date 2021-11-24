@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.mathpar.func.parser.ParserTest
--------------------------------------------------------------------------------
-Tests run: 110, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.254 sec - in com.mathpar.func.parser.ParserTest

@@ -1,1 +1,0 @@
-<script src="${path_prefix}js/libs/require.js" data-main="${path_prefix}js/main"></script>

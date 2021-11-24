@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.mathpar.polynom.gbasis.algorithms.BuchbergerTest
--------------------------------------------------------------------------------
-Tests run: 24, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.308 sec - in com.mathpar.polynom.gbasis.algorithms.BuchbergerTest

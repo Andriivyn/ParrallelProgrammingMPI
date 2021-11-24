@@ -1,8 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.mathpar.matrix.MatrixSTest
--------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.025 sec <<< FAILURE! - in com.mathpar.matrix.MatrixSTest
-multiplySorted2(com.mathpar.matrix.MatrixSTest)  Time elapsed: 0.009 sec  <<< ERROR!
-java.lang.ArrayIndexOutOfBoundsException: Index 0 out of bounds for length 0
-	at com.mathpar.matrix.MatrixSTest.multiplySorted2(MatrixSTest.java:72)
-

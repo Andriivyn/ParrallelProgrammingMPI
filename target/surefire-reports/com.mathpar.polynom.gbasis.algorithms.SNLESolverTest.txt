@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.mathpar.polynom.gbasis.algorithms.SNLESolverTest
--------------------------------------------------------------------------------
-Tests run: 11, Failures: 0, Errors: 0, Skipped: 1, Time elapsed: 0.434 sec - in com.mathpar.polynom.gbasis.algorithms.SNLESolverTest
