@@ -1,7 +1,6 @@
 package com.mathpar.parallel.dap.multiply.MatrixS;
 
 import com.mathpar.log.MpiLogger;
-import com.mathpar.matrix.MatrixD;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Array;
 import com.mathpar.number.Element;
@@ -47,10 +46,17 @@ public class MatrSMult4 extends Drop {
 
         return amin;
     }
+
+    /**
+     * key that starts on 77 (M in ascii) is a mldtsv custom key,
+     * the next 2 digits form the number of the step
+     */
     @Override
     public void setVars(){
         switch (key){
+            // a*b (mldtsv step 8, 13, 20)
             case(0):
+            // -a*b (mldtsv step 9)
             case(1): {
                 inputDataLength = 2;
                 outputDataLength = 1;
@@ -65,20 +71,71 @@ public class MatrSMult4 extends Drop {
                 break;
             }
 
-            //drop 12
-            case(3):{
-                inputDataLength = 6;
-                outputDataLength = 3;
-                resultForOutFunctionLength = 5;
+            case(7702):
+            case(7707):
+            case(7710):
+            case(7718):
+            case(7724): {
+                inputDataLength = 3;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
                 break;
             }
-            //drop 5
-            case(4):{
+
+            case(7703): {
+                inputDataLength = 4;
+                outputDataLength = 2;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+
+            case(7705): {
                 inputDataLength = 6;
                 outputDataLength = 1;
                 resultForOutFunctionLength = 5;
                 break;
             }
+
+            case(7711):
+            case(7721):
+            case(7725): {
+                inputDataLength = 4;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+
+            case(7712): {
+                inputDataLength = 7;
+                outputDataLength = 3;
+                resultForOutFunctionLength = 5;
+                break;
+            }
+
+            case(7714):
+            case(7717):
+            case(7722):
+            case(7723): {
+                inputDataLength = 6;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+
+            case(7716): {
+                inputDataLength = 7;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 5;
+                break;
+            }
+
+            case(7719): {
+                inputDataLength = 5;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+            
         }
 
         inData =  new Element[inputDataLength];
