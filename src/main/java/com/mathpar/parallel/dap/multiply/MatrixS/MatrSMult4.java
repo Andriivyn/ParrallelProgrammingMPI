@@ -1,6 +1,7 @@
 package com.mathpar.parallel.dap.multiply.MatrixS;
 
 import com.mathpar.log.MpiLogger;
+import com.mathpar.matrix.AdjMatrixS;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Array;
 import com.mathpar.number.Element;
@@ -135,7 +136,7 @@ public class MatrSMult4 extends Drop {
                 resultForOutFunctionLength = 4;
                 break;
             }
-            
+
         }
 
         inData =  new Element[inputDataLength];
@@ -148,44 +149,100 @@ public class MatrSMult4 extends Drop {
     @Override
     public void sequentialCalc(Ring ring) {
         // LOGGER.info("in sequentialCalc indata = " + inData[0] + ",  "+inData[1]);
-        MatrixS A = (MatrixS) inData[0];
-        MatrixS B = (MatrixS) inData[1];
+
 
         switch (key){
-            case(0): outData[0] =A.multiply(B, ring); break;
-            case(1): outData[0] = A.multiply(B, ring).negate(ring); break;
+            // (mldtsv step 8, 13, 20)
+            case(0): {
+                MatrixS A = (MatrixS) inData[0];
+                MatrixS B = (MatrixS) inData[1];
+                outData[0] =A.multiply(B, ring);
+                break;
+            }
+            // (mldtsv step 9)
+            case(1): {
+                MatrixS A = (MatrixS) inData[0];
+                MatrixS B = (MatrixS) inData[1];
+                outData[0] = A.multiply(B, ring).negate(ring);
+                break;
+            }
             case(2): {
-
                 MatrixS b = ((MatrixS) inData[0]).transpose();
                 outData[1] = b;
                 MatrixS bbT =  b.multiply((MatrixS) inData[0], ring);
                 outData[0] = ((MatrixS)inData[1]).subtract(bbT, ring);
-
                 break;
             }
-            case(3):{
-
-                MatrixS M22_2 = A.multiply(B, ring).divideByNumber(inData[4].
-                        multiply(inData[4], ring), ring);
-
-                Element M22_3 = inData[5].multiply(M22_2, ring);//temporary(use multiplyLeftI)
-                Element ds = inData[2].multiply(inData[3], ring).divide(inData[4], ring);
-
-                outData[0]  = M22_2;
-                outData[1]  =  ds;
-                outData[2] = M22_3;
-
+            case(7702):
+            case(7718): {
+                MatrixS A = (MatrixS) inData[0];
+                MatrixS B = (MatrixS) inData[1];
+                Element d = inData[2];
+                outData[0] = A.multiplyDivRecursive(B, d.negate(ring), ring);
                 break;
             }
-            case(4):{
-                MatrixS ET = ((MatrixS) inData[4]).transpose();
+
+            case(7703): {
+                // todo be aware it can possibly not work
+                AdjMatrixS m11 = (AdjMatrixS) inData[0];
+                MatrixS M12 = (MatrixS) inData[1];
+                Element d0 = inData[2];
+                Element finalN = inData[3];
+                MatrixS M12_1 = m11.A.multiplyDivRecursive(M12, d0, ring);
+                MatrixS M12_2 = M12_1.multiplyLeftI(Array.involution(m11.Ei, (int) finalN.value));
+                outData[0] = M12_1;
+                outData[1] = M12_2;
+                break;
+            }
+
+            case(7705): {
+                MatrixS M22 = (MatrixS) inData[0];
+                Element d11 = inData[1];
+                MatrixS M21 = (MatrixS) inData[2];
+                MatrixS M12_1 = (MatrixS) inData[3];
+                // todo be aware it can possibly not work
+                AdjMatrixS m11 = (AdjMatrixS) inData[4];
                 Element d0 = inData[5];
-                MatrixS Md = ((MatrixS) inData[2]).multiplyByNumber(inData[3],ring);
-                MatrixS M22_1 = A.multiply(ET.multiply(B, ring),ring).negate(ring).
-                        divideByNumber(d0, ring).add(Md,ring);
-                outData[0] = M22_1;
+                outData[0] = ((M22.multiplyByNumber(d11, ring))
+                        .subtract(M21.multiplyRecursive(M12_1.multiplyLeftE(m11.Ej, m11.Ei), ring), ring))
+                        .divideByNumber(d0, ring);
                 break;
             }
+
+            case(7707): {
+                // todo be aware it can possibly not work
+                MatrixS A = ((AdjMatrixS) inData[0]).S;
+                MatrixS B = (MatrixS) inData[1];
+                Element d = inData[2];
+                outData[0] = A.multiplyDivRecursive(B, d.negate(ring), ring);
+                break;
+            }
+
+            // todo 10-25
+
+//            case(3):{
+//
+//                MatrixS M22_2 = A.multiply(B, ring).divideByNumber(inData[4].
+//                        multiply(inData[4], ring), ring);
+//
+//                Element M22_3 = inData[5].multiply(M22_2, ring);//temporary(use multiplyLeftI)
+//                Element ds = inData[2].multiply(inData[3], ring).divide(inData[4], ring);
+//
+//                outData[0]  = M22_2;
+//                outData[1]  =  ds;
+//                outData[2] = M22_3;
+//
+//                break;
+//            }
+//            case(4):{
+//                MatrixS ET = ((MatrixS) inData[4]).transpose();
+//                Element d0 = inData[5];
+//                MatrixS Md = ((MatrixS) inData[2]).multiplyByNumber(inData[3],ring);
+//                MatrixS M22_1 = A.multiply(ET.multiply(B, ring),ring).negate(ring).
+//                        divideByNumber(d0, ring).add(Md,ring);
+//                outData[0] = M22_1;
+//                break;
+//            }
         }
     }
 

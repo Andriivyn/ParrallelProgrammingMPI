@@ -7,7 +7,7 @@ import com.mathpar.number.Ring;
  * @author gennadi
  * Первый, базовый вариант для вычисления Adjoint+Echelon
  */
-public class AdjMatrixS {
+public class AdjMatrixS extends Element{
    /** adjoint matrix */
    public MatrixS A;
    /** список строк матрицы Е */
