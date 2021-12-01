@@ -549,29 +549,126 @@ public class MatrSMult4 extends Drop {
         Element[] res = new Element[outputDataLength];
         switch (key){
             case(0):
+            case(7708):
+            case(7713):
+            case(7720): {
                 res = new MatrixS[]{MatrixS.join(resmat)};
                 break;
+            }
             case(1):
+            case(7709): {
                 res = new MatrixS[]{MatrixS.join(resmat).negate(ring)};
                 break;
+            }
             case(2):{
                 res = new Element[]{inData[1].add(MatrixS.join(resmat).negate(ring),ring), input[4]};
                 break;
             }
-            case(3):{
+            case(7702):
+            case(7707):
+            case(7718): {
+                Element d = inData[2];
+                MatrixS result1 = MatrixS.join(resmat).divideByNumber(d.negate(ring), ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7703): {
+                AdjMatrixS m11 = (AdjMatrixS) inData[0];
+                Element d0 = inData[2];
+                Element finalN = inData[3];
+                MatrixS M12_1 = MatrixS.join(resmat).divideByNumber(d0, ring);
+                MatrixS M12_2 = M12_1.multiplyLeftI(Array.involution(m11.Ei, (int) finalN.value));
+                res = new MatrixS[]{M12_1, M12_2};
+                break;
+            }
+            case(7705): {
+                Element d0 = inData[5];
+                MatrixS s1 = (MatrixS) input[4];
+                MatrixS s2 = MatrixS.join(resmat).divideByNumber(d0, ring);
+                MatrixS result1 = s1.subtract(s2, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7710):
+            case(7724): {
+                Element d11 = inData[2];
+                MatrixS result1 = MatrixS.join(resmat).divideByNumber(d11, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7711):
+            case(7721): {
+                Element d11 = inData[3];
+                MatrixS result1 = MatrixS.join(resmat).divideByNumber(d11, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7712): {
+                Element d11 = inData[2];
+                AdjMatrixS m21 = (AdjMatrixS) inData[5];
+                Element finalN = inData[6];
+                MatrixS M22_2 = MatrixS.join(resmat).divideByNumber(d11.
+                        multiply(d11, ring), ring);
 
-                MatrixS M22_2 = MatrixS.join(resmat).divideByNumber(inData[4].
-                        multiply(inData[4], ring), ring);
-
-                Element M22_3 = inData[5].multiply(M22_2, ring);//temporary(use multiplyLeftI)
+                MatrixS M22_3 = M22_2.multiplyLeftI(Array.involution(m21.Ei, (int) finalN.value));
                 res = new Element[]{M22_2, input[4], M22_3};
 
                 break;
             }
-            case(4):{
-
-                res = new MatrixS[]{MatrixS.join(resmat).negate(ring).
-                        divideByNumber(inData[5], ring).add((MatrixS)input[4],ring)};
+            case(7714):
+            case(7723): {
+                Element d0 = inData[2];
+                Element d12 = inData[3];
+                MatrixS K2 = (MatrixS) inData[4];
+                Element d11 = inData[5];
+                MatrixS s1 = MatrixS.join(resmat).divideMultiply(d0, d12, ring);
+                MatrixS s2 = s1.add(K2, ring);
+                MatrixS result1 = s2.divideByNumber(d11.negate(ring), ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7716): {
+                Element d11 = inData[4];
+                MatrixS s2 = (MatrixS) input[4];
+                MatrixS s3 = MatrixS.join(resmat).add(s2, ring);
+                MatrixS result1 = s3.divideByNumber(d11, ring);;
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7717): {
+                MatrixS A1 = (MatrixS) inData[0];
+                Element d11 = inData[4];
+                Element d22 = inData[5];
+                MatrixS s1 = MatrixS.join(resmat).divideByNumber(d11, ring);
+                MatrixS s2 = A1.subtract(s1, ring);
+                MatrixS result1 = s2.divideMultiply(d11, d22, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case (7719): {
+                Element ds = inData[3];
+                AdjMatrixS m22 = (AdjMatrixS) inData[4];
+                MatrixS s1 = MatrixS.join(resmat).divideByNumber(ds.negate(ring), ring);
+                MatrixS result1 = s1.add(m22.S, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case (7722): {
+                MatrixS A2 = (MatrixS) inData[0];
+                Element ds = inData[4];
+                Element d21 = inData[5];
+                MatrixS s1 = MatrixS.join(resmat).divideByNumber(ds, ring);
+                MatrixS s2 = A2.subtract(s1, ring);
+                MatrixS result1 = s2.divideByNumber(d21, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case (7725): {
+                Element d12 = inData[3];
+                MatrixS L = (MatrixS) inData[0];
+                MatrixS s1 = L.add(MatrixS.join(resmat), ring);
+                MatrixS result1 = s1.divideByNumber(d12, ring);
+                res = new MatrixS[]{result1};
                 break;
             }
         }
