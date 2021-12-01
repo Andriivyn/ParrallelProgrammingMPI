@@ -55,10 +55,14 @@ public class MatrSMult4 extends Drop {
     @Override
     public void setVars(){
         switch (key){
-            // a*b (mldtsv step 8, 13, 20)
+            // a*b
             case(0):
-            // -a*b (mldtsv step 9)
-            case(1): {
+            // -a*b
+            case(1):
+            case(7708):
+            case(7709):
+            case(7713):
+            case(7720): {
                 inputDataLength = 2;
                 outputDataLength = 1;
                 resultForOutFunctionLength = 4;
@@ -152,14 +156,13 @@ public class MatrSMult4 extends Drop {
 
 
         switch (key){
-            // (mldtsv step 8, 13, 20)
-            case(0): {
+            case(0):
+            case(7713): {
                 MatrixS A = (MatrixS) inData[0];
                 MatrixS B = (MatrixS) inData[1];
                 outData[0] =A.multiply(B, ring);
                 break;
             }
-            // (mldtsv step 9)
             case(1): {
                 MatrixS A = (MatrixS) inData[0];
                 MatrixS B = (MatrixS) inData[1];
@@ -173,8 +176,8 @@ public class MatrSMult4 extends Drop {
                 outData[0] = ((MatrixS)inData[1]).subtract(bbT, ring);
                 break;
             }
-            case(7702):
             // todo ask if is needed to change recursive methods to non-recursive
+            case(7702):
             case(7718): {
                 MatrixS A = (MatrixS) inData[0];
                 MatrixS B = (MatrixS) inData[1];
@@ -214,6 +217,21 @@ public class MatrSMult4 extends Drop {
                 MatrixS B = (MatrixS) inData[1];
                 Element d = inData[2];
                 outData[0] = A.multiplyDivRecursive(B, d.negate(ring), ring);
+                break;
+            }
+
+            case(7708):
+            case(7720): {
+                MatrixS A1 = ((AdjMatrixS) inData[0]).A;
+                MatrixS A2 = ((AdjMatrixS) inData[1]).A;
+                outData[0] = A1.multiply(A2, ring);
+                break;
+            }
+
+            case(7709): {
+                MatrixS A21 = ((AdjMatrixS) inData[0]).A;
+                MatrixS M22_1 = (MatrixS) inData[1];
+                outData[0] = A21.multiply(M22_1, ring).negate(ring);
                 break;
             }
 
@@ -353,26 +371,123 @@ public class MatrSMult4 extends Drop {
     @Override
     //Вхідна функція дропа, розбиває вхідні дані на блоки.
     public MatrixS[] inputFunction(Element[] input, Amin amin, Ring ring) {
-//LOGGER.info(input[0]);
+        //LOGGER.info(input[0]);
         MatrixS[] res = new MatrixS[8];
-        MatrixS ms = (MatrixS) input[0];
-        MatrixS ms1 = (MatrixS) input[1];
-
+        MatrixS v1;
+        MatrixS v2;
 
         switch (key) {
-            case(2):{
-                ms =  ((MatrixS) input[0]).transpose();
-                ms1 = (MatrixS) input[0];
-                amin.resultForOutFunction[4] = ms;
+            case(0):
+            case(1):
+            case(7702):
+            case(7712):
+            case(7713):
+            case(7718):
+            case(7724):
+            default: {
+                v1 = (MatrixS) input[0];
+                v2 = (MatrixS) input[1];
                 break;
             }
-            case(4):{
-                MatrixS E11T = ((MatrixS) input[4]).transpose();
-                ms1 = E11T.multiply(ms1, ring);
+            case(2):{
+                v1 =  ((MatrixS) input[0]).transpose();
+                v2 = (MatrixS) input[0];
+                amin.resultForOutFunction[4] = v1;
                 break;
+            }
+            case(7703):{
+                v1 = ((AdjMatrixS) input[0]).A;
+                v2 = (MatrixS) input[1];
+                break;
+            }
+            case(7705): {
+                v1 = (MatrixS) inData[2];
+                MatrixS M12_1 = (MatrixS) inData[3];
+                AdjMatrixS m11 = (AdjMatrixS) inData[4];
+                v2 = M12_1.multiplyLeftE(m11.Ej, m11.Ei);
+                break;
+            }
+            case(7707): {
+                v1 = ((AdjMatrixS) input[0]).S;
+                v2 = (MatrixS) inData[1];
+                break;
+            }
+            case(7708):
+            case(7720): {
+                v1 = ((AdjMatrixS) input[0]).A;
+                v2 = ((AdjMatrixS) input[1]).A;
+                break;
+            }
+
+            case(7709): {
+                v1 = ((AdjMatrixS) input[0]).A;
+                v2 = (MatrixS) inData[1];
+                break;
+            }
+            case(7710): {
+                MatrixS S11 = ((AdjMatrixS) input[0]).S;
+                AdjMatrixS m21 = (AdjMatrixS) inData[1];
+                v1 = S11;
+                v2 = m21.A.multiplyLeftE(m21.Ej, m21.Ei);
+                break;
+            }
+            case(7711):
+            case(7721): {
+                MatrixS M22_1 = (MatrixS) inData[0];
+                MatrixS A1 = (MatrixS) inData[1];
+                AdjMatrixS m12 = (AdjMatrixS) inData[2];
+                v1 = M22_1;
+                v2 = A1.multiplyLeftE(m12.Ej, m12.Ei);
+                break;
+            }
+            case(7714): {
+                v1 = (MatrixS) inData[0];
+                AdjMatrixS m11 = (AdjMatrixS) inData[1];
+                v2 = m11.A.multiplyLeftE(m11.Ej, m11.Ei);
+                break;
+            }
+            case(7716): {
+                MatrixS Q1 = (MatrixS) inData[0];
+                MatrixS M12_1 = (MatrixS) inData[1];
+                AdjMatrixS m11 = (AdjMatrixS) inData[2];
+                Element d21 = inData[3];
+                Element d11 = inData[4];
+                v1 = (Q1.subtract((M12_1.multiplyLeftI(m11.Ei).multiplyByNumber(d21, ring)), ring))
+                        .divideByNumber(d11, ring);
+                v2 = (MatrixS) inData[5];
+                break;
+            }
+            case(7717):
+            case(7722): {
+                MatrixS A1 = (MatrixS) inData[0];
+                MatrixS M12_1 = (MatrixS) inData[1];
+                AdjMatrixS m11 = (AdjMatrixS) inData[2];
+                AdjMatrixS m12 = (AdjMatrixS) inData[3];
+                v1 = M12_1.multiplyLeftI(m11.Ei);
+                v2 = A1.multiplyLeftE(m12.Ej, m12.Ei);
+                break;
+            }
+            case(7719): {
+                MatrixS M22_2 = (MatrixS) inData[0];
+                AdjMatrixS m21 = (AdjMatrixS) inData[1];
+                MatrixS y22 = (MatrixS) inData[2];
+                v1 = M22_2.multiplyLeftI(m21.Ei);
+                v2 = y22;
+                break;
+            }
+            case(7723): {
+                v1 = ((AdjMatrixS) input[0]).S;
+                AdjMatrixS m21 = (AdjMatrixS) inData[1];
+                v2 = m21.A.multiplyLeftE(m21.Ej, m21.Ei);
+                break;
+            }
+            case(7725): {
+                v1 = (MatrixS) inData[1];
+                v2 = (MatrixS) inData[2];
             }
         }
-        Array.concatTwoArrays(ms.split(), ms1.split(), res);
+
+        Array.concatTwoArrays(v1.split(), v2.split(), res);
         return res;
 
     }
