@@ -498,15 +498,40 @@ public class MatrSMult4 extends Drop {
         switch (key){
             case(0):
             case(1):
-            case(2): break;
-            case(3):{
-                Element ds = inData[2].multiply(inData[3], ring).divide(inData[4], ring);
+            case(2):
+            case(7702):
+            case(7703):
+            case(7707):
+            case(7708):
+            case(7709):
+            case(7710):
+            case(7711):
+            case(7713):
+            case(7714):
+            case(7717):
+            case(7718):
+            case(7719):
+            case(7720):
+            case(7721):
+            case(7722):
+            case(7723):
+            case(7724):
+            case(7725): break;
+
+            case(7705): {
+                MatrixS s1 = ((MatrixS) inData[0]).multiplyByNumber(inData[1], ring);
+                amin.resultForOutFunction[4] = s1;
+                break;
+            }
+            case(7712): {
+                Element ds = inData[3].multiply(inData[4], ring).divide(inData[2], ring);
                 amin.resultForOutFunction[4] = ds;
                 break;
             }
-            case(4):{
-                Element md = inData[2].multiply(inData[3], ring);
-                amin.resultForOutFunction[4] = md;
+            case(7716): {
+                MatrixS S12 = ((AdjMatrixS) inData[6]).S;
+                Element d21 = inData[3];
+                amin.resultForOutFunction[4] = S12.multiplyByNumber(d21, ring);
                 break;
             }
         }
