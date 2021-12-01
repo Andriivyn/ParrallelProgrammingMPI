@@ -8,6 +8,8 @@ import com.mathpar.number.Ring;
  * Первый, базовый вариант для вычисления Adjoint+Echelon
  */
 public class AdjMatrixS extends Element{
+
+    private static final long serialVersionUID = 10000000000111L;
    /** adjoint matrix */
    public MatrixS A;
    /** список строк матрицы Е */
