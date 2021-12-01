@@ -6,6 +6,7 @@
 //package com.mathpar.students.ukma17i41.bosa.parallel.engine;
 package com.mathpar.parallel.dap.core;
 
+import com.mathpar.parallel.dap.adjmatrix.MatrixS.MatrSAdjMatrix;
 import com.mathpar.parallel.dap.cholesky.MatrixD.MatrDCholFact4;
 import com.mathpar.parallel.dap.cholesky.MatrixD.MatrDCholFactStrassWin7;
 import com.mathpar.parallel.dap.cholesky.MatrixS.MatrSCholFact4;
@@ -295,6 +296,9 @@ public abstract class Drop implements Serializable {
                 break;
             case 22:
                 task = new MatrDCholFactStrassWin7();
+                break;
+            case 7701:
+                task = new MatrSAdjMatrix();
                 break;
 
             default:
