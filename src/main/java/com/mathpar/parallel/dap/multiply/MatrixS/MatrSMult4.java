@@ -395,6 +395,8 @@ public class MatrSMult4 extends Drop {
                 amin.resultForOutFunction[4] = v1;
                 break;
             }
+
+            //todo
             case(7703):{
                 v1 = ((AdjMatrixS) input[0]).A;
                 v2 = (MatrixS) input[1];
@@ -679,7 +681,47 @@ public class MatrSMult4 extends Drop {
     //Перевіряє чи є дроп листовим
     @Override
     public boolean isItLeaf() {
-        MatrixS ms = (MatrixS) inData[0];
+        MatrixS ms;
+//        MatrixS ms = (MatrixS) inData[0];
+        switch(key){
+            case(0):
+            case(1):
+            case(2):
+            case(7702):
+            case(7705):
+            case(7711):
+            case(7712):
+            case(7713):
+            case(7714):
+            case(7716):
+            case(7717):
+            case(7718):
+            case(7719):
+            case(7721):
+            case(7722):
+            case(7724):
+            case(7725):
+            default: {
+                ms = (MatrixS) inData[0];
+                break;
+            }
+            case(7703):
+            case(7707):
+            case(7709): {
+                ms = (MatrixS) inData[1];
+                break;
+            }
+            case(7708):
+            case(7720):{
+                ms = ((AdjMatrixS) inData[0]).A;
+                break;
+            }
+            case(7710):
+            case(7723): {
+                ms = ((AdjMatrixS) inData[0]).S;
+                break;
+            }
+        }
         return (ms.size <= leafSize);
     }
 

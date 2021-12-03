@@ -18,12 +18,12 @@ public class MatrSAdjMatrix extends Drop {
     private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSCholFact4.class);
     private static int[][] _arcs = new int[][]{
             {1,0,0,  2,2,0,  3,1,1,  5,3,0,  5,2,2,  14,2,0,
-                    /* todo dependency on d0 and finalN*/ 1,4,1,  2,4,2,  3,4,2,  3,5,3,  5,4,5,  12,5,6,  14,4,2,  26,5,13},
+                    /* todo dependency on d0 and finalN*/ 1,4,1,  2,4,2,  3,4,2,  3,5,3,  5,4,5,  12,5,6,  14,4,2},
             // 0 inputFunction; I(M, d0), O( M[0], M[1], M[2], M[3], d0, finalN)
             {2,1,1,  3,0,0,  4,2,1,  5,2,1,  5,0,4,  6,2,1,  7,0,0,  7,2,2,  8,0,1,  10,0,0,
                     10,2,2,  11,2,3,  12,2,2,  14,0,1,  14,2,5,  16,0,2,  16,2,4,  17,0,2,  17,2,4,  23,0,0,  23,2,2,  26,0,10},
             // 1, here is done y11; I( M[0], d0  ), O ( m11, y11, d11 )
-            {4,0,0,  }, // 2; I( M[2], y11, d0 ), O ( M21_1 )
+            {4,0,0  }, // 2; I( M[2], y11, d0 ), O ( M21_1 )
             {5,0,3,  6,1,0,  16,0,1,  17,0,1}, // 3; I( m11, M[1], d0, finalN ), O ( M12_1, M12_2 )
             {7,1,1,  9,0,0,  10,0,1,  12,2,3,  12,0,5,  16,2,3,  19,0,1,  20,0,1,  22,0,2,  22,2,5,  23,0,1,  23,2,5,  26,2,6,  26,0,8},
             // 4; I( M21_1, d11 ), O ( m21, y21, d21 )
@@ -142,6 +142,7 @@ public class MatrSAdjMatrix extends Drop {
         int N = m.size;
         int finalN = N >>> 1;
         res[5] = new Element(finalN);
+        amin.resultForOutFunction[13] = new Element(finalN);
         return res;
     }
 
