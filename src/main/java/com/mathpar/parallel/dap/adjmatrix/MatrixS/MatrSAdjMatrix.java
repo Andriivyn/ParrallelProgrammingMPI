@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class MatrSAdjMatrix extends Drop {
 
     private static int leafSize = 2;
-    private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSCholFact4.class);
+    private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSAdjMatrix.class);
     private static int[][] _arcs = new int[][]{
             {1,0,0,  2,2,0,  3,1,1,  5,3,0,  5,2,2,  14,2,0,
                     /* todo dependency on d0 and finalN*/ 1,4,1,  2,4,2,  3,4,2,  3,5,3,  5,4,5,  12,5,6,  14,4,2},

@@ -176,7 +176,6 @@ public class MatrSMult4 extends Drop {
                 outData[0] = ((MatrixS)inData[1]).subtract(bbT, ring);
                 break;
             }
-            // todo ask if is needed to change recursive methods to non-recursive
             case(7702):
             case(7718): {
                 MatrixS A = (MatrixS) inData[0];
@@ -187,7 +186,6 @@ public class MatrSMult4 extends Drop {
             }
 
             case(7703): {
-                // todo be aware it can possibly not work where is used AdjMatrix
                 AdjMatrixS m11 = (AdjMatrixS) inData[0];
                 MatrixS M12 = (MatrixS) inData[1];
                 Element d0 = inData[2];
@@ -262,7 +260,7 @@ public class MatrSMult4 extends Drop {
                 AdjMatrixS m21 = (AdjMatrixS) inData[5];
                 Element finalN = inData[6];
                 Element d11_2 = d11.multiply(d11, ring);
-                MatrixS M22_2 = B.multiplyDivRecursive(y12, d11_2.negate(ring), ring);
+                MatrixS M22_2 = B.multiplyDivRecursive(y12, d11_2, ring);
                 Element ds = d12.multiply(d21, ring).divide(d11, ring);
                 MatrixS M22_3 = M22_2.multiplyLeftI(Array.involution(m21.Ei, (int) finalN.value));
                 outData[0] = M22_2;
