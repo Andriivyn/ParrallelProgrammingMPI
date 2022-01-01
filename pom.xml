@@ -45,25 +45,13 @@
   </properties>
 
   <repositories>
-    <!-- This is our repository where we put OpenMPI java bindings. -->
-    <repository>
-      <id>mathpar</id>
-      <url>http://mathpar.com/mvnrepo/</url>
-    </repository>
     <repository>
       <id>dcm4che2</id>
-      <url>http://www.dcm4che.org/maven2/</url>
+      <url>https://www.dcm4che.org/maven2/</url>
     </repository>
   </repositories>
 
   <dependencies>
-    <dependency>
-      <groupId>org.open-mpi</groupId>
-      <artifactId>mpi</artifactId>
-      <!--version>4.0.1</version -->
-      <version>1.7.4-12022013</version>
-      <type>jar</type>
-    </dependency>
 
     <dependency>
       <groupId>com.h2database</groupId>
@@ -317,7 +305,7 @@
             <containerId>tomcat7x</containerId>
             <zipUrlInstaller>
               <url>
-                http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.47/bin/apache-tomcat-7.0.47.zip
+                https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.47/bin/apache-tomcat-7.0.47.zip
               </url>
               <downloadDir>${project.build.directory}/downloads</downloadDir>
               <extractDir>${project.build.directory}/extracts</extractDir>
