@@ -51,7 +51,18 @@ public class MatrSMult4 extends Drop {
     public void setVars(){
         switch (key){
             case(0):
-            case(1): {
+            case(1):
+            case(102):
+            case(105):
+            case(111):
+            case(122):
+            case(114):
+            case(110):
+            case(119):
+            case(124):
+            case(123):
+            case(125):
+            case(126): {
                 inputDataLength = 2;
                 outputDataLength = 1;
                 resultForOutFunctionLength = 4;
@@ -77,6 +88,48 @@ public class MatrSMult4 extends Drop {
                 inputDataLength = 6;
                 outputDataLength = 1;
                 resultForOutFunctionLength = 5;
+                break;
+            }
+            // LDUMW drop 3 and 4
+            case(103):
+            case(104):{
+                inputDataLength = 3;
+                outputDataLength = 2;
+                resultForOutFunctionLength = 5;
+                break;
+            }
+            case(107):
+            case(115):
+            case(120):
+            case(116):
+            case(121):{
+                inputDataLength = 3;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+            case(109):{
+                inputDataLength = 5;
+                outputDataLength = 2;
+                resultForOutFunctionLength = 5;
+                break;
+            }
+            case(112): {
+                inputDataLength = 5;
+                outputDataLength = 4;
+                resultForOutFunctionLength = 8;
+                break;
+            }
+            case(113): {
+                inputDataLength = 4;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+            case(118): {
+                inputDataLength = 5;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
                 break;
             }
         }
