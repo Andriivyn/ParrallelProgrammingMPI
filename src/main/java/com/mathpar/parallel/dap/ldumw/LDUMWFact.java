@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class LDUMWFact extends Drop {
     private static int leafSize = 2;
-    private static int[][] arcs_ = new int[][]{
+    private static int[][] arcs_ = new int[][]{ // TODO change the order of input params to use similar drops in different cases
             {1, 0, 0, 1, 4, 1, 2, 1, 1, 3, 1, 1, 3, 4, 2, 4, 2, 1, 4, 4, 2, 5, 2, 0, 9, 3, 1, 9, 4, 4, 12, 4, 4, 13, 4, 3, 18, 4, 4, 27, 4, 8},//0. inputFunction
             {2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 1, 6, 0, 1, 7, 0, 0, 8, 0, 1, 9, 0, 0, 10, 0, 0, 11, 0, 0, 12, 0, 3, 15, 0, 2, 16, 0, 2, 18, 0, 2, 27, 0, 0},//1. F11 = LDU /* 1 крок - це все в одній змінній? */
             {13, 0, 2},//2. X_U2
@@ -66,10 +66,10 @@ public class LDUMWFact extends Drop {
         amin.get(2).key = 103;
         // step 4
         amin.add(new MatrSMult4());
-        amin.get(3).key = 103;
+        amin.get(3).key = 104;
         // step 5
         amin.add(new MatrSMult4());
-        amin.get(4).key = 102;
+        amin.get(4).key = 105;
         // step 6
         amin.add(new LDUMWFact());
         // step 7
