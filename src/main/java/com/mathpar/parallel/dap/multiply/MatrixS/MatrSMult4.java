@@ -335,6 +335,130 @@ public class MatrSMult4 extends Drop {
                 outData[0] = Y_L3;
                 break;
             }
+            case (115): {
+
+                Element invD12hat = inData[0];
+                LdumwDto F12 = ((LdumwDto) inData[1]);
+                LdumwDto F11 = ((LdumwDto) inData[2]);
+
+
+                Element L1minus1 = invD12hat.multiply(F12.getM(), ring)
+                        .multiply(F11.getDhat(), ring)
+                        .multiply(F11.getM(), ring);
+
+                outData[0] = L1minus1;
+                break;
+            }
+            case (116): {
+
+                Element lambda = inData[0];
+                LdumwDto F12 = ((LdumwDto) inData[1]);
+                LdumwDto F11 = ((LdumwDto) inData[2]);
+
+                Element I12lambda = lambda.multiply(F12.getJ(), ring).add(F12.getJbar(), ring);
+                Element L12lambda = F12.getL().multiply(I12lambda, ring);
+                Element X_L = F11.getL().multiply(L12lambda, ring);
+
+                outData[0] = X_L;
+                break;
+            }
+            case (118): {
+                Element Y_L3 = inData[0];
+                LdumwDto F12 = ((LdumwDto) inData[1]);
+                LdumwDto F11 = ((LdumwDto) inData[2]);
+                Element X_L3 = inData[3];
+                Element a = inData[4];
+
+                Element L_3 = Y_L3.multiply(F12.getW(), ring)
+                        .multiply(F12.getI(), ring)
+                        .divide(F12.getA_n().multiply(F11.getA_n(), ring).multiply(a, ring), ring)
+                        .add(X_L3, ring);
+
+                outData[0] = L_3;
+
+                break;
+            }
+            case (119): {
+                Element U1_m1 = inData[0];
+                Element U2 = inData[1];
+
+                Element X_W21 = U1_m1.multiply(U2.negate(ring), ring);
+
+                outData[0] = X_W21;
+
+                break;
+            }
+            case (120): {
+                Element invD12hat = inData[0];
+                LdumwDto F12 = ((LdumwDto) inData[1]);
+                LdumwDto F22 = ((LdumwDto) inData[2]);
+
+                Element U4_m1 = F12.getW().multiply(invD12hat, ring).multiply(F22.getW(), ring).multiply(F22.getDhat(), ring);
+
+                outData[0] = U4_m1;
+
+                break;
+            }
+            case (121): {
+                Element lambda = inData[0];
+                LdumwDto F12 = ((LdumwDto) inData[1]);
+                LdumwDto F22 = ((LdumwDto) inData[2]);
+
+                Element J12lambda = lambda.multiply(F12.getJ(), ring).multiply(F12.getJbar(), ring);
+                Element U12lambda = J12lambda.add(F12.getU(), ring);
+                Element X_U = F22.getU().multiply(U12lambda, ring);
+
+                outData[0] = X_U;
+                break;
+            }
+            case (122): {
+                LdumwDto F22 = ((LdumwDto) inData[0]);
+                LdumwDto F21 = ((LdumwDto) inData[1]);
+
+                Element L4_m1 = F22.getDhat()
+                        .multiply(F22.getM(), ring)
+                        .multiply(F21.getDhat(), ring)
+                        .multiply(F21.getM(), ring);
+
+                outData[0] = L4_m1;
+                break;
+            }
+            case (123): {
+                LdumwDto F21 = ((LdumwDto) inData[0]);
+                LdumwDto F22 = ((LdumwDto) inData[1]);
+
+                Element LL = F21.getL().multiply(F22.getL(), ring);
+
+                outData[0] = LL;
+                break;
+            }
+            case (124): {
+                Element L4_m1 = inData[0];
+                Element L3 = inData[1];
+
+                Element LL = L4_m1.multiply(L3.negate(ring), ring);
+
+                outData[0] = LL;
+                break;
+            }
+            case (125): {
+                Element X_W21 = inData[0];
+                Element U4_m1 = inData[1];
+
+                Element X_W2 = X_W21.multiply(U4_m1, ring);
+
+                outData[0] = X_W2;
+                break;
+            }
+            case (126): {
+                Element X_m12 = inData[0];
+                Element L1_m1 = inData[1];
+
+                Element X_m2 = X_m12.multiply(L1_m1, ring);
+
+                outData[0] = X_m2;
+                break;
+            }
         }
     }
 
