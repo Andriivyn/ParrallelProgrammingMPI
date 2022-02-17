@@ -82,7 +82,7 @@ public class LDUMWFact extends Drop {
         amin.get(8).key = 109;
         // step 10
         amin.add(new MatrSMult4());
-        amin.get(9).key = 0;
+        amin.get(9).key = 110;
         // step 11
         amin.add(new MatrSMult4());
         amin.get(10).key = 111;
@@ -97,7 +97,7 @@ public class LDUMWFact extends Drop {
         amin.get(13).key = 114;
         // step 15
         amin.add(new MatrSMult4());
-        amin.get(14).key = 111;
+        amin.get(14).key = 115;
         // step 16
         amin.add(new MatrSMult4());
         amin.get(15).key = 116;
@@ -105,31 +105,31 @@ public class LDUMWFact extends Drop {
         amin.add(new LDUMWFact());
         // step 18
         amin.add(new MatrSMult4());
-        amin.get(17).key = 113;
+        amin.get(17).key = 118;
         // step 19
         amin.add(new MatrSMult4());
         amin.get(18).key = 119;
         // step 20
         amin.add(new MatrSMult4());
-        amin.get(19).key = 111;
+        amin.get(19).key = 120;
         // step 21
         amin.add(new MatrSMult4());
-        amin.get(20).key = 116;
+        amin.get(20).key = 121;
         // step 22
         amin.add(new MatrSMult4());
-        amin.get(21).key = 111;
+        amin.get(21).key = 122;
         // step 23
         amin.add(new MatrSMult4());
-        amin.get(21).key = 0;
+        amin.get(21).key = 123;
         // step 24
         amin.add(new MatrSMult4());
-        amin.get(23).key = 119;
+        amin.get(23).key = 124;
         // step 25
         amin.add(new MatrSMult4());
-        amin.get(24).key = 0;
+        amin.get(24).key = 125;
         // step 25
         amin.add(new MatrSMult4());
-        amin.get(25).key = 0;
+        amin.get(25).key = 126;
 
         return amin;
     }

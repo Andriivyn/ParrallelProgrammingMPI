@@ -467,9 +467,12 @@ public class MatrSMult4 extends Drop {
     public MatrixS[] inputFunction(Element[] input, Amin amin, Ring ring) {
 //LOGGER.info(input[0]);
         MatrixS[] res = new MatrixS[8];
-        MatrixS ms = (MatrixS) input[0];
-        MatrixS ms1 = (MatrixS) input[1];
-
+        MatrixS ms = null;
+        MatrixS ms1 = null;
+        if (input[0] instanceof MatrixS && input[1] instanceof MatrixS) {
+            ms = (MatrixS) input[0];
+            ms1 = (MatrixS) input[1];
+        }
 
         switch (key) {
             case (2): {
@@ -481,6 +484,19 @@ public class MatrSMult4 extends Drop {
             case (4): {
                 MatrixS E11T = ((MatrixS) input[4]).transpose();
                 ms1 = E11T.multiply(ms1, ring);
+                break;
+            }
+            case (102): {
+                LdumwDto F11 = (LdumwDto) input[0];
+                ms = F11.getM();
+                ms1 = (MatrixS) input[1];
+                break;
+            }
+            case (112): {
+                LdumwDto F12 = (LdumwDto) input[1];
+
+                ms = (MatrixS) input[0];
+                ms1 = F12.getW();
                 break;
             }
         }
@@ -495,6 +511,7 @@ public class MatrSMult4 extends Drop {
             case (0):
             case (1):
             case (2):
+            case (102):
                 break;
             case (3): {
                 Element ds = inData[2].multiply(inData[3], ring).divide(inData[4], ring);
@@ -506,6 +523,28 @@ public class MatrSMult4 extends Drop {
                 amin.resultForOutFunction[4] = md;
                 break;
             }
+            case (112): {
+                LdumwDto F12 = (LdumwDto) inData[1];
+                LdumwDto F21 = (LdumwDto) inData[2];
+                LdumwDto F11 = (LdumwDto) inData[3];
+                Element a = inData[4];
+
+                Element lambda = F21.getA_n().divide(F11.getA_n(), ring);
+                Element as = lambda.multiply(F12.getA_n(), ring);
+
+                Element I12lambdaM2 = F12.getI().divideByNumbertoFraction(lambda, ring).add(F12.getIbar(), ring);
+                Element invD12hat = I12lambdaM2.multiply(F12.getDhat(), ring);
+
+                Element ak2 = F11.getA_n().multiply(F11.getA_n(), ring);
+                Element aak2 = ak2.multiply(a, ring);
+
+                amin.resultForOutFunction[4] = lambda;
+                amin.resultForOutFunction[5] = as;
+                amin.resultForOutFunction[6] = invD12hat;
+                amin.resultForOutFunction[7] = aak2;
+                break;
+            }
+
         }
         return;
     }
@@ -544,6 +583,24 @@ public class MatrSMult4 extends Drop {
 
                 res = new MatrixS[]{MatrixS.join(resmat).negate(ring).
                         divideByNumber(inData[5], ring).add((MatrixS) input[4], ring)};
+                break;
+            }
+            case (102): {
+                LdumwDto F11 = (LdumwDto) inData[0];
+
+                res = new Element[] {
+                        F11.getJ().multiply(MatrixS.join(resmat), ring).divideByNumber(F11.getA_n(), ring)
+                };
+                break;
+            }
+            case (112): {
+                LdumwDto F12 = (LdumwDto) inData[1];
+                Element A22_2 = MatrixS.join(resmat).multiply(F12.getDbar(), ring);
+                Element A22_3 = A22_2.divide(input[7], ring);
+
+                res = new Element[] {
+                        input[4], input[5], A22_3, input[6]
+                };
                 break;
             }
         }
