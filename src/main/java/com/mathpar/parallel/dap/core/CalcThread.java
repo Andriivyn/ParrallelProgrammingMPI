@@ -12,6 +12,7 @@ import com.mathpar.number.Ring;
 
 import java.util.*;
 
+import liquibase.pro.packaged.L;
 import mpi.MPI;
 import mpi.MPIException;
 
@@ -154,7 +155,17 @@ public class CalcThread implements Runnable {
             int numOfDependantDrop = drop.arcs[0][i];
             int from = drop.arcs[0][i + 1];
             int to = drop.arcs[0][i + 2];
-            Drop dependantDrop = curAmin.branch.get(numOfDependantDrop - 1);
+            Drop dependantDrop = null;
+//            try {
+//                LOGGER.info("curAmin.branch.size: " + curAmin.branch.size());
+
+                dependantDrop = curAmin.branch.get(numOfDependantDrop - 1);
+//            } catch (Exception e) {
+//                LOGGER.info("i: " + i);
+//                LOGGER.error(e.getMessage(), e);
+//                throw new NullPointerException();
+//            }
+
            // LOGGER.info("dependantDrop = " + dependantDrop.type+ " to " +to+ " from "+from);
           //  LOGGER.info("dependantDrop.inData =  " + dependantDrop.inData);
             dependantDrop.inData[to] = resInputFunc[from];
@@ -317,7 +328,6 @@ public class CalcThread implements Runnable {
         Element[] resInputFunc;
 
         curAmin = new Amin(currentDrop, pine.size(), myRank);
-        //LOGGER.info("curAmin = "+ curAmin);
         pine.add(curAmin);
         currentDrop.setNumbOfMyAmine(curAmin.aminIdInPine);
         //System.arraycopy(currentDrop.inData, 0, curAmin.inputData, 0, curAmin.inputData.size());

@@ -1,20 +1,24 @@
 package com.mathpar.parallel.dap.ldumw;
 
+import com.mathpar.log.MpiLogger;
 import com.mathpar.matrix.LDUMW;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
+import com.mathpar.parallel.dap.cholesky.MatrixS.MatrSCholFact4;
 import com.mathpar.parallel.dap.core.Amin;
 import com.mathpar.parallel.dap.core.Drop;
 import com.mathpar.parallel.dap.multiply.MatrixS.MatrSMult4;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-public class LDUMWFact extends Drop {
+public class LdumwFact extends Drop {
     private static int leafSize = 2;
+    private final static MpiLogger LOGGER = MpiLogger.getLogger(LdumwFact.class);
     private static int[][] arcs_ = new int[][]{ // TODO change the order of input params to use similar drops in different cases
-            {1, 0, 0, 1, 4, 1, 2, 1, 1, 3, 1, 1, 3, 4, 2, 4, 2, 1, 4, 4, 2, 5, 2, 1, 9, 3, 1, 9, 4, 4, 12, 4, 4, 13, 4, 3, 18, 4, 4, 27, 4, 8},//0. inputFunction
-            {2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 6, 0, 1, 7, 0, 0, 8, 0, 1, 9, 0, 0, 10, 0, 0, 11, 0, 0, 12, 0, 3, 15, 0, 2, 16, 0, 2, 18, 0, 2, 27, 0, 0},//1. F11 = LDU /* 1 крок - це все в одній змінній? */
+            {1, 0, 0,   1, 4, 1,   2, 1, 1,   3, 1, 1,   3, 4, 2,   4, 2, 1,   4, 4, 2,   5, 2, 1,   9, 3, 1,   9, 4, 4,   12, 4, 4,   13, 4, 3,   18, 4, 4,   27, 4, 8},//0. inputFunction
+            {2, 0, 0,   3, 0, 0,   4, 0, 0,   5, 0, 0,   6, 0, 1,   7, 0, 0,   8, 0, 1,   9, 0, 0,   10, 0, 0,   11, 0, 0,   12, 0, 3,   15, 0, 2,   16, 0, 2,   18, 0, 2,   27, 0, 0},//1. F11 = LDU /* 1 крок - це все в одній змінній? */
             {13, 0, 2},//2. X_U2
             {6, 1, 0, 7, 0, 2},//3. A12_0  and  A12_2
             {7, 0, 1, 8, 1, 0},//4. A21_0  and  A21_2
@@ -42,7 +46,7 @@ public class LDUMWFact extends Drop {
             {27, 0, 14}, //26. X_m2
             {}};//27. OutputFunction
 
-    public LDUMWFact() {
+    public LdumwFact() {
         arcs = arcs_;
         type = 23;
         number = cnum++;
@@ -57,7 +61,7 @@ public class LDUMWFact extends Drop {
     public ArrayList<Drop> doAmin() {
         ArrayList<Drop> amin = new ArrayList<>();
         // step 1
-        amin.add(new LDUMWFact());
+        amin.add(new LdumwFact());
         // step 2
         amin.add(new MatrSMult4());
         amin.get(1).key = 102;
@@ -71,12 +75,12 @@ public class LDUMWFact extends Drop {
         amin.add(new MatrSMult4());
         amin.get(4).key = 105;
         // step 6
-        amin.add(new LDUMWFact());
+        amin.add(new LdumwFact());
         // step 7
         amin.add(new MatrSMult4());
         amin.get(6).key = 107;
         // step 8
-        amin.add(new LDUMWFact());
+        amin.add(new LdumwFact());
         // step 9
         amin.add(new MatrSMult4());
         amin.get(8).key = 109;
@@ -102,7 +106,7 @@ public class LDUMWFact extends Drop {
         amin.add(new MatrSMult4());
         amin.get(15).key = 116;
         // step 17
-        amin.add(new LDUMWFact());
+        amin.add(new LdumwFact());
         // step 18
         amin.add(new MatrSMult4());
         amin.get(17).key = 118;
@@ -127,10 +131,11 @@ public class LDUMWFact extends Drop {
         // step 25
         amin.add(new MatrSMult4());
         amin.get(24).key = 0;
-        // step 25
+        // step 26
         amin.add(new MatrSMult4());
         amin.get(25).key = 0;
 
+        LOGGER.info("amin.size: " + amin.size());
         return amin;
     }
 

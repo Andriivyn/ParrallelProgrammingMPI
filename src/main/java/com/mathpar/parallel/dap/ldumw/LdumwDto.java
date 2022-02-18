@@ -5,6 +5,9 @@ import com.mathpar.number.Element;
 import com.mathpar.number.Fraction;
 import com.mathpar.number.Ring;
 
+import java.util.Comparator;
+import java.util.Objects;
+
 public class LdumwDto extends Element {
     private final MatrixS L;
     private final MatrixS D; // ==Ddenom   new sense of this matrix! (denom-of-each-elems)
@@ -18,7 +21,6 @@ public class LdumwDto extends Element {
     private MatrixS J;
     private MatrixS Jbar;
     private final Element a_n; // determinant
-
 
     public LdumwDto(MatrixS l, MatrixS d, MatrixS u, Element a_n) {
         L = l;
@@ -141,7 +143,6 @@ public class LdumwDto extends Element {
                 MI[i] = zero;
             }
         }
-        ;
         maxCol++;
         maxColOut++;
         int mmax = Math.max(maxCol, maxColOut);
@@ -238,5 +239,25 @@ public class LdumwDto extends Element {
 
     public void setJbar(MatrixS jbar) {
         Jbar = jbar;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LdumwDto ldumwDto = (LdumwDto) o;
+        Ring ring = new Ring("Z[]");
+
+        return L.subtract(ldumwDto.L(), ring).isZero(ring) &&
+                D.subtract(ldumwDto.D(), ring).isZero(ring) &&
+                U.subtract(ldumwDto.U(), ring).isZero(ring) &&
+                M.subtract(ldumwDto.M(), ring).isZero(ring) &&
+                W.subtract(ldumwDto.W(), ring).isZero(ring);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(L, D, Dhat, Dbar, U, M, W, I, Ibar, J, Jbar, a_n);
     }
 }
