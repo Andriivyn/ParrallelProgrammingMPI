@@ -13,8 +13,8 @@ import java.util.ArrayList;
 public class LDUMWFact extends Drop {
     private static int leafSize = 2;
     private static int[][] arcs_ = new int[][]{ // TODO change the order of input params to use similar drops in different cases
-            {1, 0, 0, 1, 4, 1, 2, 1, 1, 3, 1, 1, 3, 4, 2, 4, 2, 1, 4, 4, 2, 5, 2, 0, 9, 3, 1, 9, 4, 4, 12, 4, 4, 13, 4, 3, 18, 4, 4, 27, 4, 8},//0. inputFunction
-            {2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 1, 6, 0, 1, 7, 0, 0, 8, 0, 1, 9, 0, 0, 10, 0, 0, 11, 0, 0, 12, 0, 3, 15, 0, 2, 16, 0, 2, 18, 0, 2, 27, 0, 0},//1. F11 = LDU /* 1 крок - це все в одній змінній? */
+            {1, 0, 0, 1, 4, 1, 2, 1, 1, 3, 1, 1, 3, 4, 2, 4, 2, 1, 4, 4, 2, 5, 2, 1, 9, 3, 1, 9, 4, 4, 12, 4, 4, 13, 4, 3, 18, 4, 4, 27, 4, 8},//0. inputFunction
+            {2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 6, 0, 1, 7, 0, 0, 8, 0, 1, 9, 0, 0, 10, 0, 0, 11, 0, 0, 12, 0, 3, 15, 0, 2, 16, 0, 2, 18, 0, 2, 27, 0, 0},//1. F11 = LDU /* 1 крок - це все в одній змінній? */
             {13, 0, 2},//2. X_U2
             {6, 1, 0, 7, 0, 2},//3. A12_0  and  A12_2
             {7, 0, 1, 8, 1, 0},//4. A21_0  and  A21_2
@@ -47,7 +47,7 @@ public class LDUMWFact extends Drop {
         type = 23;
         number = cnum++;
         inputDataLength = 2;
-        outputDataLength = 6;
+        outputDataLength = 1;
         inData = new Element[inputDataLength];
         outData = new Element[outputDataLength];
         resultForOutFunctionLength = 18;
@@ -108,7 +108,7 @@ public class LDUMWFact extends Drop {
         amin.get(17).key = 118;
         // step 19
         amin.add(new MatrSMult4());
-        amin.get(18).key = 119;
+        amin.get(18).key = 1;
         // step 20
         amin.add(new MatrSMult4());
         amin.get(19).key = 120;
@@ -123,13 +123,13 @@ public class LDUMWFact extends Drop {
         amin.get(21).key = 123;
         // step 24
         amin.add(new MatrSMult4());
-        amin.get(23).key = 124;
+        amin.get(23).key = 1;
         // step 25
         amin.add(new MatrSMult4());
-        amin.get(24).key = 125;
+        amin.get(24).key = 0;
         // step 25
         amin.add(new MatrSMult4());
-        amin.get(25).key = 126;
+        amin.get(25).key = 0;
 
         return amin;
     }
@@ -185,17 +185,17 @@ public class LDUMWFact extends Drop {
 
         MatrixS L = MatrixS.join(new MatrixS[]{X_L, MatrixS.zeroMatrix(), L3, LL});
         MatrixS D = MatrixS.join(new MatrixS[]{
-                F11.getD(), F12.getD().multiplyByNumber(lambda.multiply(lambda, ring), ring),
-                F21.getD(), F22.getD()});
+                F11.D(), F12.D().multiplyByNumber(lambda.multiply(lambda, ring), ring),
+                F21.D(), F22.D()});
         MatrixS U = MatrixS.join(new MatrixS[]{UU, U2, MatrixS.zeroMatrix(), X_U});
 
 
-        LdumwDto ldumw = new LdumwDto(L, D, U, F22.getA_n());
-        ldumw.IJMap(F22.getA_n(), ring);
+        LdumwDto ldumw = new LdumwDto(L, D, U, F22.A_n());
+        ldumw.IJMap(F22.A_n(), ring);
 
-        Element ar_m1 = F22.getA_n().pow(-1, ring);
+        Element ar_m1 = F22.A_n().pow(-1, ring);
         MatrixS DhatLeft = D.multiplyByNumber(a.multiply(ar_m1, ring), ring);
-        MatrixS DhatRight = ldumw.getDbar().multiplyByNumber(ar_m1, ring);
+        MatrixS DhatRight = ldumw.Dbar().multiplyByNumber(ar_m1, ring);
         MatrixS Dhat = DhatLeft.add(DhatRight, ring);
         MatrixS Dinv = Dhat.negate(ring);
 

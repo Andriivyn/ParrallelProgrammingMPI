@@ -160,51 +160,51 @@ public class LdumwDto extends Element {
         return new MatrixS[]{I, J};
     }
 
-    public MatrixS getL() {
+    public MatrixS L() {
         return L;
     }
 
-    public MatrixS getD() {
+    public MatrixS D() {
         return D;
     }
 
-    public MatrixS getDhat() {
+    public MatrixS Dhat() {
         return Dhat;
     }
 
-    public MatrixS getDbar() {
+    public MatrixS Dbar() {
         return Dbar;
     }
 
-    public MatrixS getU() {
+    public MatrixS U() {
         return U;
     }
 
-    public MatrixS getM() {
+    public MatrixS M() {
         return M;
     }
 
-    public MatrixS getW() {
+    public MatrixS W() {
         return W;
     }
 
-    public MatrixS getI() {
+    public MatrixS I() {
         return I;
     }
 
-    public MatrixS getIbar() {
+    public MatrixS Ibar() {
         return Ibar;
     }
 
-    public MatrixS getJ() {
+    public MatrixS J() {
         return J;
     }
 
-    public MatrixS getJbar() {
+    public MatrixS Jbar() {
         return Jbar;
     }
 
-    public Element getA_n() {
+    public Element A_n() {
         return a_n;
     }
 
