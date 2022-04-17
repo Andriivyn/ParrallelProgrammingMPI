@@ -75,7 +75,8 @@ public class MatrSMultiplyScalar extends Drop {
 
         MatrixS A = (MatrixS) input[0];
         MatrixS B = (MatrixS) input[1];
-
+//        LOGGER.info("A: " + A.getElement(0, 0, ring));
+//        LOGGER.info("B: " + B);
         MatrixS[] res = new MatrixS[]{A.add(B, ring)};
         return res;
     }

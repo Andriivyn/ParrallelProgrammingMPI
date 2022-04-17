@@ -1,7 +1,11 @@
 package com.mathpar.matrix;
 
+import com.jcraft.jsch.Logger;
 import com.mathpar.func.F;
+import com.mathpar.log.MpiLogger;
+import com.mathpar.matrix.file.dm.MatrixZ;
 import com.mathpar.number.*;
+import com.mathpar.parallel.dap.ldumw.LdumwFact;
 import com.mathpar.parallel.stat.MS.AELDU;
 import com.mathpar.parallel.utils.MPITransport;
 import com.mathpar.polynom.Polynom;
@@ -1037,6 +1041,8 @@ public class MatrixS extends Element {// implements Serializable {
         }
         return new MatrixS(m, newColNumb+1, A, C);
     }
+
+    private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrixS.class);
     /**
      * Сумма матриц в общем случае.
      *

@@ -248,6 +248,9 @@ public class LdumwDto extends Element {
         LdumwDto ldumwDto = (LdumwDto) o;
         Ring ring = new Ring("Z[]");
 
+//        System.out.println("L: " + L.getElement(0,0, ring));
+//        System.out.println("o.L: " + ldumwDto.L().getElement(0,0, ring));
+
         return L.subtract(ldumwDto.L(), ring).isZero(ring) &&
                 D.subtract(ldumwDto.D(), ring).isZero(ring) &&
                 U.subtract(ldumwDto.U(), ring).isZero(ring) &&

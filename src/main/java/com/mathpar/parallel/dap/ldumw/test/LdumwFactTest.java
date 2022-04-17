@@ -17,12 +17,13 @@ public class LdumwFactTest extends DAPTest {
 
     protected LdumwFactTest() {
         super("LdumwFactTest", 23, 0);
-        //ring = new Ring("R[]");
+        ring = new Ring("Z[]");
     }
 
     @Override
     protected Element[] initData(int size, int density, int maxBits, Ring ring) {
-        return new Element[]{matrix(size, density, maxBits, ring), ring.numberONE};
+        MatrixS A = matrix(size, density, 5, ring);
+        return new Element[]{A, ring.numberONE};
     }
 
     @Override
@@ -30,9 +31,23 @@ public class LdumwFactTest extends DAPTest {
         LdumwDto ldumwDto = (LdumwDto) resultData[0];
 
         MatrixS A = (MatrixS) initData[0];
+        LOGGER.info("A=" + A);
         Element a = initData[1];
 
         LdumwDto ldumwDtoSequential = LDUMW.LDUMW(A, a, ring);
+
+        LOGGER.info("L=" + ldumwDto.L());
+        LOGGER.info("L SEQ=" + ldumwDtoSequential.L());
+        LOGGER.info("D=" + ldumwDto.D());
+        LOGGER.info("D SEQ=" + ldumwDtoSequential.D());
+        LOGGER.info("U=" + ldumwDto.U());
+        LOGGER.info("U SEQ=" + ldumwDtoSequential.U());
+        LOGGER.info("M=" + ldumwDto.M());
+        LOGGER.info("M SEQ=" + ldumwDtoSequential.M());
+        LOGGER.info("W=" + ldumwDto.W());
+        LOGGER.info("W SEQ=" + ldumwDtoSequential.W());
+        LOGGER.info("A_n=" + ldumwDto.A_n());
+        LOGGER.info("A_n SEQ=" + ldumwDtoSequential.A_n());
 
         if (ldumwDto.equals(ldumwDtoSequential)) {
             return new Pair<>(true, null);
@@ -58,6 +73,6 @@ public class LdumwFactTest extends DAPTest {
 
         LdumwDto FF = LDUMW.LDUMW(A, a, ring);
 
-        return new Element[] {FF};
+        return new Element[] {FF, FF.A_n()};
     }
 }

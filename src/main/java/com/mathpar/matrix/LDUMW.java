@@ -60,7 +60,8 @@ public class LDUMW {
         boolean flag; //flag is true for size== 2^n
         if(b!=s){flag=false;b=b<<1;}else {flag=(As==Aclmn);}
         A.size=b; A.colNumb=b; // b=2^n
-        LDUMW FF = new LDUMW(A); FF.getLDU(A, a, ring);
+        LDUMW FF = new LDUMW(A);
+        FF.getLDU(A, a, ring);
         if(!flag){ FF.L.size=As; FF.U.colNumb=Aclmn; FF.W.size=Aclmn; FF.M.colNumb=As;}
         return new LdumwDto(
                 FF.L, FF.D, FF.Dhat, FF.Dbar,
@@ -225,7 +226,7 @@ public class LDUMW {
                 Jbar=MatrixS.scalarMatrix(n, ONE, ring);
                 Ibar=MatrixS.scalarMatrix(n, ONE, ring);
                            if(n==2){
-  System.out.println( "A=========="+T+"; L="+L+"; U="+U+"; M="+M+"; W="+W+"; \\hat D="+Dhat+"; D="+invForD(D, ring)+":   ");
+//  System.out.println( "A=========="+T+"; L="+L+"; U="+U+"; M="+M+"; W="+W+"; \\hat D="+Dhat+"; D="+invForD(D, ring)+":   ");
            }
                 return;
         }
@@ -274,8 +275,8 @@ public class LDUMW {
      Element lambda= al.divideToFraction(ak, ring);
      Element as=lambda.multiply(am, ring);
      MatrixS  D11PLUS=F11.D.transpose();
-if(n>2)
-System.out.println( "A12_0="+A12_0+"; A12_1="+A12_1+"; A12_2="+A12_2+"; A21_0="+A21_0+"; A21_1="+A21_1+"; A21_2="+A21_2+";");
+if(n>2){}
+//System.out.println( "A12_0="+A12_0+"; A12_1="+A12_1+"; A12_2="+A12_2+"; A21_0="+A21_0+"; A21_1="+A21_1+"; A21_2="+A21_2+";");
 
 
 
@@ -318,12 +319,45 @@ System.out.println( "A12_0="+A12_0+"; A12_1="+A12_1+"; A12_2="+A12_2+"; A21_0="+
                F12.D.multiplyByNumber(lambda2, ring), F21.D, F22.D});
      IJMap(a,ring);
 
-   if(n>2)
-     System.out.println( "A22_0="+A22_0+"; A22_1="+A22_1+"; A22_2="+A22_2+"; A22_3="+A22_3+"; U2="+U2+"; L3="+L3+";");
+   if(n>2){}
+//     System.out.println( "A22_0="+A22_0+"; A22_1="+A22_1+"; A22_2="+A22_2+"; A22_3="+A22_3+"; U2="+U2+"; L3="+L3+";");
 
 
     MatrixS I12lambdaM2=(F12.I.divideByNumbertoFraction(lambda, ring)).add(F12.Ibar, ring);
     MatrixS invD12hat=  I12lambdaM2.multiply(F12.Dhat, ring);
+
+
+//
+//          Element ar_m1 = F22.a_n.inverse(ring);
+//          MatrixS DhatLeft = D.multiplyByNumber(a.multiply(ar_m1, ring), ring);
+//          MatrixS DhatRight = Dbar.multiplyByNumber(ar_m1, ring);
+//          MatrixS Dhat = DhatLeft.add(DhatRight, ring);
+//          MatrixS Dinv = Dhat.inverse(ring);
+//
+//          MatrixS L1_m1 = invD12hat.multiply(F12.M, ring)
+//                  .multiply(F11.Dhat, ring)
+//                  .multiply(F11.M, ring);
+//
+//          MatrixS L4_m1 = F22.Dhat
+//                  .multiply(F22.M, ring)
+//                  .multiply(F21.Dhat, ring)
+//                  .multiply(F21.M, ring);
+//          MatrixS X_m12 = L4_m1.multiply(L3, ring).negate(ring);
+//          MatrixS X_m2 = X_m12.multiply(L1_m1, ring);
+//
+//          M = Dinv.multiply(MatrixS.join(new MatrixS[]{L1_m1, MatrixS.zeroMatrix(), X_m2, L4_m1}), ring);
+//
+//          MatrixS U1_m1 = F11.W
+//                  .multiply(F11.Dhat, ring)
+//                  .multiply(F21.W, ring)
+//                  .multiply(F21.Dhat, ring);
+//
+//          MatrixS X_W2 = U1_m1.multiply(U2, ring).negate(ring);
+//          MatrixS U4_m1 = F12.W.multiply(invD12hat, ring).multiply(F22.W, ring).multiply(F22.Dhat, ring);
+//
+//          W = MatrixS.join(new MatrixS[]{U1_m1, X_W2, MatrixS.zeroMatrix(), U4_m1}).multiply(Dinv, ring);
+
+
     MatrixS L3prim=L3.negate(ring).multiply(invD12hat, ring).multiply(F12.M, ring).multiply(F11.Dhat.multiply(F11.M, ring), ring);
     MatrixS DhUnit= DtoUnit(D,ring.numberONE, ring).add(Dbar, ring).transpose();
        MatrixS[] Eprim=DhUnit.split();
@@ -351,8 +385,8 @@ System.out.println( "A12_0="+A12_0+"; A12_1="+A12_1+"; A12_2="+A12_2+"; A21_0="+
 
    W=MatrixS.join(new MatrixS[]{V11.add(U2prim.multiply(V21, ring), ring),
                                           V12.add(U2prim.multiply(V22, ring), ring), V21, V22});
-       if(n>2)
-     System.out.println( "V11="+V11+"; V12="+V12+"; V21="+V21+"; V22="+V22+"; U2prim="+U2prim+"; L3prim="+L3prim+";");
+       if(n>2){}
+//     System.out.println( "V11="+V11+"; V12="+V12+"; V21="+V21+"; V22="+V22+"; U2prim="+U2prim+"; L3prim="+L3prim+";");
 
 
 
@@ -373,23 +407,23 @@ System.out.println( "A12_0="+A12_0+"; A12_1="+A12_1+"; A12_2="+A12_2+"; A21_0="+
  M=MatrixS.join(new MatrixS[]{N11.add(N12.multiply(L3prim, ring), ring),
                                           N12, N21.add(N22.multiply(L3prim, ring), ring), N22});
 
-//       
+//
  MatrixS mM=MatrixS.join(new MatrixS[]{N11B, N12B, N21B, N22B});
   MatrixS wW=MatrixS.join(new MatrixS[]{V11B, V12B, V21B, V22B});
   MatrixS Dpr=MatrixS.join(new MatrixS[]{D11prim, D12prim, D21prim, D22prim});
-        if(n>2)
-     System.out.println("Dpr=="+Dpr+"Eprim=="+DhUnit+"wW====="+wW+ "N11="+N11+"; N12="+N12+"; N21="+N21+"; N22="+N22+";");
+        if(n>2){}
+//     System.out.println("Dpr=="+Dpr+"Eprim=="+DhUnit+"wW====="+wW+ "N11="+N11+"; N12="+N12+"; N21="+N21+"; N22="+N22+";");
 
 //
-//          MatrixS LL1=L3.multiply(F22.Dhat, ring);
+//          MatrixS LL1=L3.multiply(F22.A_n, ring);
 //                  MatrixS LL2=LL1.multiply(F22.M, ring);
 //                  MatrixS LL3=LL2.multiply(F21.Dhat, ring);
 //                                MatrixS LL4=LL3.multiply(F21.M, ring);
            if(n>=2){
-  System.out.println( "A="+T+"; L="+L+"; U="+U+"; M="+M+"; W="+W+"; \\hat D="+Dhat+"; D="+invForD(D, ring)+": L12tilde==  "+L12tilde+U12tilde);
+//  System.out.println( "A="+T+"; L="+L+"; U="+U+"; M="+M+"; W="+W+"; \\hat D="+Dhat+"; D="+invForD(D, ring)+": L12tilde==  "+L12tilde+U12tilde);
            }
-           if(n>2){
-       System.out.println("ak+al+am+as+a_n+lambda="+ak+"  "+al+"  "+am+"  "+as+"  "+a_n+"  "+lambda);}
+           if(n>2){}
+//       System.out.println("ak+al+am+as+a_n+lambda="+ak+"  "+al+"  "+am+"  "+as+"  "+a_n+"  "+lambda);}
 
       };
 
@@ -406,7 +440,7 @@ System.out.println( "A12_0="+A12_0+"; A12_1="+A12_1+"; A12_2="+A12_2+"; A21_0="+
 //        for (int i = D.M.length/2; i<D.M.length; i++){MI[i]=one; }   
 //        return new MatrixS(D.size,D.colNumb,  MI, D.col);
 //    }    
-    static MatrixS   DtoUnit(MatrixS D, Element e, Ring ring){
+    public static MatrixS   DtoUnit(MatrixS D, Element e, Ring ring){
         Element[][] MI=new Element[D.M.length][0];
         Element[] one = new Element[]{e};
         for (int i = 0; i<D.M.length; i++){
