@@ -6,7 +6,7 @@ import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
 import com.mathpar.parallel.dap.core.DispThread;
 import com.mathpar.parallel.dap.ldumw.LdumwDto;
-import com.mathpar.parallel.dap.multiply.MatrixS.Tests.MatrSMult4Test;
+import com.mathpar.parallel.dap.ldumw.LdumwFact;
 import com.mathpar.parallel.dap.test.DAPTest;
 import mpi.MPIException;
 import org.javatuples.Pair;
@@ -22,15 +22,22 @@ public class LdumwFactTest extends DAPTest {
 
     @Override
     protected Element[] initData(int size, int density, int maxBits, Ring ring) {
-        MatrixS A = matrix(size, density, 5, ring);
+//        MatrixS A = matrix(size, density, 5, ring);
+        MatrixS A = new MatrixS(new int[][]{
+                {0, 2, 3, 0},
+                {0, 0, 0, -3},
+                {5, 3, 2, 1},
+                {0, -1, 0, 0}}, ring);
         return new Element[]{A, ring.numberONE};
     }
 
     @Override
     protected Pair<Boolean, Element> checkResult(DispThread dispThread, String[] args, Element[] initData, Element[] resultData, Ring ring) {
         LdumwDto ldumwDto = (LdumwDto) resultData[0];
+        ldumwDto.setD(LdumwFact.invForD(ldumwDto.D(), ring));
 
         MatrixS A = (MatrixS) initData[0];
+
         LOGGER.info("A=" + A);
         Element a = initData[1];
 

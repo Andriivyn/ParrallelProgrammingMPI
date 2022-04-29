@@ -4,6 +4,7 @@ import com.mathpar.log.MpiLogger;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Array;
 import com.mathpar.number.Element;
+import com.mathpar.number.Fraction;
 import com.mathpar.number.Ring;
 import com.mathpar.parallel.dap.core.Amin;
 import com.mathpar.parallel.dap.core.Drop;
@@ -54,14 +55,8 @@ public class MatrSMult4 extends Drop {
             case (0):
             case (1):
             case (102):
-            case (111):
-            case (122):
             case (114):
             case (110):
-            case (119):
-            case (124):
-            case (125):
-            case (126):
             case (123): {
                 inputDataLength = 2;
                 outputDataLength = 1;
@@ -110,8 +105,6 @@ public class MatrSMult4 extends Drop {
                 break;
             }
             case (107):
-            case (115):
-            case (120):
             case (116):
             case (121): {
                 inputDataLength = 3;
@@ -204,8 +197,10 @@ public class MatrSMult4 extends Drop {
                 LdumwDto F11 = ((LdumwDto) inData[0]);
                 MatrixS A12 = (MatrixS) inData[1];
                 LOGGER.info("-------------------------102-------------------------------");
-
-                MatrixS X_U2 = F11.J().multiply(F11.M(), ring).multiply(A12, ring).divideByNumber(F11.A_n(), ring);
+                LOGGER.info("seq 102 A12: " + A12);
+                MatrixS X_U2 = (F11.J().multiply(F11.M(), ring))
+                        .multiply(A12, ring)
+                        .divideByNumber(F11.A_n(), ring);
 
                 outData[0] = X_U2;
                 break;
@@ -216,9 +211,9 @@ public class MatrSMult4 extends Drop {
                 Element a = inData[2];
 
                 LOGGER.info("-------------------------103-------------------------------");
-
                 MatrixS A12_0 = F11.M().multiply(A12, ring);
-                MatrixS A12_2 = F11.Dbar().multiply(A12_0, ring).divideByNumber(a, ring);
+                MatrixS A12_2 = F11.Dbar().multiply(A12_0, ring)
+                        .divideByNumber(a, ring);
                 LOGGER.info(" F11.M()=" + F11.M());
                 LOGGER.info(" A12=" + A12);
                 LOGGER.info("-------------------------/103-------------------------------");
@@ -232,9 +227,10 @@ public class MatrSMult4 extends Drop {
                 Element a = inData[2];
 
                 LOGGER.info("-------------------------104-------------------------------");
-
                 MatrixS A21_0 = A21.multiply(F11.W(), ring);
-                MatrixS A21_2 = A21_0.multiply(F11.Dbar(), ring).divideByNumber(a, ring);
+                MatrixS A21_2 = A21_0.multiply(F11.Dbar(), ring)
+                        .divideByNumber(a, ring);
+
                 LOGGER.info(" S A21_0=" + A21_0);
                 LOGGER.info(" S A21_2=" + A21_2);
                 LOGGER.info("-------------------------/104-------------------------------");
@@ -246,8 +242,11 @@ public class MatrSMult4 extends Drop {
                 LdumwDto F11 = ((LdumwDto) inData[0]);
                 MatrixS A21 = (MatrixS) inData[1];
                 LOGGER.info("-------------------------105-------------------------------");
-                MatrixS X_L3 = A21.multiply(F11.W(), ring).multiply(F11.I(), ring).divideByNumber(F11.A_n(), ring);
                 LOGGER.info("-------------------------/105-------------------------------");
+
+                MatrixS X_L3 = (A21.multiply(F11.W()
+                        .multiply(F11.I(), ring), ring))
+                        .divideByNumber(F11.A_n(), ring);
                 outData[0] = X_L3;
                 break;
             }
@@ -256,11 +255,22 @@ public class MatrSMult4 extends Drop {
                 MatrixS A21_0 = (MatrixS) inData[1];
                 MatrixS A12_0 = (MatrixS) inData[2];
                 LOGGER.info("-------------------------107-------------------------------");
-                MatrixS A21_1 = A21_0.multiplyByNumber(F11.A_n(), ring).multiply(F11.Dhat(), ring);
+
+
+                MatrixS A21_1 = A21_0.multiplyByNumber(F11.A_n(), ring)
+                        .multiply(F11.Dhat(), ring);
                 MatrixS A12_1 = F11.Dhat().multiplyByNumber(F11.A_n(), ring).multiply(A12_0, ring);
 
                 MatrixS D11PLUS = F11.D().transpose();
-                MatrixS A22_0 = A21_1.multiply(D11PLUS, ring).multiply(A12_1, ring);
+                MatrixS A22_0 = A21_1.multiply(D11PLUS
+                        .multiply(A12_1, ring), ring);
+
+                LOGGER.info("seq 107 A21_1: " + A21_1);
+                LOGGER.info("seq 107 A12_1: " + A12_1);
+                LOGGER.info("seq 107 F11.D(): " + F11.D());
+                LOGGER.info("seq 107 F11.A_n(): " + F11.A_n());
+                LOGGER.info("seq 107 D11PLUS: " + D11PLUS);
+                LOGGER.info("seq 107 A22_0: " + A22_0);
                 LOGGER.info("-------------------------/107-------------------------------");
                 outData[0] = A22_0;
                 break;
@@ -273,12 +283,23 @@ public class MatrSMult4 extends Drop {
                 Element a = inData[4];
 
                 LOGGER.info("-------------------------109-------------------------------");
-                Element ak2 = F11.A_n().multiply(F11.A_n(), ring);
-                Element aak2 = a.multiply(ak2, ring);
-                MatrixS A22_1left = A22.multiplyByNumber(aak2, ring).subtract(A22_0, ring);
-                MatrixS A22_1 = A22_1left.divideByNumber(a.multiply(F11.A_n(), ring), ring);
 
-                MatrixS X_A22_2 = F21.Dbar().multiply(F21.M(), ring).multiply(A22_1, ring);
+                Element ak = F11.A_n();
+                Element ak2 = ak.multiply(ak, ring);
+                MatrixS A22_1 = (A22.multiplyByNumber(ak2, ring)
+                        .multiplyByNumber(a, ring)
+                        .subtract(A22_0, ring))
+                        .divideByNumber(ak, ring)
+                        .divideByNumber(a, ring);
+
+                MatrixS X_A22_2 = (F21.Dbar().multiply(F21.M(), ring)).multiply(A22_1, ring);
+
+                LOGGER.info("seq 109 ak2: " + ak2);
+                LOGGER.info("seq 109 F11.A_n(): " + F11.A_n());
+                LOGGER.info("seq 109 A22_0: " + A22_0);
+                LOGGER.info("seq 109 F21.Dbar(): " + F21.Dbar());
+                LOGGER.info("seq 109 F21.M(): " + F21.M());
+                LOGGER.info("seq 109 A22_1: " + A22_1);
                 LOGGER.info("-------------------------/109-------------------------------");
                 outData[0] = A22_1;
                 outData[1] = X_A22_2;
@@ -289,20 +310,7 @@ public class MatrSMult4 extends Drop {
                 LdumwDto F21 = ((LdumwDto) inData[1]);
 
                 MatrixS UU = F21.U().multiply(F11.U(), ring);
-
                 outData[0] = UU;
-                break;
-            }
-            case (111): {
-                LdumwDto F11 = ((LdumwDto) inData[0]);
-                LdumwDto F21 = ((LdumwDto) inData[1]);
-
-                MatrixS U1_m1 = F11.W()
-                        .multiply(F11.Dhat(), ring)
-                        .multiply(F21.W(), ring)
-                        .multiply(F21.Dhat(), ring);
-
-                outData[0] = U1_m1;
                 break;
             }
             case (112): {
@@ -313,21 +321,26 @@ public class MatrSMult4 extends Drop {
                 Element a = inData[4];
 
                 LOGGER.info("-------------------------112-------------------------------");
+                Element al = F21.A_n();
+                Element am = F12.A_n();
+                Element ak = F11.A_n();
+                MatrixS A22_2 = X_A22_2.multiply(F12.W()
+                        .multiply(F12.Dbar(), ring), ring);
+                Element lambda = al.divideToFraction(ak, ring);
+                Element as = lambda.multiply(am, ring);
+                Element ak2 = ak.multiply(ak, ring);
 
-
-                MatrixS A22_2 = X_A22_2.multiply(F12.W(), ring).multiply(F12.Dbar(), ring);
-                Element lambda = F21.A_n().divide(F11.A_n(), ring);
-                Element as = lambda.multiply(F12.A_n(), ring);
-
-                LOGGER.info("al=" + F21.A_n());
-                LOGGER.info("ak=" + F11.A_n());
-                LOGGER.info("am=" + F12.A_n());
-
-                MatrixS I12lambda=(F12.I().multiplyByNumber(lambda, ring)).add(F12.Ibar(), ring);
-                MatrixS invD12hat=  I12lambda.inverse(ring).multiply(F12.Dhat(), ring);
-
-                Element ak2 = F11.A_n().multiply(F11.A_n(), ring);
+                MatrixS I12lambdaM2 = (F12.I()
+                        .divideByNumbertoFraction(lambda, ring))
+                        .add(F12.Ibar(), ring);
+                MatrixS invD12hat = I12lambdaM2.multiply(F12.Dhat(), ring);
                 MatrixS A22_3 = A22_2.divideByNumber(ak2, ring).divideByNumber(a, ring);
+
+                LOGGER.info("seq X_A22_2 F12.Dbar(): " + F12.Dbar());
+                LOGGER.info("seq X_A22_2 F12.W(): " + F12.W());
+                LOGGER.info("seq X_A22_2: " + X_A22_2);
+                LOGGER.info("seq A22_2: " + A22_2);
+                LOGGER.info("seq A22_3: " + A22_3);
                 LOGGER.info("-------------------------/112-------------------------------");
                 outData[0] = lambda;
                 outData[1] = as;
@@ -338,15 +351,19 @@ public class MatrSMult4 extends Drop {
             case (113): {
                 LdumwDto F21 = ((LdumwDto) inData[0]);
                 MatrixS A22_1 = (MatrixS) inData[1];
-                MatrixS X_U2 = (MatrixS) inData[2];
+                MatrixS U2 = (MatrixS) inData[2];//X_U2
                 Element a = inData[3];
 
                 LOGGER.info("-------------------------113-------------------------------");
-                MatrixS U2 = F21.J().multiply(F21.M(), ring)
-                        .multiply(A22_1, ring)
-                        .divideByNumber(F21.A_n().multiply(a, ring), ring)
-                        .add(X_U2, ring);
+                Element al = F21.A_n();
+                MatrixS U2H = F21.J().multiply(F21.M(), ring)
+                        .multiply(A22_1, ring);
+                U2H = U2H.divideByNumber(al, ring).divideByNumber(a, ring);
+                U2 = U2.add(U2H, ring);
 
+                System.out.println("seq 113 A22_1: " + A22_1);
+                System.out.println("seq 113 U2H: " + U2H);
+                System.out.println("seq 113 U2: " + U2);
                 LOGGER.info("-------------------------/113-------------------------------");
                 outData[0] = U2;
                 break;
@@ -355,36 +372,25 @@ public class MatrSMult4 extends Drop {
                 LdumwDto F21 = ((LdumwDto) inData[0]);
                 MatrixS A22_1 = (MatrixS) inData[1];
                 LOGGER.info("-------------------------114-------------------------------");
-                MatrixS Y_L3 = F21.Dbar().multiply(F21.M(), ring).multiply(A22_1, ring);
+                MatrixS Y_L3 = F21.Dbar().multiply(F21.M(), ring)
+                        .multiply(A22_1, ring); // L3H1
                 LOGGER.info("-------------------------/114-------------------------------");
                 outData[0] = Y_L3;
                 break;
             }
-            case (115): {
-
-                MatrixS invD12hat = (MatrixS) inData[0];
-                LdumwDto F12 = ((LdumwDto) inData[1]);
-                LdumwDto F11 = ((LdumwDto) inData[2]);
-
-                LOGGER.info("-------------------------115-------------------------------");
-                MatrixS L1_m1 = invD12hat.multiply(F12.M(), ring)
-                        .multiply(F11.Dhat(), ring)
-                        .multiply(F11.M(), ring);
-                LOGGER.info("-------------------------/115-------------------------------");
-                outData[0] = L1_m1;
-                break;
-            }
             case (116): {
 
+                LOGGER.info("-------------------------116-------------------------------");
                 LdumwDto F11 = ((LdumwDto) inData[0]);
                 LdumwDto F12 = ((LdumwDto) inData[1]);
                 Element lambda = inData[2];
 
-
-                LOGGER.info("-------------------------116-------------------------------");
-                MatrixS I12lambda=(F12.I().multiplyByNumber(lambda, ring)).add(F12.Ibar(), ring);
+                MatrixS I12lambda = (F12.I()
+                        .multiplyByNumber(lambda, ring))
+                        .add(F12.Ibar(), ring);
                 MatrixS L12tilde = F12.L().multiply(I12lambda, ring);
                 MatrixS X_L = F11.L().multiply(L12tilde, ring);
+
                 LOGGER.info("-------------------------/116-------------------------------");
                 outData[0] = X_L;
                 break;
@@ -396,34 +402,19 @@ public class MatrSMult4 extends Drop {
                 MatrixS X_L3 = (MatrixS) inData[3];
                 Element a = inData[4];
                 LOGGER.info("-------------------------118-------------------------------");
-                MatrixS L_3 = Y_L3.multiply(F12.W(), ring)
-                        .multiply(F12.I(), ring)
-                        .divideByNumber(F12.A_n().multiply(F11.A_n(), ring).multiply(a, ring), ring)
-                        .add(X_L3, ring);
+                Element am = F12.A_n();
+                Element ak = F11.A_n();
+                MatrixS L3H2 = (F12.W()
+                        .multiply(F12.I(), ring));
 
+                Y_L3 = Y_L3.multiply(L3H2, ring);
+                Y_L3 = Y_L3.divideByNumber(am, ring)
+                        .divideByNumber(ak, ring)
+                        .divideByNumber(a, ring);
+
+                MatrixS L3 = X_L3.add(Y_L3, ring);
                 LOGGER.info("-------------------------/118-------------------------------");
-                outData[0] = L_3;
-
-                break;
-            }
-            case (119): {
-                MatrixS U1_m1 = (MatrixS) inData[0];
-                MatrixS U2 = (MatrixS) inData[1];
-                LOGGER.info("-------------------------119-------------------------------");
-
-                MatrixS X_W2 = U1_m1.multiply(U2, ring).negate(ring);
-                outData[0] = X_W2;
-                LOGGER.info("-------------------------/119-------------------------------");
-                break;
-            }
-            case (120): {
-                MatrixS invD12hat = (MatrixS) inData[0];
-                LdumwDto F12 = ((LdumwDto) inData[1]);
-                LdumwDto F22 = ((LdumwDto) inData[2]);
-                LOGGER.info("-------------------------120-------------------------------");
-                MatrixS U4_m1 = F12.W().multiply(invD12hat, ring).multiply(F22.W(), ring).multiply(F22.Dhat(), ring);
-                LOGGER.info("-------------------------/120-------------------------------");
-                outData[0] = U4_m1;
+                outData[0] = L3;
 
                 break;
             }
@@ -432,60 +423,25 @@ public class MatrSMult4 extends Drop {
                 LdumwDto F12 = ((LdumwDto) inData[1]);
                 Element lambda = inData[2];
                 LOGGER.info("-------------------------121-------------------------------");
-                MatrixS J12lambda = F12.J().multiplyByNumber(lambda, ring).add(F12.Jbar(), ring);
+                System.out.println(("F22.U(): " + F22.U()));
+                MatrixS J12lambda = (F12.J().multiplyByNumber(lambda, ring))
+                        .add(F12.Jbar(), ring);
                 MatrixS U12tilde = J12lambda.multiply(F12.U(), ring);
                 MatrixS X_U = F22.U().multiply(U12tilde, ring);
                 LOGGER.info("-------------------------/121-------------------------------");
                 outData[0] = X_U;
                 break;
             }
-            case (122): {
-                LdumwDto F22 = ((LdumwDto) inData[0]);
-                LdumwDto F21 = ((LdumwDto) inData[1]);
-                LOGGER.info("-------------------------122-------------------------------");
-                MatrixS L4_m1 = F22.Dhat()
-                        .multiply(F22.M(), ring)
-                        .multiply(F21.Dhat(), ring)
-                        .multiply(F21.M(), ring);
-                LOGGER.info("-------------------------/122-------------------------------");
-                outData[0] = L4_m1;
-                break;
-            }
+
             case (123): {
                 LdumwDto F21 = ((LdumwDto) inData[0]);
                 LdumwDto F22 = ((LdumwDto) inData[1]);
-                LOGGER.info("-------------------------123-------------------------------");
+                LOGGER.info("seq F21.L(): " + F21.L());
+                LOGGER.info("seq F22.L(): " + F22.L());
+
                 MatrixS LL = F21.L().multiply(F22.L(), ring);
                 LOGGER.info("-------------------------/123-------------------------------");
                 outData[0] = LL;
-                break;
-            }
-            case (124): {
-                MatrixS L4_m1 = (MatrixS) inData[0];
-                MatrixS L3 = (MatrixS) inData[1];
-                LOGGER.info("-------------------------124-------------------------------");
-                MatrixS X_m12 = L4_m1.multiply(L3, ring).negate(ring);
-                outData[0] = X_m12;
-                LOGGER.info("-------------------------/124-------------------------------");
-                break;
-            }
-            case (125): {
-                MatrixS X_W21 = (MatrixS) inData[0];
-                MatrixS U4_m1 = (MatrixS) inData[1];
-
-                LOGGER.info("-------------------------125-------------------------------");
-                outData[0] = X_W21.multiply(U4_m1, ring);
-
-                LOGGER.info("-------------------------/125-------------------------------");
-                break;
-            }
-            case (126): {
-                MatrixS X_m12 = (MatrixS) inData[0];
-                MatrixS L1_m1 = (MatrixS) inData[1];
-                LOGGER.info("-------------------------126-------------------------------");
-                MatrixS X_m2 = X_m12.multiply(L1_m1, ring);
-                outData[0] = X_m2;
-                LOGGER.info("-------------------------/126-------------------------------");
                 break;
             }
         }
@@ -581,15 +537,6 @@ public class MatrSMult4 extends Drop {
                 ms1 = F11.U();
                 break;
             }
-            case (111): {
-                LdumwDto F11 = ((LdumwDto) inData[0]);
-                LdumwDto F21 = ((LdumwDto) inData[1]);
-                LOGGER.info("-------------------------111 input-------------------------------");
-                ms = F11.W().multiply(F11.Dhat(), ring);
-                ms1 = F21.W().multiply(F21.Dhat(), ring);
-
-                break;
-            }
             case (112): {
                 LdumwDto F12 = (LdumwDto) input[1];
                 LOGGER.info("-------------------------112 input-------------------------------");
@@ -613,15 +560,6 @@ public class MatrSMult4 extends Drop {
                 ms1 = A22_1;
                 break;
             }
-            case (115): {
-                MatrixS invD12hat = (MatrixS) inData[0];
-                LdumwDto F12 = ((LdumwDto) inData[1]);
-                LdumwDto F11 = ((LdumwDto) inData[2]);
-                LOGGER.info("-------------------------115 input-------------------------------");
-                ms = invD12hat.multiply(F12.M(), ring);
-                ms1 = F11.Dhat().multiply(F11.M(), ring);
-                break;
-            }
             case (116): {
                 LdumwDto F11 = ((LdumwDto) inData[0]);
                 LdumwDto F12 = ((LdumwDto) inData[1]);
@@ -629,7 +567,7 @@ public class MatrSMult4 extends Drop {
 
                 LOGGER.info("-------------------------116 input-------------------------------");
 
-                MatrixS I12lambda = F12.I().multiplyByNumber(lambda, ring).add(F12.Ibar(), ring);
+                MatrixS I12lambda = (F12.I().multiplyByNumber(lambda, ring)).add(F12.Ibar(), ring);
                 MatrixS L12tilde = F12.L().multiply(I12lambda, ring);
                 ms = F11.L();
                 ms1 = L12tilde;
@@ -640,21 +578,6 @@ public class MatrSMult4 extends Drop {
                 LOGGER.info("-------------------------118 input-------------------------------");
                 ms = (MatrixS) inData[0]; //Y_L3;
                 ms1 = F12.W();
-                break;
-            }
-            case (119): {
-                ms = (MatrixS) inData[0];
-                ms1 = (MatrixS) inData[1];
-                LOGGER.info("-------------------------119 input-------------------------------");
-                break;
-            }
-            case (120): {
-                MatrixS invD12hat = (MatrixS) inData[0];
-                LdumwDto F12 = ((LdumwDto) inData[1]);
-                LdumwDto F22 = ((LdumwDto) inData[2]);
-                LOGGER.info("-------------------------120 input-------------------------------");
-                ms = F12.W().multiply(invD12hat, ring);
-                ms1 = F22.W().multiply(F22.Dhat(), ring);
                 break;
             }
             case (121): {
@@ -671,14 +594,6 @@ public class MatrSMult4 extends Drop {
                 ms1 = U12tilde;
                 break;
             }
-            case (122): {
-                LdumwDto F22 = ((LdumwDto) inData[0]);
-                LdumwDto F21 = ((LdumwDto) inData[1]);
-                LOGGER.info("-------------------------122 input-------------------------------");
-                ms = F22.Dhat().multiply(F22.M(), ring);
-                ms1 = F21.Dhat().multiply(F21.M(), ring);
-                break;
-            }
             case (123): {
                 LdumwDto F21 = ((LdumwDto) inData[0]);
                 LdumwDto F22 = ((LdumwDto) inData[1]);
@@ -686,24 +601,6 @@ public class MatrSMult4 extends Drop {
                 ms = F21.L();
                 ms1 = F22.L();
 
-                break;
-            }
-            case (124): {
-                ms = (MatrixS) inData[0];
-                ms1 = (MatrixS) inData[1];
-                LOGGER.info("-------------------------124 input-------------------------------");
-                break;
-            }
-            case (125): {
-                ms = (MatrixS) inData[0];
-                ms1 = (MatrixS) inData[1];
-                LOGGER.info("-------------------------125 input-------------------------------");
-                break;
-            }
-            case (126): {
-                ms = (MatrixS) inData[0];
-                ms1 = (MatrixS) inData[1];
-                LOGGER.info("-------------------------126 input-------------------------------");
                 break;
             }
         }
@@ -723,18 +620,10 @@ public class MatrSMult4 extends Drop {
             case (107):
             case (109):
             case (110):
-            case (111):
             case (114):
-            case (115):
             case (116):
-            case (120):
             case (121):
-            case (122):
             case (123):
-            case (124):
-            case (125):
-            case (126):
-            case (119):
                 break;
             case (3): {
                 Element ds = inData[2].multiply(inData[3], ring).divide(inData[4], ring);
@@ -778,8 +667,8 @@ public class MatrSMult4 extends Drop {
                 Element lambda = F21.A_n().divide(F11.A_n(), ring);
                 Element as = lambda.multiply(F12.A_n(), ring);
 
-                MatrixS I12lambdaM2=(F12.I().divideByNumbertoFraction(lambda, ring)).add(F12.Ibar(), ring);
-                MatrixS invD12hat=  I12lambdaM2.multiply(F12.Dhat(), ring);
+                MatrixS I12lambdaM2 = (F12.I().divideByNumbertoFraction(lambda, ring)).add(F12.Ibar(), ring);
+                MatrixS invD12hat = I12lambdaM2.multiply(F12.Dhat(), ring);
 
                 Element ak2 = F11.A_n().multiply(F11.A_n(), ring);
 
@@ -833,22 +722,14 @@ public class MatrSMult4 extends Drop {
             case (0):
             case (107):
             case (110):
-            case (111):
             case (114):
-            case (115):
             case (116):
-            case (120):
             case (121):
-            case (122):
             case (123):
-            case (125):
-            case (126):
                 LOGGER.info("-------------------------0 output-------------------------------");
                 res = new MatrixS[]{MatrixS.join(resmat)};
                 break;
             case (1):
-            case (119):
-            case (124):
                 LOGGER.info("------------------------- 1 output-------------------------------");
                 res = new MatrixS[]{MatrixS.join(resmat).negate(ring)};
                 break;

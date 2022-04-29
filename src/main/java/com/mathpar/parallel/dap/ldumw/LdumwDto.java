@@ -10,7 +10,9 @@ import java.util.Objects;
 
 public class LdumwDto extends Element {
     private final MatrixS L;
-    private final MatrixS D; // ==Ddenom   new sense of this matrix! (denom-of-each-elems)
+
+
+    private MatrixS D; // ==Ddenom   new sense of this matrix! (denom-of-each-elems)
     private MatrixS Dhat;  //  L Dhat M = I, W Dhat U = I
     private MatrixS Dbar;// Dbar *Dbar^T= Ibar,  Dbar^T *Dbar = Jbar,
     private final MatrixS U;
@@ -209,6 +211,9 @@ public class LdumwDto extends Element {
         return a_n;
     }
 
+    public void setD(MatrixS d) {
+        D = d;
+    }
     public void setDhat(MatrixS dhat) {
         Dhat = dhat;
     }
@@ -262,5 +267,16 @@ public class LdumwDto extends Element {
     @Override
     public int hashCode() {
         return Objects.hash(L, D, Dhat, Dbar, U, M, W, I, Ibar, J, Jbar, a_n);
+    }
+
+    @Override
+    public String toString() {
+        return "LdumwDto{" +
+                "L=" + L +
+                ", D=" + D +
+                ", U=" + U +
+                ", M=" + M +
+                ", W=" + W +
+                '}';
     }
 }

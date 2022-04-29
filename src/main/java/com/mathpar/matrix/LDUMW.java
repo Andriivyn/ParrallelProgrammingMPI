@@ -62,6 +62,25 @@ public class LDUMW {
         A.size=b; A.colNumb=b; // b=2^n
         LDUMW FF = new LDUMW(A);
         FF.getLDU(A, a, ring);
+        System.out.println("LDUMW A(): " + A);
+        if(!flag){ FF.L.size=As; FF.U.colNumb=Aclmn; FF.W.size=Aclmn; FF.M.colNumb=As;}
+        return new LdumwDto(
+                FF.L, invForD(FF.D, ring), FF.Dhat, FF.Dbar,
+                FF.U, FF.M, FF.W, FF.I,
+                FF.Ibar, FF.J, FF.Jbar, FF.a_n
+        );
+
+   }
+    public static LdumwDto LDUMWNoInversion(MatrixS A, Element a, Ring ring){
+        // envelop with 2^n
+        int As= A.size; int Aclmn= A.colNumb;
+        int s=Math.max(As,Aclmn); int b=s;
+        for (int i = 0; i < s; i++) {b=b>>1; if (b==0){b=1<<i; break;}}
+        boolean flag; //flag is true for size== 2^n
+        if(b!=s){flag=false;b=b<<1;}else {flag=(As==Aclmn);}
+        A.size=b; A.colNumb=b; // b=2^n
+        LDUMW FF = new LDUMW(A);
+        FF.getLDU(A, a, ring);
         if(!flag){ FF.L.size=As; FF.U.colNumb=Aclmn; FF.W.size=Aclmn; FF.M.colNumb=As;}
         return new LdumwDto(
                 FF.L, FF.D, FF.Dhat, FF.Dbar,
@@ -69,7 +88,7 @@ public class LDUMW {
                 FF.Ibar, FF.J, FF.Jbar, FF.a_n
         );
 
-   }
+    }
 
 
     /** Factors of inverse matrix and psevdo inverse matrix of A:
@@ -207,47 +226,47 @@ public class LDUMW {
      * @param a is minor of previouse step (or 1 for the first step)
      * @param ring
      */
-      public void getLDU(MatrixS T, Element a,   Ring ring){
+    public void getLDU(MatrixS T, Element a,   Ring ring){
         Element ONE=ring.numberONE;
-      //    System.out.println("A="+T);
-    if (T.isZero(ring)){
-                D = MatrixS.zeroMatrix(n);
-                L = MatrixS.scalarMatrix(n, ONE, ring);
-                U = MatrixS.scalarMatrix(n, ONE, ring);
-                M = MatrixS.scalarMatrix(n, a, ring);
-                W = MatrixS.scalarMatrix(n, a, ring);
-                Element aInv=(a.isOne(ring)||a.isMinusOne(ring))
-                        ?a:new Fraction(ring.numberONE,a);
-                Dhat=MatrixS.scalarMatrix(n, aInv, ring);
-                a_n = a;
-                Dbar=MatrixS.scalarMatrix(n, ONE, ring);
-                I=MatrixS.zeroMatrix(n);
-                J=MatrixS.zeroMatrix(n);
-                Jbar=MatrixS.scalarMatrix(n, ONE, ring);
-                Ibar=MatrixS.scalarMatrix(n, ONE, ring);
-                           if(n==2){
+        //    System.out.println("A="+T);
+        if (T.isZero(ring)){
+            D = MatrixS.zeroMatrix(n);
+            L = MatrixS.scalarMatrix(n, ONE, ring);
+            U = MatrixS.scalarMatrix(n, ONE, ring);
+            M = MatrixS.scalarMatrix(n, a, ring);
+            W = MatrixS.scalarMatrix(n, a, ring);
+            Element aInv=(a.isOne(ring)||a.isMinusOne(ring))
+                    ?a:new Fraction(ring.numberONE,a);
+            Dhat=MatrixS.scalarMatrix(n, aInv, ring);
+            a_n = a;
+            Dbar=MatrixS.scalarMatrix(n, ONE, ring);
+            I=MatrixS.zeroMatrix(n);
+            J=MatrixS.zeroMatrix(n);
+            Jbar=MatrixS.scalarMatrix(n, ONE, ring);
+            Ibar=MatrixS.scalarMatrix(n, ONE, ring);
+            if(n==2){
 //  System.out.println( "A=========="+T+"; L="+L+"; U="+U+"; M="+M+"; W="+W+"; \\hat D="+Dhat+"; D="+invForD(D, ring)+":   ");
-           }
-                return;
+            }
+            return;
         }
         if(n==1){
-                a_n = T.getElement(0, 0, ring);
-                Element aan=a_n.multiply(a, ring);
-                Element an_an=a_n.multiply(a_n, ring);
-                L = new MatrixS(a_n);
-                D = new MatrixS(aan);
-                Element a2Inv=(an_an.isOne(ring)||an_an.isMinusOne(ring))
-                        ?an_an:new Fraction(ring.numberONE,an_an);
-                Dhat=new MatrixS(a2Inv);
-                Dbar = MatrixS.zeroMatrix(n);
-                U = new MatrixS(a_n);
-                M = new MatrixS(a_n);
-                W = new MatrixS(a_n);
-                Jbar=Dbar;
-                Ibar=Dbar;
-                I=new MatrixS(ONE);
-                J=I;
-                return;
+            a_n = T.getElement(0, 0, ring);
+            Element aan=a_n.multiply(a, ring);
+            Element an_an=a_n.multiply(a_n, ring);
+            L = new MatrixS(a_n);
+            D = new MatrixS(aan);
+            Element a2Inv=(an_an.isOne(ring)||an_an.isMinusOne(ring))
+                    ?an_an:new Fraction(ring.numberONE,an_an);
+            Dhat=new MatrixS(a2Inv);
+            Dbar = MatrixS.zeroMatrix(n);
+            U = new MatrixS(a_n);
+            M = new MatrixS(a_n);
+            W = new MatrixS(a_n);
+            Jbar=Dbar;
+            Ibar=Dbar;
+            I=new MatrixS(ONE);
+            J=I;
+            return;
         }
         MatrixS[] A = T.split();
         MatrixS A11 = A[0];
@@ -255,177 +274,206 @@ public class LDUMW {
         MatrixS A21 = A[2];
         MatrixS A22 = A[3];
         LDUMW F11 = new LDUMW(A11);
-           F11.getLDU(A11,a,ring);
-      Element ak=F11.a_n; Element ak2=ak.multiply(ak, ring);
-      MatrixS A12_0= F11.M.multiply(A12, ring);
-      MatrixS A12_1= F11.Dhat.multiplyByNumber(ak, ring).multiply(A12_0, ring);
-      MatrixS A21_0=A21.multiply(F11.W,ring);
+        System.out.println("A11 before getLDU: " + A11);
+        System.out.println("a before getLDU: " + a);
+        F11.getLDU(A11,a,ring);
+        System.out.println("F11.D() after: " + F11.D);
+        Element ak=F11.a_n;  //Done
+        Element ak2=ak.multiply(ak, ring); //Done
+        MatrixS A12_0= F11.M.multiply(A12, ring);//Done
+        MatrixS A12_1= F11.Dhat.multiplyByNumber(ak, ring).multiply(A12_0, ring);//Done
+        MatrixS A21_0=A21.multiply(F11.W,ring);//Done
 
-     MatrixS A21_1 =A21_0.multiplyByNumber(ak, ring).multiply(F11.Dhat, ring);
-     MatrixS A12_2=F11.Dbar.multiply(A12_0, ring).divideByNumber(a, ring);
-  // here   --- F11.Dbar
+        MatrixS A21_1 =A21_0.multiplyByNumber(ak, ring).multiply(F11.Dhat, ring); //Done
+        MatrixS A12_2=F11.Dbar.multiply(A12_0, ring).divideByNumber(a, ring); //Done
+        // here   --- F11.Dbar
 
-     MatrixS A21_2= A21_0.multiply(F11.Dbar, ring).divideByNumber(a, ring);
-     LDUMW F21 = new LDUMW(A21_2);
-         F21.getLDU(A21_2,  ak , ring);
-     Element al=F21.a_n;
-     LDUMW F12 = new LDUMW(A12_2);
+        MatrixS A21_2= A21_0.multiply(F11.Dbar, ring).divideByNumber(a, ring); //Done
+        LDUMW F21 = new LDUMW(A21_2);
+        System.out.println("A21_2 before getLDU: " + A21_2);
+        System.out.println("ak before getLDU: " + ak);
+        F21.getLDU(A21_2,  ak , ring);
+        System.out.println("F21.D() after: " + F21.D);
+        Element al=F21.a_n;// Done
+
+        LDUMW F12 = new LDUMW(A12_2);
+        System.out.println("A12_2 before getLDU: " + A12_2);
+        System.out.println("ak before getLDU: " + ak);
         F12.getLDU(A12_2, ak , ring);
-     Element am= F12.a_n;
-     Element lambda= al.divideToFraction(ak, ring);
-     Element as=lambda.multiply(am, ring);
-     MatrixS  D11PLUS=F11.D.transpose();
-if(n>2){}
-//System.out.println( "A12_0="+A12_0+"; A12_1="+A12_1+"; A12_2="+A12_2+"; A21_0="+A21_0+"; A21_1="+A21_1+"; A21_2="+A21_2+";");
+        System.out.println("F12.D() after: " + F12.D);
+        Element am= F12.a_n;// Done
+        Element lambda= al.divideToFraction(ak, ring); // Done
+        Element as=lambda.multiply(am, ring); // Done
+        System.out.println("conseq F11.D: " + F11.D);
+        MatrixS  D11PLUS=F11.D.transpose(); //Done
+        if(n>2)
+            System.out.println( "A12_0="+A12_0+"; A12_1="+A12_1+"; A12_2="+A12_2+"; A21_0="+A21_0+"; A21_1="+A21_1+"; A21_2="+A21_2+";");
 
 
 
-     MatrixS A22_0= A21_1.multiply(D11PLUS.multiply(A12_1, ring), ring);
-     MatrixS A22_1= (A22.multiplyByNumber(ak2, ring).multiplyByNumber(a, ring)
-         .subtract(A22_0,ring)).divideByNumber(ak, ring).divideByNumber(a, ring);
+        MatrixS A22_0= A21_1.multiply(D11PLUS.multiply(A12_1, ring), ring);//Done
+        MatrixS A22_1= (A22.multiplyByNumber(ak2, ring).multiplyByNumber(a, ring)//Done
+                .subtract(A22_0,ring)).divideByNumber(ak, ring).divideByNumber(a, ring); //Done
 
-     MatrixS  A22_2=(F21.Dbar.multiply(F21.M, ring)).multiply(A22_1, ring);
-              A22_2=A22_2.multiply(F12.W.multiply(F12.Dbar, ring), ring);
-     MatrixS A22_3=A22_2.divideByNumber(ak2, ring).divideByNumber(a, ring);
-     LDUMW F22 = new LDUMW(A22_3);
-          F22.getLDU(A22_3, as, ring);
-     a_n=F22.a_n;
-     MatrixS J12lambda=(F12.J.multiplyByNumber(lambda, ring)).add(F12.Jbar, ring);
-     MatrixS I12lambda=(F12.I.multiplyByNumber(lambda, ring)).add(F12.Ibar, ring);
-     MatrixS L12tilde=F12.L.multiply(I12lambda, ring);
-     MatrixS U12tilde= J12lambda.multiply(F12.U, ring);
-     Element lambda2=lambda.multiply(lambda, ring);
+        MatrixS  X_A22_2=(F21.Dbar.multiply(F21.M, ring)).multiply(A22_1, ring);//Done
 
+        MatrixS A22_2= X_A22_2.multiply(F12.W.multiply(F12.Dbar, ring), ring); //Done
+        MatrixS A22_3=A22_2.divideByNumber(ak2, ring).divideByNumber(a, ring); //Done
 
-     MatrixS U2= (F11.J.multiply(F11.M, ring)).multiply(A12, ring);
-             U2= U2.divideByNumber(ak, ring);
-     MatrixS U2H= F21.J.multiply(F21.M, ring).multiply(A22_1,ring);
-             U2H=U2H.divideByNumber(al, ring).divideByNumber(a, ring);
-             U2= U2.add(U2H, ring);
-     MatrixS L3H2= (A22_1.multiply(F12.W.multiply(F12.I, ring), ring));
-     MatrixS L3H1= F21.Dbar.multiply(F21.M, ring).multiply(L3H2, ring);
-             L3H1= L3H1.divideByNumber(am, ring)
-                .divideByNumber(ak, ring).divideByNumber(a, ring);
-     MatrixS L3= (A21.multiply(F11.W.multiply(F11.I, ring), ring));
-             L3= (L3.divideByNumber(ak, ring)).add(L3H1, ring);
-     MatrixS[] LL=new MatrixS[]{F11.L.multiply(L12tilde, ring),
-                  MatrixS.zeroMatrix(), L3, F21.L.multiply(F22.L, ring) };
-     L=MatrixS.join(LL);
-
-     MatrixS[] UU=new MatrixS[]{F21.U.multiply(F11.U, ring), U2,
-                  MatrixS.zeroMatrix(), F22.U.multiply(U12tilde, ring) };
-     U=MatrixS.join(UU);
-     D=MatrixS.join(new MatrixS[]{F11.D,
-               F12.D.multiplyByNumber(lambda2, ring), F21.D, F22.D});
-     IJMap(a,ring);
-
-   if(n>2){}
-//     System.out.println( "A22_0="+A22_0+"; A22_1="+A22_1+"; A22_2="+A22_2+"; A22_3="+A22_3+"; U2="+U2+"; L3="+L3+";");
+        LDUMW F22 = new LDUMW(A22_3);
+        System.out.println("A22_3 before getLDU: " + A22_3);
+        System.out.println("as before getLDU: " + as);
+        F22.getLDU(A22_3, as, ring);
+        System.out.println("F22.D() after: " + F22.D);
+        a_n=F22.a_n;
+        MatrixS J12lambda=(F12.J.multiplyByNumber(lambda, ring)).add(F12.Jbar, ring);// Done
+        MatrixS I12lambda=(F12.I.multiplyByNumber(lambda, ring)).add(F12.Ibar, ring); // Done
+        MatrixS L12tilde=F12.L.multiply(I12lambda, ring); // Done
+        MatrixS U12tilde= J12lambda.multiply(F12.U, ring);// Done
+        Element lambda2=lambda.multiply(lambda, ring);
 
 
-    MatrixS I12lambdaM2=(F12.I.divideByNumbertoFraction(lambda, ring)).add(F12.Ibar, ring);
-    MatrixS invD12hat=  I12lambdaM2.multiply(F12.Dhat, ring);
+        MatrixS U2= (F11.J.multiply(F11.M, ring)).multiply(A12, ring);//Done
+        U2= U2.divideByNumber(ak, ring);//Done
+        MatrixS U2H= F21.J.multiply(F21.M, ring).multiply(A22_1,ring);//Done
+        U2H=U2H.divideByNumber(al, ring).divideByNumber(a, ring);//Done
+        U2= U2.add(U2H, ring);//Done
 
+        MatrixS L3H1= F21.Dbar.multiply(F21.M, ring) // Done
+                .multiply(A22_1, ring); // Done
+
+        MatrixS L3H2= (F12.W // Done
+                .multiply(F12.I, ring)); // Done
+
+        L3H1 = L3H1.multiply(L3H2, ring); // Done
+        L3H1= L3H1.divideByNumber(am, ring) // Done
+                .divideByNumber(ak, ring) // Done
+                .divideByNumber(a, ring); // Done
+
+        MatrixS L3= (A21.multiply(F11.W.multiply(F11.I, ring), ring)); //Done
+        L3= (L3.divideByNumber(ak, ring)); //Done
+        L3= L3.add(L3H1, ring); //Done
+        MatrixS X_L = F11.L.multiply(L12tilde, ring); // Done
+        MatrixS LL_ = F21.L.multiply(F22.L, ring);// Done
+        MatrixS[] LL=new MatrixS[]{X_L,// Done
+                MatrixS.zeroMatrix(), L3, LL_};// Done
+        L=MatrixS.join(LL);// Done
+
+//        System.out.println(("U12tilde conseq: " + U12tilde));
+        System.out.println("conseq F21.L: " + F21.L);
+        System.out.println("conseq F22.L: " + F22.L);
+        System.out.println("conseq A22_1: " + A22_1);
+        System.out.println("conseq U2H: " + U2H);
+        System.out.println("conseq U2: " + U2);
+        System.out.println("conseq A12: " + A12);
+        System.out.println("conseq A11: " + A11);
+        System.out.println("conseq D11PLUS: " + D11PLUS);
+        System.out.println("conseq A21_1: " + A21_1);
+        System.out.println("conseq A12_1: " + A12_1);
+        System.out.println("conseq A22_0: " + A22_0);
+        System.out.println("conseq ak2: " + ak2);
+        System.out.println("conseq A22_0: " + A22_0);
+        System.out.println("conseq F21.Dbar: " + F21.Dbar);
+        System.out.println("conseq F21.M: " + F21.M);
+        System.out.println("conseq A22_1: " + A22_1);
+        System.out.println(("conseq X_A22_2 F12.W: " + F12.W));
+        System.out.println(("conseq X_A22_2 F12.Dbar: " + F12.Dbar));
+        System.out.println(("conseq X_A22_2: " + X_A22_2));
+        System.out.println(("conseq ak2: " + ak2));
+        System.out.println(("conseq A22_2: " + A22_2));
+        System.out.println(("conseq A22_3: " + A22_3));
+        System.out.println(("conseq F22.U(): " + F22.U));
+
+        MatrixS UU_ = F21.U.multiply(F11.U, ring); //Done
+        MatrixS X_U = F22.U.multiply(U12tilde, ring); //Done
+        MatrixS[] UU=new MatrixS[]{UU_, U2,// Done
+                MatrixS.zeroMatrix(), X_U};// Done
+        U=MatrixS.join(UU);
+        D=MatrixS.join(new MatrixS[]{F11.D,
+                F12.D.multiplyByNumber(lambda2, ring), F21.D, F22.D});
+
+        System.out.println(("conseq IJMap a: " + a));
+        System.out.println(("conseq IJMap D: " + D));
+        System.out.println(("conseq IJMap F22.a_n: " + F22.a_n));
+        IJMap(a,ring);
+
+        MatrixS I12lambdaM2=(F12.I.divideByNumbertoFraction(lambda, ring)).add(F12.Ibar, ring);// Done
+        MatrixS invD12hat=  I12lambdaM2.multiply(F12.Dhat, ring); // Done
+        MatrixS L1_m1 = invD12hat // Done
+                .multiply(F12.M, ring) // Done
+                .multiply(F11.Dhat // Done
+                .multiply(F11.M, ring), ring); // Done
+        MatrixS L3prim=L3.negate(ring).multiply(L1_m1, ring);
+        MatrixS DhUnit = DtoUnit(D,ring.numberONE, ring);
+        System.out.println("DhUnit: " + DhUnit);
+        System.out.println("DhUnit Dbar: " + Dbar);
+
+        DhUnit = DhUnit.add(Dbar, ring).transpose();
+
+        MatrixS[] Eprim=DhUnit.split();
+
+        MatrixS U2prim=F11.W.multiply(F11.Dhat.multiply(F21.W.multiply(F21.Dhat, ring), ring), ring);//Done U1_m1
+        U2prim = U2prim.multiply(U2.negate(ring), ring);
+        // Du=
+        MatrixS D11prim= DtoUnit(F11.D,ring.numberONE,ring).add(F11. Dbar, ring) ;
+        MatrixS D12prim=DtoUnit(F21.D, ak, ring).add(F21.Dbar.multiplyByNumber(a, ring), ring);
+        MatrixS D21prim=DtoUnit(F12.D, al ,ring).add(F12.Dbar.multiplyByNumber(a, ring), ring);
+        MatrixS D22prim= DtoUnit(F22.D, as,ring).add(F22.Dbar.multiplyByNumber(a, ring), ring);
+
+        MatrixS V11A = F21.W.multiply(F21.Dbar, ring).multiply(Eprim[0], ring);
+        MatrixS V11B =F11.W.multiply(D11prim, ring).multiply(V11A, ring);
+        MatrixS  V11= V11B.multiplyByNumber(new Fraction(a_n, ak.multiply(al, ring)), ring);
+        MatrixS V12A= F21.W.multiply(D12prim, ring).multiply(Eprim[1], ring);
+        MatrixS V12B= F11.W.multiply(F11.Dbar, ring).multiply( V12A, ring);
+        MatrixS  V12= V12B.multiplyByNumber(new Fraction(a_n, ak.multiply(al, ring).multiply(a , ring)), ring);
+        MatrixS V21A =F12.W.multiply(D21prim, ring).multiply(F22.W, ring).multiply(F22.Dbar, ring);
+        MatrixS V21B =V21A.multiply(Eprim[2], ring);
+        MatrixS  V21= V21B.multiplyByNumber(new Fraction(ring.numberONE, am.multiply(a, ring)), ring);
+        MatrixS V22A=F12.W.multiply(F12.Dbar, ring).multiply(F22.W, ring).multiply(D22prim, ring);
+        MatrixS V22B=V22A.multiply(Eprim[3], ring);
+        MatrixS  V22= V22B.multiplyByNumber(new Fraction(ring.numberONE, a.multiply(am, ring)), ring);
+
+
+        W=MatrixS.join(new MatrixS[]{V11.add(U2prim.multiply(V21, ring), ring),
+                V12.add(U2prim.multiply(V22, ring), ring), V21, V22});
+        if(n>2)
+            System.out.println( "V11="+V11+"; V12="+V12+"; V21="+V21+"; V22="+V22+"; U2prim="+U2prim+"; L3prim="+L3prim+";");
+
+
+
+
+        MatrixS N11A =Eprim[0].multiply(F12.Dbar, ring).multiply(F12.M, ring);
+        MatrixS  N11B =N11A.multiply(D11prim, ring).multiply(F11.M, ring);
+        MatrixS  N11= N11B.multiplyByNumber(new Fraction(a_n, ak.multiply(am, ring)), ring);
+        MatrixS N21A=Eprim[2].multiply(D21prim, ring).multiply(F12.M, ring);
+        MatrixS N21B=N21A.multiply(F11.Dbar, ring).multiply(F11.M, ring);
+        MatrixS    N21= N21B.multiplyByNumber(new Fraction(a_n, ak.multiply(am, ring).multiply(a , ring)), ring);
+        MatrixS N12A =Eprim[1].multiply(F22.Dbar, ring).multiply(F22.M, ring);
+        MatrixS N12B =N12A.multiply(D12prim, ring).multiply(F21.M, ring);
+        MatrixS  N12= N12B.multiplyByNumber(new Fraction(ring.numberONE, al.multiply(a, ring)), ring);
+        MatrixS N22A=Eprim[3].multiply(D22prim, ring).multiply(F22.M, ring);
+        MatrixS N22B=N22A.multiply(F21.Dbar, ring).multiply(F21.M, ring);
+        MatrixS  N22= N22B.multiplyByNumber(new Fraction(ring.numberONE, a.multiply(al, ring)), ring);
+
+        M=MatrixS.join(new MatrixS[]{N11.add(N12.multiply(L3prim, ring), ring),
+                N12, N21.add(N22.multiply(L3prim, ring), ring), N22});
 
 //
-//          Element ar_m1 = F22.a_n.inverse(ring);
-//          MatrixS DhatLeft = D.multiplyByNumber(a.multiply(ar_m1, ring), ring);
-//          MatrixS DhatRight = Dbar.multiplyByNumber(ar_m1, ring);
-//          MatrixS Dhat = DhatLeft.add(DhatRight, ring);
-//          MatrixS Dinv = Dhat.inverse(ring);
+        MatrixS mM=MatrixS.join(new MatrixS[]{N11B, N12B, N21B, N22B});
+        MatrixS wW=MatrixS.join(new MatrixS[]{V11B, V12B, V21B, V22B});
+        MatrixS Dpr=MatrixS.join(new MatrixS[]{D11prim, D12prim, D21prim, D22prim});
 //
-//          MatrixS L1_m1 = invD12hat.multiply(F12.M, ring)
-//                  .multiply(F11.Dhat, ring)
-//                  .multiply(F11.M, ring);
-//
-//          MatrixS L4_m1 = F22.Dhat
-//                  .multiply(F22.M, ring)
-//                  .multiply(F21.Dhat, ring)
-//                  .multiply(F21.M, ring);
-//          MatrixS X_m12 = L4_m1.multiply(L3, ring).negate(ring);
-//          MatrixS X_m2 = X_m12.multiply(L1_m1, ring);
-//
-//          M = Dinv.multiply(MatrixS.join(new MatrixS[]{L1_m1, MatrixS.zeroMatrix(), X_m2, L4_m1}), ring);
-//
-//          MatrixS U1_m1 = F11.W
-//                  .multiply(F11.Dhat, ring)
-//                  .multiply(F21.W, ring)
-//                  .multiply(F21.Dhat, ring);
-//
-//          MatrixS X_W2 = U1_m1.multiply(U2, ring).negate(ring);
-//          MatrixS U4_m1 = F12.W.multiply(invD12hat, ring).multiply(F22.W, ring).multiply(F22.Dhat, ring);
-//
-//          W = MatrixS.join(new MatrixS[]{U1_m1, X_W2, MatrixS.zeroMatrix(), U4_m1}).multiply(Dinv, ring);
-
-
-    MatrixS L3prim=L3.negate(ring).multiply(invD12hat, ring).multiply(F12.M, ring).multiply(F11.Dhat.multiply(F11.M, ring), ring);
-    MatrixS DhUnit= DtoUnit(D,ring.numberONE, ring).add(Dbar, ring).transpose();
-       MatrixS[] Eprim=DhUnit.split();
-
-    MatrixS U2prim=F11.W.multiply(F11.Dhat.multiply(F21.W.multiply(F21.Dhat.multiply(U2.negate(ring), ring), ring), ring), ring);
-       // Du=
-       MatrixS D11prim= DtoUnit(F11.D,ring.numberONE,ring).add(F11. Dbar, ring) ;
-       MatrixS D12prim=DtoUnit(F21.D, ak, ring).add(F21.Dbar.multiplyByNumber(a, ring), ring);
-       MatrixS D21prim=DtoUnit(F12.D, al ,ring).add(F12.Dbar.multiplyByNumber(a, ring), ring);
-       MatrixS D22prim= DtoUnit(F22.D, as,ring).add(F22.Dbar.multiplyByNumber(a, ring), ring);
-
-   MatrixS V11A = F21.W.multiply(F21.Dbar, ring).multiply(Eprim[0], ring);
-   MatrixS V11B =F11.W.multiply(D11prim, ring).multiply(V11A, ring);
-         MatrixS  V11= V11B.multiplyByNumber(new Fraction(a_n, ak.multiply(al, ring)), ring);
-   MatrixS V12A= F21.W.multiply(D12prim, ring).multiply(Eprim[1], ring);
-   MatrixS V12B= F11.W.multiply(F11.Dbar, ring).multiply( V12A, ring);
-         MatrixS  V12= V12B.multiplyByNumber(new Fraction(a_n, ak.multiply(al, ring).multiply(a , ring)), ring);
-   MatrixS V21A =F12.W.multiply(D21prim, ring).multiply(F22.W, ring).multiply(F22.Dbar, ring);
-   MatrixS V21B =V21A.multiply(Eprim[2], ring);
-         MatrixS  V21= V21B.multiplyByNumber(new Fraction(ring.numberONE, am.multiply(a, ring)), ring);
-   MatrixS V22A=F12.W.multiply(F12.Dbar, ring).multiply(F22.W, ring).multiply(D22prim, ring);
-   MatrixS V22B=V22A.multiply(Eprim[3], ring);
-         MatrixS  V22= V22B.multiplyByNumber(new Fraction(ring.numberONE, a.multiply(am, ring)), ring);
-
-
-   W=MatrixS.join(new MatrixS[]{V11.add(U2prim.multiply(V21, ring), ring),
-                                          V12.add(U2prim.multiply(V22, ring), ring), V21, V22});
-       if(n>2){}
-//     System.out.println( "V11="+V11+"; V12="+V12+"; V21="+V21+"; V22="+V22+"; U2prim="+U2prim+"; L3prim="+L3prim+";");
-
-
-
-
-       MatrixS N11A =Eprim[0].multiply(F12.Dbar, ring).multiply(F12.M, ring);
-       MatrixS  N11B =N11A.multiply(D11prim, ring).multiply(F11.M, ring);
-       MatrixS  N11= N11B.multiplyByNumber(new Fraction(a_n, ak.multiply(am, ring)), ring);
-       MatrixS N21A=Eprim[2].multiply(D21prim, ring).multiply(F12.M, ring);
-       MatrixS N21B=N21A.multiply(F11.Dbar, ring).multiply(F11.M, ring);
-       MatrixS    N21= N21B.multiplyByNumber(new Fraction(a_n, ak.multiply(am, ring).multiply(a , ring)), ring);
-       MatrixS N12A =Eprim[1].multiply(F22.Dbar, ring).multiply(F22.M, ring);
-       MatrixS N12B =N12A.multiply(D12prim, ring).multiply(F21.M, ring);
-       MatrixS  N12= N12B.multiplyByNumber(new Fraction(ring.numberONE, al.multiply(a, ring)), ring);
-       MatrixS N22A=Eprim[3].multiply(D22prim, ring).multiply(F22.M, ring);
-       MatrixS N22B=N22A.multiply(F21.Dbar, ring).multiply(F21.M, ring);
-       MatrixS  N22= N22B.multiplyByNumber(new Fraction(ring.numberONE, a.multiply(al, ring)), ring);
-
- M=MatrixS.join(new MatrixS[]{N11.add(N12.multiply(L3prim, ring), ring),
-                                          N12, N21.add(N22.multiply(L3prim, ring), ring), N22});
-
-//
- MatrixS mM=MatrixS.join(new MatrixS[]{N11B, N12B, N21B, N22B});
-  MatrixS wW=MatrixS.join(new MatrixS[]{V11B, V12B, V21B, V22B});
-  MatrixS Dpr=MatrixS.join(new MatrixS[]{D11prim, D12prim, D21prim, D22prim});
-        if(n>2){}
-//     System.out.println("Dpr=="+Dpr+"Eprim=="+DhUnit+"wW====="+wW+ "N11="+N11+"; N12="+N12+"; N21="+N21+"; N22="+N22+";");
-
-//
-//          MatrixS LL1=L3.multiply(F22.A_n, ring);
+//          MatrixS LL1=L3.multiply(F22.Dhat, ring);
 //                  MatrixS LL2=LL1.multiply(F22.M, ring);
 //                  MatrixS LL3=LL2.multiply(F21.Dhat, ring);
 //                                MatrixS LL4=LL3.multiply(F21.M, ring);
-           if(n>=2){
-//  System.out.println( "A="+T+"; L="+L+"; U="+U+"; M="+M+"; W="+W+"; \\hat D="+Dhat+"; D="+invForD(D, ring)+": L12tilde==  "+L12tilde+U12tilde);
-           }
-           if(n>2){}
-//       System.out.println("ak+al+am+as+a_n+lambda="+ak+"  "+al+"  "+am+"  "+as+"  "+a_n+"  "+lambda);}
+        if(n>=2){
+            System.out.println( "A="+T+"; L="+L+"; U="+U+"; M="+M+"; W="+W+"; \\hat D="+Dhat+"; D="+invForD(D, ring)+": L12tilde==  "+L12tilde+U12tilde);
+        }
+        if(n>2){
+            System.out.println("ak+al+am+as+a_n+lambda="+ak+"  "+al+"  "+am+"  "+as+"  "+a_n+"  "+lambda);}
 
-      };
+    }
 
 //    static MatrixS   DhatToUnit1(MatrixS D, Ring ring){ 
 //        Element[][] MI=new Element[D.M.length][];
@@ -554,7 +602,8 @@ if(n>2){}
    static MatrixS invForD(MatrixS Di, Ring ring) {
     int len=Di.M.length;Element[][] MI=new Element[len][];
     for (int i = 0; i<len; i++){
-        if(Di.col[i].length>0){ Element ee=Di.M[i][0]; Element  enew;
+        if(Di.col[i].length>0){
+            Element ee=Di.M[i][0]; Element  enew;
          if(ee.isNegative()){enew=(ee.isMinusOne(ring))?ee:
              new Fraction(ring.numberMINUS_ONE, ee.negate(ring));  }
          else{ enew=(ee.isOne(ring))?ee:new Fraction(ring.numberONE, ee);  }
@@ -595,11 +644,12 @@ if(n>2){}
 // {5, 0, 7, 0, 1, 0, 0},
 // {0, 0, 0, 0, 0, 0, 8},
 // {0, 2, 0, 3, 0, 0, 0}};
-  {{0, 0, 3, 0},
-  {2, 0, 1, 0},
-  {0, 0, 0, 0},
-  {1, 4, 0, 1}};
-
+//          {{0, 2, 3, 0},
+//        {0, 0, 0, -3},
+//        {5, 3, 2, 1},
+//        {0, -1, 0, 0}};
+          {{0, 2},
+                  {0, 0}};
 //  {{0, 0, 0, 0, 0, 0, 7, 0},
 //      {0, 0, 0, 0, 0, 0, 0, 1},
 //       {0, 0, 3, 5, 0, 0, 6, 0},
