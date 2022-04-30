@@ -5,16 +5,13 @@ import com.mathpar.number.Element;
 import com.mathpar.number.Fraction;
 import com.mathpar.number.Ring;
 
-import java.util.Comparator;
 import java.util.Objects;
 
 public class LdumwDto extends Element {
     private final MatrixS L;
-
-
-    private MatrixS D; // ==Ddenom   new sense of this matrix! (denom-of-each-elems)
-    private MatrixS Dhat;  //  L Dhat M = I, W Dhat U = I
-    private MatrixS Dbar;// Dbar *Dbar^T= Ibar,  Dbar^T *Dbar = Jbar,
+    private MatrixS D;
+    private MatrixS Dhat;
+    private MatrixS Dbar;
     private final MatrixS U;
     private MatrixS M;
     private MatrixS W;
@@ -22,7 +19,7 @@ public class LdumwDto extends Element {
     private MatrixS Ibar;
     private MatrixS J;
     private MatrixS Jbar;
-    private final Element a_n; // determinant
+    private final Element a_n;
 
     public LdumwDto(MatrixS l, MatrixS d, MatrixS u, Element a_n) {
         L = l;
@@ -252,9 +249,6 @@ public class LdumwDto extends Element {
         if (o == null || getClass() != o.getClass()) return false;
         LdumwDto ldumwDto = (LdumwDto) o;
         Ring ring = new Ring("Z[]");
-
-//        System.out.println("L: " + L.getElement(0,0, ring));
-//        System.out.println("o.L: " + ldumwDto.L().getElement(0,0, ring));
 
         return L.subtract(ldumwDto.L(), ring).isZero(ring) &&
                 D.subtract(ldumwDto.D(), ring).isZero(ring) &&

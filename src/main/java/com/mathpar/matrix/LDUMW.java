@@ -293,7 +293,11 @@ public class LDUMW {
         System.out.println("A21_2 before getLDU: " + A21_2);
         System.out.println("ak before getLDU: " + ak);
         F21.getLDU(A21_2,  ak , ring);
-        System.out.println("F21.D() after: " + F21.D);
+        System.out.println("F21.L() after getLDU: " + F21.L);
+        System.out.println("F21.D() after getLDU: " + F21.D);
+        System.out.println("F21.U() after getLDU: " + F21.U);
+        System.out.println("F21.M() after getLDU: " + F21.M);
+        System.out.println("F21.W() after getLDU: " + F21.W);
         Element al=F21.a_n;// Done
 
         LDUMW F12 = new LDUMW(A12_2);
@@ -342,17 +346,24 @@ public class LDUMW {
         MatrixS L3H1= F21.Dbar.multiply(F21.M, ring) // Done
                 .multiply(A22_1, ring); // Done
 
+        System.out.println("conseq L3H1: " + L3H1);
+
+
         MatrixS L3H2= (F12.W // Done
                 .multiply(F12.I, ring)); // Done
-
+        System.out.println("conseq L3H2: " + L3H2);
         L3H1 = L3H1.multiply(L3H2, ring); // Done
+        System.out.println("conseq multiplication L3H1: " + L3H1);
         L3H1= L3H1.divideByNumber(am, ring) // Done
                 .divideByNumber(ak, ring) // Done
                 .divideByNumber(a, ring); // Done
-
+        System.out.println("conseq after number L3H1: " + L3H1);
         MatrixS L3= (A21.multiply(F11.W.multiply(F11.I, ring), ring)); //Done
+        System.out.println("conseq division L3: " + L3);
         L3= (L3.divideByNumber(ak, ring)); //Done
+        System.out.println("conseq before add L3: " + L3);
         L3= L3.add(L3H1, ring); //Done
+        System.out.println("conseq final L3: " + L3);
         MatrixS X_L = F11.L.multiply(L12tilde, ring); // Done
         MatrixS LL_ = F21.L.multiply(F22.L, ring);// Done
         MatrixS[] LL=new MatrixS[]{X_L,// Done
@@ -360,29 +371,6 @@ public class LDUMW {
         L=MatrixS.join(LL);// Done
 
 //        System.out.println(("U12tilde conseq: " + U12tilde));
-        System.out.println("conseq F21.L: " + F21.L);
-        System.out.println("conseq F22.L: " + F22.L);
-        System.out.println("conseq A22_1: " + A22_1);
-        System.out.println("conseq U2H: " + U2H);
-        System.out.println("conseq U2: " + U2);
-        System.out.println("conseq A12: " + A12);
-        System.out.println("conseq A11: " + A11);
-        System.out.println("conseq D11PLUS: " + D11PLUS);
-        System.out.println("conseq A21_1: " + A21_1);
-        System.out.println("conseq A12_1: " + A12_1);
-        System.out.println("conseq A22_0: " + A22_0);
-        System.out.println("conseq ak2: " + ak2);
-        System.out.println("conseq A22_0: " + A22_0);
-        System.out.println("conseq F21.Dbar: " + F21.Dbar);
-        System.out.println("conseq F21.M: " + F21.M);
-        System.out.println("conseq A22_1: " + A22_1);
-        System.out.println(("conseq X_A22_2 F12.W: " + F12.W));
-        System.out.println(("conseq X_A22_2 F12.Dbar: " + F12.Dbar));
-        System.out.println(("conseq X_A22_2: " + X_A22_2));
-        System.out.println(("conseq ak2: " + ak2));
-        System.out.println(("conseq A22_2: " + A22_2));
-        System.out.println(("conseq A22_3: " + A22_3));
-        System.out.println(("conseq F22.U(): " + F22.U));
 
         MatrixS UU_ = F21.U.multiply(F11.U, ring); //Done
         MatrixS X_U = F22.U.multiply(U12tilde, ring); //Done
@@ -392,9 +380,6 @@ public class LDUMW {
         D=MatrixS.join(new MatrixS[]{F11.D,
                 F12.D.multiplyByNumber(lambda2, ring), F21.D, F22.D});
 
-        System.out.println(("conseq IJMap a: " + a));
-        System.out.println(("conseq IJMap D: " + D));
-        System.out.println(("conseq IJMap F22.a_n: " + F22.a_n));
         IJMap(a,ring);
 
         MatrixS I12lambdaM2=(F12.I.divideByNumbertoFraction(lambda, ring)).add(F12.Ibar, ring);// Done
@@ -408,14 +393,40 @@ public class LDUMW {
         System.out.println("DhUnit: " + DhUnit);
         System.out.println("DhUnit Dbar: " + Dbar);
 
+
+        System.out.println("conseq am=" + am);
+        System.out.println("conseq al=" + al);
+        System.out.println("conseq ak=" + ak);
+        System.out.println("conseq as=" + as);
+        System.out.println("conseq a_n=" + a_n);
+        System.out.println("conseq lambda=" + lambda);
+        System.out.println("conseq UU=" + UU_);
+        System.out.println("conseq U2=" + U2);
+        System.out.println("conseq X_U=" + X_U);
+        System.out.println("conseq invD12hat=" + invD12hat);
+        System.out.println("conseq LL=" + LL_);
+        System.out.println("conseq L3=" + L3);
+        System.out.println("conseq X_L=" + X_L);
+        System.out.println("conseq Dbar=" + Dbar);
         DhUnit = DhUnit.add(Dbar, ring).transpose();
 
         MatrixS[] Eprim=DhUnit.split();
+        System.out.println("conseq F11.W=" + F11.W);
+        System.out.println("conseq F11.Dhat=" + F11.Dhat);
+        System.out.println("conseq F21.W=" + F21.W); //TODO not empty
+        System.out.println("conseq F21.L=" + F21.L); //TODO not empty
+        System.out.println("conseq F21.D=" + F21.U); //TODO not empty
+        System.out.println("conseq F21.Dhat=" + F21.Dhat);
+        MatrixS U2prim=F11.W
+                .multiply(F11.Dhat
+                .multiply(F21.W
+                .multiply(F21.Dhat, ring), ring), ring);//Done U1_m1
+        System.out.println("conseq b U2prim=" + U2prim);
 
-        MatrixS U2prim=F11.W.multiply(F11.Dhat.multiply(F21.W.multiply(F21.Dhat, ring), ring), ring);//Done U1_m1
         U2prim = U2prim.multiply(U2.negate(ring), ring);
+
         // Du=
-        MatrixS D11prim= DtoUnit(F11.D,ring.numberONE,ring).add(F11. Dbar, ring) ;
+        MatrixS D11prim= DtoUnit(F11.D,ring.numberONE,ring).add(F11.Dbar, ring) ;
         MatrixS D12prim=DtoUnit(F21.D, ak, ring).add(F21.Dbar.multiplyByNumber(a, ring), ring);
         MatrixS D21prim=DtoUnit(F12.D, al ,ring).add(F12.Dbar.multiplyByNumber(a, ring), ring);
         MatrixS D22prim= DtoUnit(F22.D, as,ring).add(F22.Dbar.multiplyByNumber(a, ring), ring);
@@ -436,9 +447,7 @@ public class LDUMW {
 
         W=MatrixS.join(new MatrixS[]{V11.add(U2prim.multiply(V21, ring), ring),
                 V12.add(U2prim.multiply(V22, ring), ring), V21, V22});
-        if(n>2)
-            System.out.println( "V11="+V11+"; V12="+V12+"; V21="+V21+"; V22="+V22+"; U2prim="+U2prim+"; L3prim="+L3prim+";");
-
+        System.out.println("conseq U2prim.multiply(V22, ring): " + U2prim.multiply(V22, ring));
 
 
 

@@ -22,12 +22,12 @@ public class LdumwFactTest extends DAPTest {
 
     @Override
     protected Element[] initData(int size, int density, int maxBits, Ring ring) {
-//        MatrixS A = matrix(size, density, 5, ring);
-        MatrixS A = new MatrixS(new int[][]{
-                {0, 2, 3, 0},
-                {0, 0, 0, -3},
-                {5, 3, 2, 1},
-                {0, -1, 0, 0}}, ring);
+        MatrixS A = matrix(size, density, 5, ring);
+//        MatrixS A = new MatrixS(new int[][]{
+//                {0, 2, 3, 0},
+//                {0, 0, 0, -3},
+//                {5, 3, 2, 1},
+//                {0, -1, 0, 0}}, ring);
         return new Element[]{A, ring.numberONE};
     }
 
