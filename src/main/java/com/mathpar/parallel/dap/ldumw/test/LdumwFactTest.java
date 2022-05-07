@@ -38,23 +38,23 @@ public class LdumwFactTest extends DAPTest {
 
         MatrixS A = (MatrixS) initData[0];
 
-        LOGGER.info("A=" + A);
+//        LOGGER.info("A=" + A);
         Element a = initData[1];
 
         LdumwDto ldumwDtoSequential = LDUMW.LDUMW(A, a, ring);
 
-        LOGGER.info("L=" + ldumwDto.L());
-        LOGGER.info("L SEQ=" + ldumwDtoSequential.L());
-        LOGGER.info("D=" + ldumwDto.D());
-        LOGGER.info("D SEQ=" + ldumwDtoSequential.D());
-        LOGGER.info("U=" + ldumwDto.U());
-        LOGGER.info("U SEQ=" + ldumwDtoSequential.U());
-        LOGGER.info("M=" + ldumwDto.M());
-        LOGGER.info("M SEQ=" + ldumwDtoSequential.M());
-        LOGGER.info("W=" + ldumwDto.W());
-        LOGGER.info("W SEQ=" + ldumwDtoSequential.W());
-        LOGGER.info("A_n=" + ldumwDto.A_n());
-        LOGGER.info("A_n SEQ=" + ldumwDtoSequential.A_n());
+//        LOGGER.info("L=" + ldumwDto.L());
+//        LOGGER.info("L SEQ=" + ldumwDtoSequential.L());
+//        LOGGER.info("D=" + ldumwDto.D());
+//        LOGGER.info("D SEQ=" + ldumwDtoSequential.D());
+//        LOGGER.info("U=" + ldumwDto.U());
+//        LOGGER.info("U SEQ=" + ldumwDtoSequential.U());
+//        LOGGER.info("M=" + ldumwDto.M());
+//        LOGGER.info("M SEQ=" + ldumwDtoSequential.M());
+//        LOGGER.info("W=" + ldumwDto.W());
+//        LOGGER.info("W SEQ=" + ldumwDtoSequential.W());
+//        LOGGER.info("A_n=" + ldumwDto.A_n());
+//        LOGGER.info("A_n SEQ=" + ldumwDtoSequential.A_n());
 
         if (ldumwDto.equals(ldumwDtoSequential)) {
             return new Pair<>(true, null);
