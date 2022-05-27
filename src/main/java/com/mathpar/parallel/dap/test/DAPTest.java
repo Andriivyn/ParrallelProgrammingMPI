@@ -518,7 +518,7 @@ public abstract class DAPTest {
     }
 
     protected MatrixS matrix(int size, int density, int maxBits, Ring ring) {
-        return new MatrixS(size, size, density, new int[]{maxBits}, new Random(0), ring.numberONE(), ring);
+        return new MatrixS(size, size, density, new int[]{maxBits}, new Random(System.currentTimeMillis()), ring.numberONE(), ring);
     }
     protected MatrixD matrix(int size, int mod, Ring ring) {
         return new MatrixD(size,size, mod, ring);

@@ -4,7 +4,6 @@ import com.mathpar.log.MpiLogger;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Array;
 import com.mathpar.number.Element;
-import com.mathpar.number.Fraction;
 import com.mathpar.number.Ring;
 import com.mathpar.parallel.dap.core.Amin;
 import com.mathpar.parallel.dap.core.Drop;
