@@ -20,6 +20,7 @@ import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
 import com.mathpar.parallel.dap.QR.QPDecomposition;
 import com.mathpar.parallel.dap.QR.QRDecomposition;
+import com.mathpar.parallel.dap.ldumw.LdumwFact;
 import com.mathpar.parallel.dap.multiply.*;
 import com.mathpar.parallel.dap.multiply.MatrixD.*;
 import com.mathpar.parallel.dap.multiply.MatrixS.*;
@@ -299,6 +300,12 @@ public abstract class Drop implements Serializable {
                 break;
             case 7701:
                 task = new MatrSAdjMatrix();
+                break;
+
+
+
+            case 23:
+                task = new LdumwFact();
                 break;
 
             default:

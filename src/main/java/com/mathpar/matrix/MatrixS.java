@@ -3,7 +3,6 @@ package com.mathpar.matrix;
 import com.mathpar.func.F;
 import com.mathpar.number.*;
 import com.mathpar.parallel.stat.MS.AELDU;
-import com.mathpar.parallel.utils.MPITransport;
 import com.mathpar.polynom.Polynom;
 import mpi.MPIException;
 
