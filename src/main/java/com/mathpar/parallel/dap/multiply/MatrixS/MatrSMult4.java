@@ -85,7 +85,6 @@ public class MatrSMult4 extends Drop {
                 resultForOutFunctionLength = 5;
                 break;
             }
-            // LDUMW drop 3 and 4
             case (103): {
                 inputDataLength = 3;
                 outputDataLength = 2;
@@ -306,7 +305,6 @@ public class MatrSMult4 extends Drop {
                 LdumwDto F11 = ((LdumwDto) inData[3]);
                 Element a = inData[4];
 
-//                LOGGER.info("-------------------------112-------------------------------");
                 Element al = F21.A_n();
                 Element am = F12.A_n();
                 Element ak = F11.A_n();
@@ -322,12 +320,6 @@ public class MatrSMult4 extends Drop {
                 MatrixS invD12hat = I12lambdaM2.multiply(F12.Dhat(), ring);
                 MatrixS A22_3 = A22_2.divideByNumber(ak2, ring).divideByNumber(a, ring);
 
-//                LOGGER.info("seq X_A22_2 F12.Dbar(): " + F12.Dbar());
-//                LOGGER.info("seq X_A22_2 F12.W(): " + F12.W());
-//                LOGGER.info("seq X_A22_2: " + X_A22_2);
-//                LOGGER.info("seq A22_2: " + A22_2);
-//                LOGGER.info("seq A22_3: " + A22_3);
-//                LOGGER.info("-------------------------/112-------------------------------");
                 outData[0] = lambda;
                 outData[1] = as;
                 outData[2] = A22_3;
