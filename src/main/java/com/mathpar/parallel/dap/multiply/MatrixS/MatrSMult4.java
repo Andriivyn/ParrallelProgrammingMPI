@@ -1,6 +1,7 @@
 package com.mathpar.parallel.dap.multiply.MatrixS;
 
 import com.mathpar.log.MpiLogger;
+import com.mathpar.matrix.AdjMatrixS;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Array;
 import com.mathpar.number.Element;
@@ -48,11 +49,22 @@ public class MatrSMult4 extends Drop {
         return amin;
     }
 
+    /**
+     * key that starts on 77 (M in ascii) is a mldtsv custom key,
+     * the next 2 digits form the number of the step
+     */
+
     @Override
-    public void setVars() {
-        switch (key) {
-            case (0):
-            case (1):
+    public void setVars(){
+        switch (key){
+            // a*b
+            case(0):
+            // -a*b
+            case(1):
+            case(7708):
+            case(7709):
+            case(7713):
+            case(7720):
             case (102):
             case (114):
             case (110):
@@ -63,23 +75,67 @@ public class MatrSMult4 extends Drop {
                 break;
             }
 
-            case (2): {
+            case(2): {
                 inputDataLength = 2;
                 outputDataLength = 2;
                 resultForOutFunctionLength = 5;
                 break;
             }
 
-            //drop 12
-            case (3): {
+            case(7702):
+            case(7707):
+            case(7710):
+            case(7718):
+            case(7724): {
+                inputDataLength = 3;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+
+            case(7703): {
+                inputDataLength = 4;
+                outputDataLength = 2;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+
+            case(7705): {
                 inputDataLength = 6;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 5;
+                break;
+            }
+
+            case(7711):
+            case(7721):
+            case(7725): {
+                inputDataLength = 4;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+
+            case(7712): {
+                inputDataLength = 7;
                 outputDataLength = 3;
                 resultForOutFunctionLength = 5;
                 break;
             }
             //drop 5
-            case (4): {
+            case (4):
+            case(7714):
+            case(7717):
+            case(7722):
+            case(7723): {
                 inputDataLength = 6;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+
+            case(7716): {
+                inputDataLength = 7;
                 outputDataLength = 1;
                 resultForOutFunctionLength = 5;
                 break;
@@ -134,6 +190,14 @@ public class MatrSMult4 extends Drop {
                 resultForOutFunctionLength = 4;
                 break;
             }
+
+            case(7719): {
+                inputDataLength = 5;
+                outputDataLength = 1;
+                resultForOutFunctionLength = 4;
+                break;
+            }
+
         }
 
         inData = new Element[inputDataLength];
@@ -147,48 +211,213 @@ public class MatrSMult4 extends Drop {
     public void sequentialCalc(Ring ring) {
         // LOGGER.info("in sequentialCalc indata = " + inData[0] + ",  "+inData[1]);
 
-        MatrixS A;
-        MatrixS B;
-        switch (key) {
-            case (0):
-                outData[0] = inData[0].multiply(inData[1], ring);
-                break;
-            case (1):
-                outData[0] = inData[0].multiply(inData[1], ring).negate(ring);
-                break;
-            case (2): {
 
-                MatrixS b = ((MatrixS) inData[0]).transpose();
-                outData[1] = b;
-                MatrixS bbT = b.multiply((MatrixS) inData[0], ring);
-                outData[0] = ((MatrixS) inData[1]).subtract(bbT, ring);
-
+        switch (key){
+            case(0):
+            case(7713): {
+                MatrixS A = (MatrixS) inData[0];
+                MatrixS B = (MatrixS) inData[1];
+                outData[0] =A.multiply(B, ring);
                 break;
             }
-            case (3): {
-                A = (MatrixS) inData[0];
-                B = (MatrixS) inData[1];
-                MatrixS M22_2 = A.multiply(B, ring).divideByNumber(inData[4].
-                        multiply(inData[4], ring), ring);
+            case(1): {
+                MatrixS A = (MatrixS) inData[0];
+                MatrixS B = (MatrixS) inData[1];
+                outData[0] = A.multiply(B, ring).negate(ring);
+                break;
+            }
+            case(2): {
+                MatrixS b = ((MatrixS) inData[0]).transpose();
+                outData[1] = b;
+                MatrixS bbT =  b.multiply((MatrixS) inData[0], ring);
+                outData[0] = ((MatrixS)inData[1]).subtract(bbT, ring);
+                break;
+            }
+            case(7702):
+            case(7718): {
+                MatrixS A = (MatrixS) inData[0];
+                MatrixS B = (MatrixS) inData[1];
+                Element d = inData[2];
+                outData[0] = A.multiplyDivRecursive(B, d.negate(ring), ring);
+                break;
+            }
 
-                Element M22_3 = inData[5].multiply(M22_2, ring);//temporary(use multiplyLeftI)
-                Element ds = inData[2].multiply(inData[3], ring).divide(inData[4], ring);
+            case(7703): {
+                AdjMatrixS m11 = (AdjMatrixS) inData[0];
+                MatrixS M12 = (MatrixS) inData[1];
+                Element d0 = inData[2];
+                Element finalN = inData[3];
+                MatrixS M12_1 = m11.A.multiplyDivRecursive(M12, d0, ring);
+                MatrixS M12_2 = M12_1.multiplyLeftI(Array.involution(m11.Ei, (int) finalN.value));
+                outData[0] = M12_1;
+                outData[1] = M12_2;
+                break;
+            }
 
+            case(7705): {
+                MatrixS M22 = (MatrixS) inData[0];
+                Element d11 = inData[1];
+                MatrixS M21 = (MatrixS) inData[2];
+                MatrixS M12_1 = (MatrixS) inData[3];
+                AdjMatrixS m11 = (AdjMatrixS) inData[4];
+                Element d0 = inData[5];
+                outData[0] = ((M22.multiplyByNumber(d11, ring))
+                        .subtract(M21.multiplyRecursive(M12_1.multiplyLeftE(m11.Ej, m11.Ei), ring), ring))
+                        .divideByNumber(d0, ring);
+                break;
+            }
+
+            case(7707): {
+                MatrixS A = ((AdjMatrixS) inData[0]).S;
+                MatrixS B = (MatrixS) inData[1];
+                Element d = inData[2];
+                outData[0] = A.multiplyDivRecursive(B, d.negate(ring), ring);
+                break;
+            }
+
+            case(7708):
+            case(7720): {
+                MatrixS A1 = ((AdjMatrixS) inData[0]).A;
+                MatrixS A2 = ((AdjMatrixS) inData[1]).A;
+                outData[0] = A1.multiply(A2, ring);
+                break;
+            }
+
+            case(7709): {
+                MatrixS A21 = ((AdjMatrixS) inData[0]).A;
+                MatrixS M22_1 = (MatrixS) inData[1];
+                outData[0] = A21.multiply(M22_1, ring).negate(ring);
+                break;
+            }
+
+            case(7710): {
+                AdjMatrixS m11 = (AdjMatrixS) inData[0];
+                AdjMatrixS m21 = (AdjMatrixS) inData[1];
+                Element d11 = inData[2];
+                outData[0] = m11.S.multiplyDivRecursive(m21.A.multiplyLeftE(m21.Ej, m21.Ei), d11, ring);
+                break;
+            }
+
+            case(7711):
+            case(7721): {
+                MatrixS M22_1 = (MatrixS) inData[0];
+                MatrixS A1 = (MatrixS) inData[1];
+                AdjMatrixS m12 = (AdjMatrixS) inData[2];
+                Element d11 = inData[3];
+                outData[0] = M22_1.multiplyDivRecursive(A1.multiplyLeftE(m12.Ej, m12.Ei), d11, ring);
+                break;
+            }
+
+            case(7712): {
+                MatrixS B = (MatrixS) inData[0];
+                MatrixS y12 = (MatrixS) inData[1];
+                Element d11 = inData[2];
+                Element d21 = inData[3];
+                Element d12 = inData[4];
+                AdjMatrixS m21 = (AdjMatrixS) inData[5];
+                Element finalN = inData[6];
+                Element d11_2 = d11.multiply(d11, ring);
+                MatrixS M22_2 = B.multiplyDivRecursive(y12, d11_2, ring);
+                Element ds = d12.multiply(d21, ring).divide(d11, ring);
+                MatrixS M22_3 = M22_2.multiplyLeftI(Array.involution(m21.Ei, (int) finalN.value));
                 outData[0] = M22_2;
                 outData[1] = ds;
                 outData[2] = M22_3;
-
                 break;
             }
-            case (4): {
-                A = (MatrixS) inData[0];
-                B = (MatrixS) inData[1];
-                MatrixS ET = ((MatrixS) inData[4]).transpose();
-                Element d0 = inData[5];
-                MatrixS Md = ((MatrixS) inData[2]).multiplyByNumber(inData[3], ring);
-                MatrixS M22_1 = A.multiply(ET.multiply(B, ring), ring).negate(ring).
-                        divideByNumber(d0, ring).add(Md, ring);
-                outData[0] = M22_1;
+
+            case(7714): {
+                MatrixS M21 = (MatrixS) inData[0];
+                AdjMatrixS m11 = (AdjMatrixS) inData[1];
+                Element d0 = inData[2];
+                Element d12 = inData[3];
+                MatrixS K2 = (MatrixS) inData[4];
+                Element d11 = inData[5];
+                outData[0] = (M21.multiplyDivMulRecursive(m11.A.multiplyLeftE(m11.Ej, m11.Ei), d0, d12, ring).add(K2, ring))
+                        .divideByNumber(d11.negate(ring), ring);
+                break;
+            }
+
+            case(7716): {
+                MatrixS Q1 = (MatrixS) inData[0];
+                MatrixS M12_1 = (MatrixS) inData[1];
+                AdjMatrixS m11 = (AdjMatrixS) inData[2];
+                Element d21 = inData[3];
+                Element d11 = inData[4];
+                MatrixS y12 = (MatrixS) inData[5];
+                AdjMatrixS m12 = (AdjMatrixS) inData[6];
+                outData[0] = (
+                ((Q1.subtract((M12_1.multiplyLeftI(m11.Ei).multiplyByNumber(d21, ring)), ring))
+                    .divideByNumber(d11, ring).multiplyRecursive(y12, ring))
+                        .add((m12.S).multiplyByNumber(d21, ring), ring)
+                )
+                        .divideByNumber(d11, ring);
+                break;
+            }
+
+            case(7717): {
+                MatrixS A1 = (MatrixS) inData[0];
+                MatrixS M12_1 = (MatrixS) inData[1];
+                AdjMatrixS m11 = (AdjMatrixS) inData[2];
+                AdjMatrixS m12 = (AdjMatrixS) inData[3];
+                Element d11 = inData[4];
+                Element d22 = inData[5];
+                outData[0] = (A1.subtract((M12_1.multiplyLeftI(m11.Ei)).
+                        multiplyDivRecursive(A1.multiplyLeftE(m12.Ej, m12.Ei), d11, ring), ring)
+                ).divideMultiply(d11, d22, ring);
+                break;
+            }
+
+            case(7719): {
+                MatrixS M22_2 = (MatrixS) inData[0];
+                AdjMatrixS m21 = (AdjMatrixS) inData[1];
+                MatrixS y22 = (MatrixS) inData[2];
+                Element ds = inData[3];
+                AdjMatrixS m22 = (AdjMatrixS) inData[4];
+                outData[0] = ((M22_2.multiplyLeftI(m21.Ei))
+                        .multiplyDivRecursive(y22, ds.negate(ring), ring)).add(m22.S, ring);
+                break;
+            }
+
+            case(7722): {
+                MatrixS A2 = (MatrixS) inData[0];
+                MatrixS M22_2 = (MatrixS) inData[1];
+                AdjMatrixS m21 = (AdjMatrixS) inData[2];
+                AdjMatrixS m22 = (AdjMatrixS) inData[3];
+                Element ds = inData[4];
+                Element d21 = inData[5];
+                outData[0] = (A2.subtract((M22_2.multiplyLeftI(m21.Ei)).
+                        multiplyDivRecursive(A2.multiplyLeftE(m22.Ej, m22.Ei), ds, ring), ring)
+                ).divideByNumber(d21, ring);
+                break;
+            }
+
+            case(7723): {
+                AdjMatrixS m11 = (AdjMatrixS) inData[0];
+                AdjMatrixS m21 = (AdjMatrixS) inData[1];
+                Element d11 = inData[2];
+                Element d22 = inData[3];
+                MatrixS K1 = (MatrixS) inData[4];
+                Element d21 = inData[5];
+                outData[0] = (m11.S.multiplyDivMulRecursive(m21.A.multiplyLeftE(m21.Ej, m21.Ei), d11, d22, ring).add(K1, ring))
+                        .divideByNumber(d21.negate(ring), ring);
+                break;
+            }
+
+            case(7724): {
+                MatrixS P = (MatrixS) inData[0];
+                MatrixS G = (MatrixS) inData[1];
+                Element d12 = inData[2];
+                outData[0] = P.multiplyDivRecursive(G, d12, ring);
+                break;
+            }
+
+            case(7725): {
+                MatrixS L = (MatrixS) inData[0];
+                MatrixS F = (MatrixS) inData[1];
+                MatrixS G = (MatrixS) inData[2];
+                Element d12 = inData[3];
+                outData[0] = (L.add(F.multiplyRecursive(G, ring), ring)).divideByNumber(d12, ring);
                 break;
             }
             case (102): {
@@ -421,8 +650,10 @@ public class MatrSMult4 extends Drop {
     @Override
     //Вхідна функція дропа, розбиває вхідні дані на блоки.
     public MatrixS[] inputFunction(Element[] input, Amin amin, Ring ring) {
-
+        //LOGGER.info(input[0]);
         MatrixS[] res = new MatrixS[8];
+        MatrixS v1;
+        MatrixS v2;
 
         MatrixS ms = null;
         MatrixS ms1 = null;
@@ -433,162 +664,156 @@ public class MatrSMult4 extends Drop {
         }
 
         switch (key) {
-            case (2): {
-                ms = ((MatrixS) input[0]).transpose();
-                ms1 = (MatrixS) input[0];
-                amin.resultForOutFunction[4] = ms;
+            case(0):
+            case(1):
+            case(7702):
+            case(7712):
+            case(7713):
+            case(7718):
+            case(7724):
+            default: {
+                v1 = (MatrixS) input[0];
+                v2 = (MatrixS) input[1];
                 break;
             }
-            case (4): {
-                ms = (MatrixS) input[0];
-                ms1 = (MatrixS) input[1];
-                MatrixS E11T = ((MatrixS) input[4]).transpose();
-                ms1 = E11T.multiply(ms1, ring);
+            case(2):{
+                v1 =  ((MatrixS) input[0]).transpose();
+                v2 = (MatrixS) input[0];
+                amin.resultForOutFunction[4] = v1;
                 break;
             }
-            case (102):
-            case (103): {
-                LdumwDto F11 = (LdumwDto) input[0];
-//                LOGGER.info("F11.M(): " + F11.M());
-                ms = F11.M(); // M
-                ms1 = (MatrixS) input[1]; // A12
-//                LOGGER.info("-------------------------102 103 input-------------------------------");
+
+            //todo
+            case(7703):{
+                v1 = ((AdjMatrixS) input[0]).A;
+                v2 = (MatrixS) input[1];
                 break;
             }
-            case (104):
-            case (105): {
-                LdumwDto F11 = (LdumwDto) input[0];
-                ms = (MatrixS) input[1]; // A21
-                ms1 = F11.W(); // W
-//                LOGGER.info("-------------------------104 105 input-------------------------------");
+            case(7705): {
+                v1 = (MatrixS) inData[2];
+                MatrixS M12_1 = (MatrixS) inData[3];
+                AdjMatrixS m11 = (AdjMatrixS) inData[4];
+                v2 = M12_1.multiplyLeftE(m11.Ej, m11.Ei);
                 break;
             }
-            case (107): {
-                LdumwDto F11 = ((LdumwDto) inData[0]);
-                MatrixS A21_0 = (MatrixS) inData[1];
-                MatrixS A12_0 = (MatrixS) inData[2];
-
-//                LOGGER.info("-------------------------107 input-------------------------------");
-
-                MatrixS A21_1 = A21_0.multiplyByNumber(F11.A_n(), ring).multiply(F11.Dhat(), ring);
-                MatrixS A12_1 = F11.Dhat().multiplyByNumber(F11.A_n(), ring).multiply(A12_0, ring);
-
-                MatrixS D11PLUS = F11.D().transpose();
-
-                ms = A21_1.multiply(D11PLUS, ring);
-                ms1 = A12_1;
+            case(7707): {
+                v1 = ((AdjMatrixS) input[0]).S;
+                v2 = (MatrixS) inData[1];
                 break;
             }
-            case (109): {
-                LdumwDto F11 = ((LdumwDto) inData[0]);
-                MatrixS A22 = (MatrixS) inData[1];
-                MatrixS A22_0 = (MatrixS) inData[2];
-                LdumwDto F21 = ((LdumwDto) inData[3]);
-                Element a = inData[4];
-
-//                LOGGER.info("-------------------------109 input-------------------------------");
-                Element ak = F11.A_n();
-                Element ak2 = ak.multiply(ak, ring);
-                MatrixS A22_1 = (A22.multiplyByNumber(ak2, ring)
-                        .multiplyByNumber(a, ring)
-                        .subtract(A22_0, ring))
-                        .divideByNumber(ak, ring)
-                        .divideByNumber(a, ring);
-
-//                LOGGER.info("-------------------------/109 input-------------------------------");
-
-                ms = F21.Dbar().multiply(F21.M(), ring);
-                ms1 = A22_1;
-
-                amin.resultForOutFunction[4] = A22_1;
+            case(7708):
+            case(7720): {
+                v1 = ((AdjMatrixS) input[0]).A;
+                v2 = ((AdjMatrixS) input[1]).A;
                 break;
             }
-            case (110): {
-                LdumwDto F11 = ((LdumwDto) inData[0]);
-                LdumwDto F21 = ((LdumwDto) inData[1]);
-//                LOGGER.info("-------------------------110 input-------------------------------");
-                ms = F21.U();
-                ms1 = F11.U();
-                break;
-            }
-            case (112): {
-                LdumwDto F12 = (LdumwDto) input[1];
-//                LOGGER.info("-------------------------112 input-------------------------------");
-                ms = (MatrixS) input[0];
-                ms1 = F12.W();
-                break;
-            }
-            case (113): {
-                LdumwDto F21 = ((LdumwDto) inData[0]);
-                MatrixS A22_1 = (MatrixS) inData[1];
-//                LOGGER.info("-------------------------113 input-------------------------------");
-                ms = F21.J().multiply(F21.M(), ring);
-                ms1 = A22_1;
-                break;
-            }
-            case (114): {
-                LdumwDto F21 = ((LdumwDto) inData[0]);
-                MatrixS A22_1 = (MatrixS) inData[1];
-//                LOGGER.info("-------------------------114 input-------------------------------");
-                ms = F21.Dbar().multiply(F21.M(), ring);
-                ms1 = A22_1;
-                break;
-            }
-            case (116): {
-                LdumwDto F11 = ((LdumwDto) inData[0]);
-                LdumwDto F12 = ((LdumwDto) inData[1]);
-                Element lambda = inData[2];
-//                LOGGER.info("-------------------------116 input-------------------------------");
 
-                MatrixS I12lambda = (F12.I().multiplyByNumber(lambda, ring)).add(F12.Ibar(), ring);
-                MatrixS L12tilde = F12.L().multiply(I12lambda, ring);
-
-                ms = F11.L();
-                ms1 = L12tilde;
+            case(7709): {
+                v1 = ((AdjMatrixS) input[0]).A;
+                v2 = (MatrixS) inData[1];
                 break;
             }
-            case (118): {
-                MatrixS Y_L3 = (MatrixS) inData[0];
-                LdumwDto F12 = ((LdumwDto) inData[1]);
-//                LOGGER.info("-------------------------118-------------------------------");
-                MatrixS L3H2 = (F12.W().multiply(F12.I(), ring));
-//                LOGGER.info("118 input Y_L3: " + Y_L3);
-//                LOGGER.info("118 input L3H2: " + L3H2);
-//                LOGGER.info("-------------------------118 input-------------------------------");
-                ms = Y_L3;
-                ms1 = L3H2;
+            case(7710): {
+                MatrixS S11 = ((AdjMatrixS) input[0]).S;
+                AdjMatrixS m21 = (AdjMatrixS) inData[1];
+                v1 = S11;
+                v2 = m21.A.multiplyLeftE(m21.Ej, m21.Ei);
                 break;
             }
-            case (121): {
-                LdumwDto F22 = ((LdumwDto) inData[0]);
-                LdumwDto F12 = ((LdumwDto) inData[1]);
-                Element lambda = inData[2];
-
-//                LOGGER.info("-------------------------121 input-------------------------------");
-
-                MatrixS J12lambda = F12.J().multiplyByNumber(lambda, ring).add(F12.Jbar(), ring);
-                MatrixS U12tilde = J12lambda.multiply(F12.U(), ring);
-
-                ms = F22.U();
-                ms1 = U12tilde;
+            case(7711):
+            case(7721): {
+                MatrixS M22_1 = (MatrixS) inData[0];
+                MatrixS A1 = (MatrixS) inData[1];
+                AdjMatrixS m12 = (AdjMatrixS) inData[2];
+                v1 = M22_1;
+                v2 = A1.multiplyLeftE(m12.Ej, m12.Ei);
                 break;
             }
-            case (123): {
-                LdumwDto F21 = ((LdumwDto) inData[0]);
-                LdumwDto F22 = ((LdumwDto) inData[1]);
-//                LOGGER.info("-------------------------123 input-------------------------------");
-                ms = F21.L();
-                ms1 = F22.L();
-
+            case(7714): {
+                v1 = (MatrixS) inData[0];
+                AdjMatrixS m11 = (AdjMatrixS) inData[1];
+                v2 = m11.A.multiplyLeftE(m11.Ej, m11.Ei);
                 break;
+            }
+            case(7716): {
+                MatrixS Q1 = (MatrixS) inData[0];
+                MatrixS M12_1 = (MatrixS) inData[1];
+                AdjMatrixS m11 = (AdjMatrixS) inData[2];
+                Element d21 = inData[3];
+                Element d11 = inData[4];
+                v1 = (Q1.subtract((M12_1.multiplyLeftI(m11.Ei).multiplyByNumber(d21, ring)), ring))
+                        .divideByNumber(d11, ring);
+                v2 = (MatrixS) inData[5];
+                break;
+            }
+            case(7717):
+            case(7722): {
+                MatrixS A1 = (MatrixS) inData[0];
+                MatrixS M12_1 = (MatrixS) inData[1];
+                AdjMatrixS m11 = (AdjMatrixS) inData[2];
+                AdjMatrixS m12 = (AdjMatrixS) inData[3];
+                v1 = M12_1.multiplyLeftI(m11.Ei);
+                v2 = A1.multiplyLeftE(m12.Ej, m12.Ei);
+                break;
+            }
+            case(7719): {
+                MatrixS M22_2 = (MatrixS) inData[0];
+                AdjMatrixS m21 = (AdjMatrixS) inData[1];
+                MatrixS y22 = (MatrixS) inData[2];
+                v1 = M22_2.multiplyLeftI(m21.Ei);
+                v2 = y22;
+                break;
+            }
+            case(7723): {
+                v1 = ((AdjMatrixS) input[0]).S;
+                AdjMatrixS m21 = (AdjMatrixS) inData[1];
+                v2 = m21.A.multiplyLeftE(m21.Ej, m21.Ei);
+                break;
+            }
+            case(7725): {
+                v1 = (MatrixS) inData[1];
+                v2 = (MatrixS) inData[2];
             }
         }
-        Array.concatTwoArrays(ms.split(), ms1.split(), res);
+
+        Array.concatTwoArrays(v1.split(), v2.split(), res);
         return res;
 
     }
 
     @Override
+    public void independentCalc(Ring ring, Amin amin)
+    {
+        switch (key){
+            case(0):
+            case(1):
+            case(2):
+            case(7702):
+            case(7703):
+            case(7707):
+            case(7708):
+            case(7709):
+            case(7710):
+            case(7711):
+            case(7713):
+            case(7714):
+            case(7717):
+            case(7718):
+            case(7719):
+            case(7720):
+            case(7721):
+            case(7722):
+            case(7723):
+            case(7724):
+            case(7725): break;
+
+            case(7705): {
+                MatrixS s1 = ((MatrixS) inData[0]).multiplyByNumber(inData[1], ring);
+                amin.resultForOutFunction[4] = s1;
+                break;
+            }
+            case(7712): {
+                Element ds = inData[3].multiply(inData[4], ring).divide(inData[2], ring);
     public void independentCalc(Ring ring, Amin amin) {
         switch (key) {
             case (0):
@@ -612,9 +837,10 @@ public class MatrSMult4 extends Drop {
                 amin.resultForOutFunction[4] = ds;
                 break;
             }
-            case (4): {
-                Element md = inData[2].multiply(inData[3], ring);
-                amin.resultForOutFunction[4] = md;
+            case(7716): {
+                MatrixS S12 = ((AdjMatrixS) inData[6]).S;
+                Element d21 = inData[3];
+                amin.resultForOutFunction[4] = S12.multiplyByNumber(d21, ring);
                 break;
             }
             case (112): {
@@ -668,6 +894,11 @@ public class MatrSMult4 extends Drop {
         }
 
         Element[] res = new Element[outputDataLength];
+        switch (key){
+            case(0):
+            case(7708):
+            case(7713):
+            case(7720): {
         switch (key) {
             case (0):
             case (107):
@@ -679,28 +910,126 @@ public class MatrSMult4 extends Drop {
 //                LOGGER.info("-------------------------0 output-------------------------------");
                 res = new MatrixS[]{MatrixS.join(resmat)};
                 break;
+            }
+            case(1):
+            case(7709): {
             case (1):
 //                LOGGER.info("------------------------- 1 output-------------------------------");
                 res = new MatrixS[]{MatrixS.join(resmat).negate(ring)};
                 break;
+            }
+            case(2):{
+                res = new Element[]{inData[1].add(MatrixS.join(resmat).negate(ring),ring), input[4]};
             case (2): {
                 res = new Element[]{inData[1].add(MatrixS.join(resmat).negate(ring), ring), input[4]};
                 break;
             }
+            case(7702):
+            case(7707):
+            case(7718): {
+                Element d = inData[2];
+                MatrixS result1 = MatrixS.join(resmat).divideByNumber(d.negate(ring), ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7703): {
+                AdjMatrixS m11 = (AdjMatrixS) inData[0];
+                Element d0 = inData[2];
+                Element finalN = inData[3];
+                MatrixS M12_1 = MatrixS.join(resmat).divideByNumber(d0, ring);
+                MatrixS M12_2 = M12_1.multiplyLeftI(Array.involution(m11.Ei, (int) finalN.value));
+                res = new MatrixS[]{M12_1, M12_2};
+                break;
+            }
+            case(7705): {
+                Element d0 = inData[5];
+                MatrixS s1 = (MatrixS) input[4];
+                MatrixS s2 = MatrixS.join(resmat).divideByNumber(d0, ring);
+                MatrixS result1 = s1.subtract(s2, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7710):
+            case(7724): {
+                Element d11 = inData[2];
+                MatrixS result1 = MatrixS.join(resmat).divideByNumber(d11, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7711):
+            case(7721): {
+                Element d11 = inData[3];
+                MatrixS result1 = MatrixS.join(resmat).divideByNumber(d11, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7712): {
+                Element d11 = inData[2];
+                AdjMatrixS m21 = (AdjMatrixS) inData[5];
+                Element finalN = inData[6];
+                MatrixS M22_2 = MatrixS.join(resmat).divideByNumber(d11.
+                        multiply(d11, ring), ring);
             case (3): {
 
-                MatrixS M22_2 = MatrixS.join(resmat).divideByNumber(inData[4].
-                        multiply(inData[4], ring), ring);
-
-                Element M22_3 = inData[5].multiply(M22_2, ring);//temporary(use multiplyLeftI)
+                MatrixS M22_3 = M22_2.multiplyLeftI(Array.involution(m21.Ei, (int) finalN.value));
                 res = new Element[]{M22_2, input[4], M22_3};
 
                 break;
             }
-            case (4): {
-
-                res = new MatrixS[]{MatrixS.join(resmat).negate(ring).
-                        divideByNumber(inData[5], ring).add((MatrixS) input[4], ring)};
+            case(7714):
+            case(7723): {
+                Element d0 = inData[2];
+                Element d12 = inData[3];
+                MatrixS K2 = (MatrixS) inData[4];
+                Element d11 = inData[5];
+                MatrixS s1 = MatrixS.join(resmat).divideMultiply(d0, d12, ring);
+                MatrixS s2 = s1.add(K2, ring);
+                MatrixS result1 = s2.divideByNumber(d11.negate(ring), ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7716): {
+                Element d11 = inData[4];
+                MatrixS s2 = (MatrixS) input[4];
+                MatrixS s3 = MatrixS.join(resmat).add(s2, ring);
+                MatrixS result1 = s3.divideByNumber(d11, ring);;
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case(7717): {
+                MatrixS A1 = (MatrixS) inData[0];
+                Element d11 = inData[4];
+                Element d22 = inData[5];
+                MatrixS s1 = MatrixS.join(resmat).divideByNumber(d11, ring);
+                MatrixS s2 = A1.subtract(s1, ring);
+                MatrixS result1 = s2.divideMultiply(d11, d22, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case (7719): {
+                Element ds = inData[3];
+                AdjMatrixS m22 = (AdjMatrixS) inData[4];
+                MatrixS s1 = MatrixS.join(resmat).divideByNumber(ds.negate(ring), ring);
+                MatrixS result1 = s1.add(m22.S, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case (7722): {
+                MatrixS A2 = (MatrixS) inData[0];
+                Element ds = inData[4];
+                Element d21 = inData[5];
+                MatrixS s1 = MatrixS.join(resmat).divideByNumber(ds, ring);
+                MatrixS s2 = A2.subtract(s1, ring);
+                MatrixS result1 = s2.divideByNumber(d21, ring);
+                res = new MatrixS[]{result1};
+                break;
+            }
+            case (7725): {
+                Element d12 = inData[3];
+                MatrixS L = (MatrixS) inData[0];
+                MatrixS s1 = L.add(MatrixS.join(resmat), ring);
+                MatrixS result1 = s1.divideByNumber(d12, ring);
+                res = new MatrixS[]{result1};
                 break;
             }
             case (102): {
@@ -812,6 +1141,47 @@ public class MatrSMult4 extends Drop {
     //Перевіряє чи є дроп листовим
     @Override
     public boolean isItLeaf() {
+        MatrixS ms;
+//        MatrixS ms = (MatrixS) inData[0];
+        switch(key){
+            case(0):
+            case(1):
+            case(2):
+            case(7702):
+            case(7705):
+            case(7711):
+            case(7712):
+            case(7713):
+            case(7714):
+            case(7716):
+            case(7717):
+            case(7718):
+            case(7719):
+            case(7721):
+            case(7722):
+            case(7724):
+            case(7725):
+            default: {
+                ms = (MatrixS) inData[0];
+                break;
+            }
+            case(7703):
+            case(7707):
+            case(7709): {
+                ms = (MatrixS) inData[1];
+                break;
+            }
+            case(7708):
+            case(7720):{
+                ms = ((AdjMatrixS) inData[0]).A;
+                break;
+            }
+            case(7710):
+            case(7723): {
+                ms = ((AdjMatrixS) inData[0]).S;
+                break;
+            }
+        }
         if (inData[0] instanceof LdumwDto) {
             LdumwDto ldumwDto = (LdumwDto) inData[0];
             return (ldumwDto.L().size <= leafSize);
