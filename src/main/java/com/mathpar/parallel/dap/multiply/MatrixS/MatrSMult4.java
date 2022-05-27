@@ -1242,6 +1242,10 @@ public class MatrSMult4 extends Drop {
     @Override
     public boolean isItLeaf() {
         MatrixS ms;
+        if (inData[0] instanceof LdumwDto) {
+            LdumwDto ldumwDto = (LdumwDto) inData[0];
+            return (ldumwDto.L().size <= leafSize);
+        }
 //        MatrixS ms = (MatrixS) inData[0];
         switch(key){
             case(0):
