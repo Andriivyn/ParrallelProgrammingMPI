@@ -30,16 +30,16 @@ public class MatrSAdjMatrixTest extends DAPTest {
 
     @Override
     protected Pair<Boolean, Element> checkResult(DispThread dispThread, String[] args, Element[] initData, Element[] resultData, Ring ring) {
-        AdjMatrixS resAdj = (AdjMatrixS) resultData[0];
-//        LOGGER.info("Res A = " + resAdj.A);
-//        LOGGER.info("Res det = " + resDet);
-//        LOGGER.info("Res S = " + resAdj.S);
         MatrixS initM = (MatrixS) initData[0];
-        AdjMatrixS toCompare = new AdjMatrixS(initM, ring.numberONE, ring);
-//        LOGGER.info("toCompare A = " + toCompare.A);
-//        LOGGER.info("toCompare d = "+ toCompare.Det);
-//        LOGGER.info("toCompare S = "+ toCompare.S);
-        boolean succeed = resAdj.A.equals(toCompare.A, ring) && resAdj.S.equals(toCompare.S, ring) && resAdj.Det.equals(toCompare.Det);
+        LOGGER.info("Input matrix: " + initM);
+        AdjMatrixS resAdj = (AdjMatrixS) resultData[0];
+        //AdjMatrixS resAdj = new AdjMatrixS(initM, ring.numberONE,  ring);
+        LOGGER.info("Adj matrix = " + resAdj.A);
+        LOGGER.info("Output matrix det = " + resAdj.Det);
+        MatrixS divided = resAdj.A.divideByNumbertoFraction(resAdj.Det, ring);
+        MatrixS rr = initM.multiply(divided, ring);
+        LOGGER.info("Output: " + rr);
+        boolean succeed = rr.isOne(ring);
         return new Pair<>(succeed, null);
     }
 
