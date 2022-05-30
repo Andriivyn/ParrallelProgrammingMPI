@@ -191,9 +191,9 @@ public class NumberZ extends Element {
     /**
      * Создание массива биномиальных коэффициентов
      */
-    static {
-        PascalTriangle.initCacheZ();
-    }   
+//    static {
+//        PascalTriangle.initCacheZ();
+//    }   
     public static final NumberZ POSCONST[] = new NumberZ[MAX_CONSTANT + 1];   
     public static final NumberZ NEGCONST[] = new NumberZ[MAX_CONSTANT + 1];
 
@@ -240,8 +240,6 @@ public class NumberZ extends Element {
         }
     }
 
- //   public NumberZ(int val) {this(new int[]{val});}
-    
     /**
      * This private constructor translates an int array containing the
      * two's-complement binary representation of a BigInteger into a BigInteger.
@@ -2858,12 +2856,14 @@ public class NumberZ extends Element {
 //                ? signum * intArrayCmp(mag, val.mag)
 //                : (signum > val.signum ? 1 : -1));
 //    }
+    @Override
     public int compareTo(Element val, Ring ring) {
         return compareTo(val);
     }
 
     @Override
     public int compareTo(Element val) {
+        if  (val.numbElementType()==Ring.Zp) return compareTo((NumberZ) val);
         if ((val == NAN) || (this == NAN)) {
             return Integer.MAX_VALUE;
         }
@@ -3010,6 +3010,8 @@ public class NumberZ extends Element {
     public NumberZ max(NumberZ val) {
         return (compareTo(val) > 0 ? this : val);
     }
+
+
 
     // Hash Function
     /**
@@ -3716,7 +3718,8 @@ public class NumberZ extends Element {
         NumberZkaratcuba f = new NumberZkaratcuba(quantSize, 1, 1, 1);
         return f.multiplyK5(this, val);
     }
-    public static final NumberZ MINUS_ONE = ONE.negate();
+    public static final NumberZ MINUS_ONE; // = ONE.negate();
+    static{MINUS_ONE = ONE.negate(); }
 
     @Override
     public Element myOne(Ring ring) {
@@ -3802,9 +3805,11 @@ public class NumberZ extends Element {
     }
 
     @Override
-    public NumberZ LCM(Element x, Ring ring) {
+    public Element LCM(Element x, Ring ring) {
         if (!(x instanceof NumberZ)) {
-            return LCM((NumberZ) x.toNumber(Ring.Z, ring));
+            return  (x.isItNumber(ring))?  
+                    LCM((NumberZ) x.toNumber(Ring.Z, ring)):
+                    x.LCM(this, ring);
         } else {
             return LCM((NumberZ) (x));
         }
@@ -3817,83 +3822,39 @@ public class NumberZ extends Element {
     //===========================================================
     //============ Арифметика с любыми элементами ===============
     @Override
-//    public Element add(Element x, Ring ring) {
-//       return (x.numbElementType() < number.Ring.NumberOfSimpleTypes) ?
-//         add((NumberZ) x.toNumber(Ring.Z,ring)):
-//          x.add(this, ring);
-//       }
     public Element add(Element x, Ring ring) {
-        if (x == NAN) {
-            return NAN;
-        }
-        if ((x == NEGATIVE_INFINITY) || (x == POSITIVE_INFINITY)) {
-            return x;
-        }
+        if ((x == NAN) ||  (x == NEGATIVE_INFINITY) || (x == POSITIVE_INFINITY)) { return x;  }
+        if (x instanceof NumberZ) { return add((NumberZ) x); }
         int X_Type = x.numbElementType();
-        if (X_Type == Ring.Z) {
-            return add((NumberZ) x);
-        }
-        if (X_Type > Ring.Z) {
-            return x.add(this, ring);
-        }
+        if (X_Type > Ring.Z) {return x.add(this, ring);}
         return add((NumberZ) (x.toNumber(Ring.Z, ring)));
     }
-
     @Override
     public Element subtract(Element x, Ring ring) {
-        if (x == NAN) {
-            return NAN;
-        }
-        if ((x == NEGATIVE_INFINITY) || (x == POSITIVE_INFINITY)) {
-            return x.negate(ring);
-        }
-        if (this.isZero(ring)) {
-            return x.negate(ring);
-        }
-        int xType = x.numbElementType();
-        if (xType == Ring.Z) {
-            return subtract((NumberZ) x);
-        }
-        if (xType < Ring.Z) {
-            return subtract((NumberZ) (x.toNumber(Ring.Z, ring)));
-        }
-        if (xType < Ring.Polynom) {
-            return x.negate(ring).add(this, ring);
-        }
-        switch (xType) {
-            case Ring.Polynom: case Ring.Q: case Ring.Rational:
-                return x.negate(ring).add(this, ring);
-            case Ring.F:
-                return new F(com.mathpar.func.F.SUBTRACT, new Element[] {this, x});
-            default:
-                return subtract((NumberZ) x.toNumber(Ring.Z, ring));
-        }
+        if ((x == NAN) ||  (x == NEGATIVE_INFINITY) || (x == POSITIVE_INFINITY)) { return x;  }
+        if (x instanceof NumberZ) { return subtract((NumberZ) x); }
+        int X_Type = x.numbElementType();
+        if (X_Type > Ring.Z) {return x.negate(ring).add(this, ring);}
+        return subtract((NumberZ) (x.toNumber(Ring.Z, ring)));
     }
-
     @Override
     public Element multiply(Element x, Ring ring) {
-        if (x == NAN) {
-            return NAN;
-        }
-        if ((x == NEGATIVE_INFINITY) || (x == POSITIVE_INFINITY)) {
-            return (this.isZero(ring)) ? NAN : this.isNegative() ? x.inverse(ring) : x;
-        }
-        if (x.isZero(ring)||this.isZero(ring)) {
-            return NumberZ.ZERO;
-        }
-        if (x.isOne(ring)) {
-            return this;
-        }
-        if (x.isMinusOne(ring)) {
-            return negate(ring);
-        }
-        if (x instanceof NumberZ) {
-            return multiply((NumberZ) x);
-        }
-        if (x.numbElementType() > com.mathpar.number.Ring.Z) {
-            return x.multiply(this, ring);
-        }
+        if ((x == NAN) ||  (x == NEGATIVE_INFINITY) || (x == POSITIVE_INFINITY)) { return x;  }
+        if (x instanceof NumberZ) { return multiply((NumberZ) x); }
+        int X_Type = x.numbElementType();
+        if (X_Type > Ring.Z) {return x.multiply(this, ring);}
         return multiply((NumberZ) (x.toNumber(Ring.Z, ring)));
+    }
+  //  @Override
+    public Element divide000(Element x, Ring ring) {
+        if ((x == NAN) ||  (x == NEGATIVE_INFINITY) || (x == POSITIVE_INFINITY)) { return x;  }
+        if (x.isOne(ring)) return this;
+        if (x.isMinusOne(ring)) return negate(ring);
+        if(signum==0){return (x.isZero(ring))? NAN: ZERO; }
+        if (x instanceof NumberZ) { return divide((NumberZ) x); }
+        int X_Type = x.numbElementType();
+        if (X_Type > Ring.Z) {return   x.inverse(ring).multiply(this, ring); }
+        return divide( (NumberZ)(x.toNumber(Ring.Z, ring)) );
     }
 
     @Override
@@ -3931,36 +3892,24 @@ public class NumberZ extends Element {
     }
 
     public Element modInverse(Element m) {
-        if ((m == NEGATIVE_INFINITY) || (m == POSITIVE_INFINITY)) {
-            return NAN;
-        }
-
+        if ((m == NEGATIVE_INFINITY) || (m == POSITIVE_INFINITY)) { return NAN; }
         return modInverse((NumberZ) m);
     }
 
-    public NumberZ modPow(Element exp, Element m) {
-        return null;
-    }
+    public NumberZ modPow(Element exp, Element m) { return null;}
 
     @Override
     public Element valOf(double x, Ring ring) {
         Element pp = NumberR.valueOf(x);
-        if (pp instanceof NumberR) {
-            return ((NumberR) pp).NumberRtoNumberZ();
-        } else {
-            return pp;
-        }
+        if (pp instanceof NumberR) { return ((NumberR) pp).NumberRtoNumberZ();}
+        else {return pp;}
     }
 
     @Override
-    public NumberZ valOf(long x, Ring ring) {
-        return valueOf(x);
-    }
+    public NumberZ valOf(long x, Ring ring) { return valueOf(x); }
 
     @Override
-    public NumberZ valOf(String s, Ring ring) {
-        return new NumberZ(s);
-    }
+    public NumberZ valOf(String s, Ring ring) { return new NumberZ(s); }
 
     /**
      * Transform this number of NumberZ type to the new type fixed by
@@ -4092,8 +4041,14 @@ public class NumberZ extends Element {
      */
     @Override
     public NumberZ random(int[] randomType, Random rnd, Ring ring) {
-        return new NumberZ(randomType[randomType.length - 1], rnd);
+        int bits=randomType[randomType.length - 1]; int base=bits; NumberZ sd=null ;
+        if(bits<0) { base=-bits; sd= ONE.shiftLeft(base-1);  }
+        NumberZ w= new NumberZ(base, rnd);
+        return (bits<0)? w.subtract(sd): w;
     }
+
+
+
 
     public int posOfHighestBit() {
         return (mag.length == 0) ? 0 : (((mag.length - 1) << 5) + 32 - Integer.numberOfLeadingZeros(
@@ -4372,7 +4327,8 @@ public class NumberZ extends Element {
 
     @Override
     public Element inverse(Ring ring) {
-        return(isOne(ring)|isMinusOne(ring))? this : (this.signum<0)?new Fraction(ring.numberMINUS_ONE,this.negate()) : new Fraction(ring.numberONE,this);
+        return(isOne(ring)|isMinusOne(ring))? this :
+                (this.signum<0)?new Fraction(ring.numberMINUS_ONE,this.negate()) : new Fraction(ring.numberONE,this);
     }
 
     @Override
@@ -4481,6 +4437,32 @@ public class NumberZ extends Element {
         for (int i = 0; i < intV.length; i++) {res[i]=new NumberZ(intV[i]);}
         return res;
     }
+    
+    /**   The Jacobi symbol of (a,b) is defined when b is odd and positive. */
+  public static Element JacobiSymbol(Element aa,Element bb, Ring ring) {
+      NumberZ a=(NumberZ) aa.toNumber(Ring.Z, ring); 
+      NumberZ b=(NumberZ) bb.toNumber(Ring.Z, ring);
+    if(b.isEven()){ring.exception.append(" JacobiSymbol:The~second~argument~must~be~odd. "); return Element.NAN;}
+    if(b.isNegative()){ring.exception.append(" JacobiSymbol:The~second~argument~must~be~positive. "); return Element.NAN;}
+    NumberZ N4=NumberZ.POSCONST[4];  NumberZ N8=NumberZ.POSCONST[8];  
+    int s=1;
+    int j=1;
+    while(j==1){
+       if(b.isOne(ring)){j=0;}
+       a=a.mod(b);
+       if((j==1)&&(a.isZero(ring))){j=0; s=0;};
+       if((j==1)&&(a.isOne(ring))){j=0;};
+       int g=b.mod(N8).intValue();
+       int h=1; if ((g==3)||(g==5)){h=-1;}
+       int k=1;
+       while ((j==1)&&(a.isEven())){k=k*h; a=a.shiftRight(1);}
+       int m=a.mod(N4).intValue();
+       int n=b.mod(N4).intValue();
+       s=s*k; if ((m==3)&&(n==3)){s=-s;}
+       NumberZ c=a; a=b; b=c;
+    } 
+return(new NumberZ64(s));
+} 
     public static void main(String[] args) {
         Ring r = new Ring("Z[x]");
         Page page=new Page (r,true); 

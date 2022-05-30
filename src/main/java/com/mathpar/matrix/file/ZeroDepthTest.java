@@ -7,6 +7,7 @@
 package com.mathpar.matrix.file;
 
 import com.mathpar.matrix.file.dense.FileMatrixD;
+import com.mathpar.number.NumberZ;
 import com.mathpar.number.Ring;
 import com.mathpar.parallel.stat.FMD.MultFMatrix.Multiplay;
 import com.mathpar.parallel.stat.FMD.MultFMatrix.SendReciveFileMatrixL;
@@ -23,7 +24,9 @@ import mpi.*;
 public class ZeroDepthTest {
     static String matrixFold="/tmp/mA";
     public static void main(String[] args) throws Exception{
-        sendRecvTest(args);
+        //NumberZ number = new NumberZ(5);
+        //sendRecvTest(args);
+        addTest();
     }
     
     public static void addTest() throws Exception{

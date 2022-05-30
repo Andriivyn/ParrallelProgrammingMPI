@@ -1246,6 +1246,12 @@ public class MatrSMult4 extends Drop {
             LdumwDto ldumwDto = (LdumwDto) inData[0];
             return (ldumwDto.L().size <= leafSize);
         }
+
+        /*if (inData[0] instanceof LdumwDto) {
+            LdumwDto ldumwDto = (LdumwDto) inData[0];
+            return (ldumwDto.L().size <= leafSize);
+        }
+        ms = (MatrixS) inData[0];*/
 //        MatrixS ms = (MatrixS) inData[0];
         switch(key){
             case(0):
@@ -1286,11 +1292,7 @@ public class MatrSMult4 extends Drop {
                 break;
             }
         }
-        if (inData[0] instanceof LdumwDto) {
-            LdumwDto ldumwDto = (LdumwDto) inData[0];
-            return (ldumwDto.L().size <= leafSize);
-        }
-        ms = (MatrixS) inData[0];
+
         return (ms.size <= leafSize);
     }
 
