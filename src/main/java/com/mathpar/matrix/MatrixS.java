@@ -10,6 +10,9 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 /**
@@ -1531,6 +1534,13 @@ public class MatrixS extends Element {// implements Serializable {
         return A1.multiplyRecursive(B1, ring).add(A2.multiplyRecursive(B2, ring), ring);
     }
 
+    public MatrixS scalarMultiplyThreaded(
+            MatrixS A1, MatrixS A2, MatrixS B1,
+            MatrixS B2, Ring ring
+    ) {
+        return A1.multiplyRecursiveThreaded(B1, ring).add(A2.multiplyRecursiveThreaded(B2, ring), ring);
+    }
+
     /**
      * Процедура вычисления скалярного произведения векторов A1*A2+B1*B2
      * c точным делением на число d.
@@ -1552,6 +1562,17 @@ public class MatrixS extends Element {// implements Serializable {
             r
         );
     }
+
+    private MatrixS scalarMultiplyDivThreaded(
+            MatrixS A1, MatrixS A2,
+            MatrixS B1, MatrixS B2, Element d, Ring r
+    ) {
+        return (A1.multiplyRecursiveThreaded(B1, r).add(A2.multiplyRecursiveThreaded(B2, r), r)).divideByNumber(
+                d,
+                r
+        );
+    }
+
 
     /**
      * Процедура вычисления скалярного произведения векторов (A1,A2) и (B1,B2):
@@ -1578,6 +1599,29 @@ public class MatrixS extends Element {// implements Serializable {
         );
     }
 
+    private MatrixS scalarMultiplyDivMulThreaded(
+            MatrixS A1, MatrixS A2, MatrixS B1,
+            MatrixS B2, Element d, Element g, Ring r
+    ) {
+        return (A1.multiplyRecursiveThreaded(B1, r).add(A2.multiplyRecursiveThreaded(B2, r), r)).divideMultiply(
+                d,
+                g,
+                r
+        );
+    }
+
+    private static ExecutorService service;
+
+    private static void initService() {
+        if(service == null) {
+            synchronized (MatrixS.class) {
+                if(service == null) {
+                    service = Executors.newFixedThreadPool(4);
+                }
+            }
+        }
+    }
+
     /**
      * Умножения   матриц.
      * Рекурсивный параллельный вариант
@@ -1596,8 +1640,30 @@ public class MatrixS extends Element {// implements Serializable {
         return join(R);
     }
 
+    public MatrixS multiplyRecursiveThreaded(MatrixS b, Ring ring) {
+        if (b.M.length <= ring.SMALLESTBLOCK) {
+            return multiplySmallBlock(b, ring);
+        }
+        initService();
+        MatrixS[] A = split();
+        MatrixS[] B = b.split();
+        MatrixS[] R = new MatrixS[4];
+        Future<?> calcR0 = service.submit(() -> {
+            R[0] = scalarMultiplyThreaded(A[0], A[1], B[0], B[2], ring);
+        });
+        Future<?> calcR1 = service.submit(() -> {
+            R[1] = scalarMultiplyThreaded(A[0], A[1], B[1], B[3], ring);
+        });
+        Future<?> calcR2 = service.submit(() -> {
+            R[2] = scalarMultiplyThreaded(A[2], A[3], B[0], B[2], ring);
+        });
 
+        R[3] = scalarMultiplyThreaded(A[2], A[3], B[1], B[3], ring);
 
+        while(! (calcR0.isDone() && calcR1.isDone() && calcR2.isDone())) {}
+
+        return join(R);
+    }
 
     /**
      * Умножение матриц с последующим делением на число d нацело.
@@ -1621,6 +1687,29 @@ public class MatrixS extends Element {// implements Serializable {
         return join(R);
     }
 
+    public MatrixS multiplyDivRecursiveThreaded(MatrixS b, Element d, Ring r) {
+        if (b.M.length <= r.SMALLESTBLOCK) {
+            return (multiplySmallBlock(b, r).divideByNumber(d, r));
+        }
+        initService();
+        MatrixS[] A = split();
+        MatrixS[] B = b.split();
+        MatrixS[] R = new MatrixS[4];
+        Future<?> calcR0 = service.submit(() -> {
+            R[0] = scalarMultiplyDivThreaded(A[0], A[1], B[0], B[2], d, r);
+        });
+        Future<?> calcR1 = service.submit(() -> {
+            R[1] = scalarMultiplyDivThreaded(A[0], A[1], B[1], B[3], d, r);
+        });
+        Future<?> calcR2 = service.submit(() -> {
+            R[2] = scalarMultiplyDivThreaded(A[2], A[3], B[0], B[2], d, r);
+        });
+        R[3] = scalarMultiplyDivThreaded(A[2], A[3], B[1], B[3], d, r);
+
+        while(! (calcR0.isDone() && calcR1.isDone() && calcR2.isDone())) {}
+        return join(R);
+    }
+
     /**
      * Умножение матриц с делением на число d нацело и умножением на число g.
      * Рекурсивный параллельный вариант
@@ -1641,6 +1730,29 @@ public class MatrixS extends Element {// implements Serializable {
         R[1] = scalarMultiplyDivMul(A[0], A[1], B[1], B[3], d, g, r);
         R[2] = scalarMultiplyDivMul(A[2], A[3], B[0], B[2], d, g, r);
         R[3] = scalarMultiplyDivMul(A[2], A[3], B[1], B[3], d, g, r);
+        return join(R);
+    }
+
+    public MatrixS multiplyDivMulRecursiveThreaded(MatrixS b, Element d, Element g, Ring r) {
+        if (b.M.length <= r.SMALLESTBLOCK) {
+            return multiplySmallBlock(b, r).divideMultiply(d, g, r);
+        }
+        initService();
+        MatrixS[] A = split();
+        MatrixS[] B = b.split();
+        MatrixS[] R = new MatrixS[4];
+        Future<?> calcR0 = service.submit(() -> {
+            R[0] = scalarMultiplyDivMulThreaded(A[0], A[1], B[0], B[2], d, g, r);
+        });
+        Future<?> calcR1 = service.submit(() -> {
+            R[1] = scalarMultiplyDivMulThreaded(A[0], A[1], B[1], B[3], d, g, r);
+        });
+        Future<?> calcR2 = service.submit(() -> {
+            R[2] = scalarMultiplyDivMulThreaded(A[2], A[3], B[0], B[2], d, g, r);
+        });
+        R[3] = scalarMultiplyDivMulThreaded(A[2], A[3], B[1], B[3], d, g, r);
+
+        while(! (calcR0.isDone() && calcR1.isDone() && calcR2.isDone())) {}
         return join(R);
     }
 
@@ -3441,6 +3553,22 @@ public class MatrixS extends Element {// implements Serializable {
     public MatrixS[] adjointEchelon(int[][] EiEj, Element one, Ring ring) {
         MatrixS gg = this;
         AdjMatrixS x = new AdjMatrixS(expandToPow2with0(), one, ring);
+        EiEj[0] = x.Ei;
+        EiEj[1] = x.Ej;
+        return permutAdjAndEchel(x.A, x.S, EiEj, ring);
+    }
+
+    public MatrixS[] mldtsvAdjointEchelon(int[][] EiEj, Element one, Ring ring) {
+        MatrixS gg = this;
+        MldtsvAdjMatrixS x = new MldtsvAdjMatrixS(expandToPow2with0(), one, ring);
+        EiEj[0] = x.Ei;
+        EiEj[1] = x.Ej;
+        return permutAdjAndEchel(x.A, x.S, EiEj, ring);
+    }
+
+    public MatrixS[] adjointEchelon2(int[][] EiEj, Element one, Ring ring) {
+        MatrixS gg = this;
+        AdjMatrixSThreadsMolodtsov x = new AdjMatrixSThreadsMolodtsov(expandToPow2with0(), one, ring);
         EiEj[0] = x.Ei;
         EiEj[1] = x.Ej;
         return permutAdjAndEchel(x.A, x.S, EiEj, ring);
@@ -6887,32 +7015,111 @@ public   MatrixS inverseLowTriangle(  Ring ring) {
     
     
     
+//    public static void main(String[] args) {
+//
+//        Ring ring = new Ring("R[]");
+//        ring.setAccuracy(30);
+//        ring.setMachineEpsilonR(10);
+//        ring.setFLOATPOS(40);
+//       ring = new Ring("Z[]");
+//
+//       MatrixS mat =  new MatrixS(5, 5, 1000, new int[]{5}, new Random(),ring.numberONE(), ring);
+//        //MatrixS mat = new MatrixS(matrix, ring);
+//       // AdjDet rr= new AdjDet(mat, ring.numberONE,ring;
+//      // MatrixS[] mm= mat.adjointEchelon(new int[2][0], ring.numberONE, ring);
+//
+//     //   System.out.println(mm[1]);
+//      //  System.out.println(matrix.length+"  "+matrix[0].length);
+//      //  System.out.println(mm[1].size+"  "+mm[0].M.length);
+//
+//        ArrayList<Element> arr = new ArrayList<>();
+//        arr.add(0, null);
+//        arr.add(1, mat);
+//
+//
+//
+//        }
+
+
     public static void main(String[] args) {
 
-        Ring ring = new Ring("R[]");
-        ring.setAccuracy(30);
-        ring.setMachineEpsilonR(10);
-        ring.setFLOATPOS(40);
-       ring = new Ring("Z[]");
+        Ring ring = new Ring("Z[]");
 
-       MatrixS mat =  new MatrixS(5, 5, 1000, new int[]{5}, new Random(),ring.numberONE(), ring);
-        //MatrixS mat = new MatrixS(matrix, ring);
-       // AdjDet rr= new AdjDet(mat, ring.numberONE,ring;
-      // MatrixS[] mm= mat.adjointEchelon(new int[2][0], ring.numberONE, ring);
+//        int [][]matrix = {{1, 2, 3, 4}, {5,6, 7, 8}, {9,10,11,12}, {13,14,15,16}};
+        double singleSum = 0;
+        double multiSum = 0;
+        double multiSum2 = 0;
+        double it = Double.parseDouble(args[0]);
+        int size = Integer.parseInt(args[1]);
+        for(int i = 0; i < it; i++){
+            int[][] matrix = get2xMatrix(size);
 
-     //   System.out.println(mm[1]);
-      //  System.out.println(matrix.length+"  "+matrix[0].length);
-      //  System.out.println(mm[1].size+"  "+mm[0].M.length);
+            MatrixS mat = new MatrixS(matrix, ring);
+//        System.out.println("Matrix:" + mat);
+            long t1_start=System.currentTimeMillis();
+            int[][] EIEJ = new int[2][];
+            MatrixS[] result = mat.adjointEchelon(EIEJ, ring.numberONE, ring);
+            long t1_end = System.currentTimeMillis();
+//        System.out.println("Adjoint matrix (non-threaded execution): " + result[0]);
+            long time = t1_end- t1_start;
+            singleSum += time;
+            System.out.println("Non-threaded execution duration: " + time);
+            t1_start=System.currentTimeMillis();
+            EIEJ = new int[2][];
+            result = mat.mldtsvAdjointEchelon(EIEJ, ring.numberONE, ring);
+            t1_end = System.currentTimeMillis();
+            time = t1_end- t1_start;
+            multiSum += time;
+//        System.out.println("Adjoint matrix (threaded execution): " + result[0]);
+            System.out.println("Threaded execution duration: " + time);
 
-        ArrayList<Element> arr = new ArrayList<>();
-        arr.add(0, null);
-        arr.add(1, mat);
-
-
-
+            t1_start=System.currentTimeMillis();
+            EIEJ = new int[2][];
+            result = mat.adjointEchelon2(EIEJ, ring.numberONE, ring);
+            t1_end = System.currentTimeMillis();
+            time = t1_end- t1_start;
+            multiSum2 += time;
+//            System.out.println("Adjoint matrix (threaded execution): " + result[0]);
+            System.out.println("Threaded 2 execution duration: " + time);
         }
+        double averageSingle = singleSum/it;
+        double averageMulti = multiSum/it;
+        double averageMulti2 = multiSum2/it;
+        double multBetterThan1 = 100 - (averageMulti/averageSingle) * 100;
+        double mult2BetterThan1 = 100 - (averageMulti2/averageSingle) * 100;
 
+        System.out.println("Ring smallestBlock: " + ring.SMALLESTBLOCK);
+        System.out.println("Matrix size (2^N): N = " + size);
+        System.out.println("Average single: " + averageSingle);
+        System.out.println("Average multi: " + averageMulti);
+        System.out.println("Average multi2: " + averageMulti2);
+        System.out.printf("Multi is %.3f %% faster than single \n", multBetterThan1);
+        System.out.printf("Multi2 is %.3f %% faster than single \n", mult2BetterThan1);
+//        MatrixS A = result[0];
+//        MatrixS S = result[1];
+//        Element d = S.M[0][0];
+//        MatrixS id = mat.multiply(A, ring).divideByNumber(d, ring);
+//        System.out.println(A.multiply(mat, ring)); //=== S
+//        System.out.println("d: " + d);
+//        System.out.println("ID: " + id);
+//        System.out.println("First element: " + A);
+//        System.out.println("Second element: " + S);
+        System.exit(0);
     }
+
+    public static int[][] get2xMatrix(int power) {
+        int side = (int) Math.pow(2, power);
+        int[][] res = new int[side][side];
+        int counter = 0;
+        for(int i = 0; i < side; i++) {
+            for (int j = 0; j < side; j++) {
+                res[i][j] = counter++;
+            }
+        }
+        return res;
+    }
+
+}
 /** ???????????????????  thread -- matrixMTrunner ? */
 class matrixMTrunner extends Thread {
 
