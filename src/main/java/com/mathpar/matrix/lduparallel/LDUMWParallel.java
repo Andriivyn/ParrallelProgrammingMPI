@@ -916,9 +916,9 @@ public class LDUMWParallel {
 
     // *********************************************
     public static void main(String[] args) throws Exception {
-        int times = Integer.parseInt(args[0]);
-        int size = Integer.parseInt(args[1]);
-        String mode = args[2];
+        int times = 1;//Integer.parseInt(args[0]);
+        int size = 16;//Integer.parseInt(args[1]);
+        String mode = "novalidation";//args[2];
         Ring ring = new Ring("Z[]");
         int[][] qq =
 //  {{4, 0, 2, 0, 3, 0, 0},

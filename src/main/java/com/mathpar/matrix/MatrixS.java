@@ -66,6 +66,8 @@ public class MatrixS extends Element {// implements Serializable {
      * число строк в матрице, обычно это степень 2-х
      */
     public int size = 0;
+
+    public int colSize = -1;
     /**
      * число столбцов в матрице, т.е. номер последнего ненулевого столбца
      */
@@ -6629,6 +6631,28 @@ public class MatrixS extends Element {// implements Serializable {
         return new MatrixS(n_length, colN, sumM, sumC);
         }
 
+    /**  Get number of non-zero Elements in this matrix
+     * @return long  - number of non-zero Elements
+     */
+    public  long getNumberOfElements() {
+        long res=0;
+        for (int j =0; j < col.length; j++) {res+= col[j].length;}
+        return res;
+    }
+
+    /**  Is this matrix has leaf size?
+     * (1 - Yes  0 - No (0= it is larger than leaf)
+     * @return int  - 1 - Yes  0 - No
+     */
+
+    public  boolean isItLeaf(int leafSize, double leafdensity) {  if (leafSize>=size) return true; // little size
+        //System.out.println("leafdensity = " + leafdensity);
+        long elNumb =getNumberOfElements();
+        long lsls =  ((long)leafSize)*leafSize;  if (elNumb>=lsls) return false; // many non-zero elements
+        double cc = (double)size; cc= (colSize==-1)?  cc*cc: cc*(double)colSize;
+        double dens= ((elNumb==0)||(cc==0)) ? 0.0 :  ((double)elNumb)/cc ;
+        return (dens <= leafdensity)? true: false;   // if little density than it is a leaf
+    }
 
 public MatrixS[] choleskyFactorize(Ring ring) {
       
@@ -7049,8 +7073,8 @@ public   MatrixS inverseLowTriangle(  Ring ring) {
         double singleSum = 0;
         double multiSum = 0;
         double multiSum2 = 0;
-        double it = Double.parseDouble(args[0]);
-        int size = Integer.parseInt(args[1]);
+        double it = 1;//Double.parseDouble(args[0]);
+        int size = 4;//Integer.parseInt(args[1]);
         for(int i = 0; i < it; i++){
             int[][] matrix = get2xMatrix(size);
 

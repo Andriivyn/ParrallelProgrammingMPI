@@ -6,6 +6,7 @@
 //package com.mathpar.students.ukma17i41.bosa.parallel.engine;
 package com.mathpar.parallel.dap.core;
 
+import com.mathpar.matrix.MatrixS;
 import com.mathpar.parallel.dap.adjmatrix.MatrixS.MatrSAdjMatrix;
 import com.mathpar.parallel.dap.cholesky.MatrixD.MatrDCholFact4;
 import com.mathpar.parallel.dap.cholesky.MatrixD.MatrDCholFactStrassWin7;
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 
 public abstract class Drop implements Serializable {
     private final static MpiLogger LOGGER = MpiLogger.getLogger(Drop.class);
+    protected static int leafSize = 4;
+    protected static double leafdensity = 0.1;
     /**inData - an array of input data to which the initial task data is transmitted
      *
      * outData - the output array of the drop is the result.
@@ -99,7 +102,7 @@ public abstract class Drop implements Serializable {
 
     public abstract Element[] inputFunction(Element[] input, Amin amin, Ring ring);
     public abstract Element[] outputFunction(Element[] input, Ring ring);
-    public abstract boolean isItLeaf();
+
     public abstract void sequentialCalc(Ring ring);
 
     void setNumbOfMyAmine(int numOfAmin)
@@ -115,6 +118,15 @@ public abstract class Drop implements Serializable {
     int getRecNum() {return recNum;}
 
     public abstract void setLeafSize(int dataSize);
+
+    public  boolean isItLeaf() {
+        MatrixS ms = (MatrixS)inData[0];
+        return (ms.isItLeaf(leafSize, leafdensity));
+    }
+
+    public void setLeafDensity(double ldensity) {
+        leafdensity = ldensity;
+    }
 
     public boolean hasFullInputData(){
         for (int j = 0; j < inputDataLength; j++) {

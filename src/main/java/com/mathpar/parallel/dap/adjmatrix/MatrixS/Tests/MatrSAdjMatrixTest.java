@@ -32,8 +32,8 @@ public class MatrSAdjMatrixTest extends DAPTest {
     protected Pair<Boolean, Element> checkResult(DispThread dispThread, String[] args, Element[] initData, Element[] resultData, Ring ring) {
         MatrixS initM = (MatrixS) initData[0];
         LOGGER.info("Input matrix: " + initM);
-        //AdjMatrixS resAdj = (AdjMatrixS) resultData[0];
-        AdjMatrixS resAdj = new AdjMatrixS(initM, ring.numberONE,  ring);
+        AdjMatrixS resAdj = (AdjMatrixS) resultData[0];
+        //AdjMatrixS resAdj = new AdjMatrixS(initM, ring.numberONE,  ring);
         LOGGER.info("Adj matrix = " + resAdj.A);
         LOGGER.info("Output matrix det = " + resAdj.Det);
         MatrixS divided = resAdj.A.divideByNumbertoFraction(resAdj.Det, ring);

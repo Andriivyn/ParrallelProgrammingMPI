@@ -106,13 +106,6 @@ public class QRDecomposition extends Drop {
     }
 
     @Override
-    public boolean isItLeaf() {
-        MatrixS source = (MatrixS) inData[0];
-
-        return source.size <= leafSize;
-    }
-
-    @Override
     public void setLeafSize(int dataSize) {
         leafSize = dataSize;
     }

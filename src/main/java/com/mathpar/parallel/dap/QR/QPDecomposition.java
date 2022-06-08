@@ -139,12 +139,6 @@ public class QPDecomposition extends Drop {
         return result;
     }
 
-    @Override
-    public boolean isItLeaf() {
-        MatrixS inputData = (MatrixS) inData[0];
-
-        return inputData.size <= leafSize;
-    }
 
     @Override
     public void setLeafSize(int dataSize) {

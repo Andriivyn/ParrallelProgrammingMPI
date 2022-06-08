@@ -192,11 +192,5 @@ public class MatrSAdjMatrix extends Drop {
     }
 
     @Override
-    public boolean isItLeaf() {
-        MatrixS ms = (MatrixS)inData[0];
-        return (ms.size <= leafSize);
-    }
-
-    @Override
     public void setLeafSize(int dataSize) { leafSize = dataSize; }
 }

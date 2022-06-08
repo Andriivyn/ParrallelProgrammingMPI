@@ -72,12 +72,6 @@ public class MatrSTriangInvStrassWin7 extends Drop {
 
         return new MatrixS[]{MatrixS.join(resInv)};
     }
-
-    @Override
-    public boolean isItLeaf() {
-        return (((MatrixS) inData[0]).size <= leafSize);
-    }
-
     @Override
     public void setLeafSize(int dataSize) {
         leafSize = dataSize;

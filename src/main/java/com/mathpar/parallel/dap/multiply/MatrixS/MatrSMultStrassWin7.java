@@ -119,11 +119,6 @@ public class MatrSMultStrassWin7 extends Drop {
     }
 
     @Override
-    public boolean isItLeaf() {
-        return ((MatrixS) inData[0]).size <= LeafSize;
-    }
-
-    @Override
     public void setLeafSize(int dataSize) {
         LeafSize = dataSize;
     }

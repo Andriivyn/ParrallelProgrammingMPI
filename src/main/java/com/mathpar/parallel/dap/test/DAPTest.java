@@ -47,6 +47,8 @@ import java.util.stream.IntStream;
  * -seq or -sequential run sequential test on given size, density and accuracy
  *
  * -z set ring Z[]
+ *
+ * -leafdensity set density for leaf
  */
 
 public abstract class DAPTest {
@@ -68,6 +70,9 @@ public abstract class DAPTest {
     protected int sleepTime = 1;
     private int taskType = 0;
     private int key = 0;
+
+    private double leafdensity = 0.1;
+
     protected Ring ring = new Ring("R64[]");
 
     private String reportFile;
@@ -107,6 +112,7 @@ public abstract class DAPTest {
     private void runTest(DispThread disp, Test test, String[] args) {
         Element[] data = new Element[0];
         setLeafSize(test.leaf);
+        setLeafDensity(test.leafdensity);
 
         if (rank == root) {
             data = initData(test.size, test.density, test.maxBits, test.ring);
@@ -221,6 +227,12 @@ public abstract class DAPTest {
         drop.doAmin().forEach(Drop -> Drop.setLeafSize(leafSize));
     }
 
+    private void setLeafDensity(double ldensity) {
+        Drop drop = (Drop)Drop.getDropObject(taskType, new byte[0]);
+        drop.setLeafDensity(ldensity);
+        drop.doAmin().forEach(Drop -> Drop.setLeafDensity(ldensity));
+    }
+
     private List<Test> getTests(String[] args){
         final String sizeArg = "-size=";
         final String leafArg = "-leaf=";
@@ -232,6 +244,7 @@ public abstract class DAPTest {
         final String seqComputingArg = "-seq";
         final String ringZ = "-z";
         final String sleepTimeArg = "-sleeptime=";
+        final String leafDensity = "-leafdensity=";
 
         List<Integer> sizes = new LinkedList<>();
         List<Integer> leaves = new LinkedList<>();
@@ -297,6 +310,12 @@ public abstract class DAPTest {
                     sleepTime = Integer.parseInt(value);
                 }
             }
+            else if (arg.startsWith(leafDensity)) {
+                String value = getValue(arg);
+                if (value != null) {
+                    leafdensity = Double.parseDouble(value);
+                }
+            }
         });
 
         return generateTests(sizes, leaves, density, maxBits);
@@ -313,7 +332,7 @@ public abstract class DAPTest {
 //                .collect(Collectors.toList());
 
         sizes.forEach(size -> leaves.forEach(leaf -> density.forEach(dens -> maxBits.forEach(maxB ->
-                tests.add(new Test(size, leaf, dens, maxB, testsPerDataSize, checkResult, ring))
+                tests.add(new Test(size, leaf, leafdensity, dens, maxB, testsPerDataSize, checkResult, ring))
         ))));
 
         return tests;
@@ -402,6 +421,7 @@ public abstract class DAPTest {
                 proc,
                 String.valueOf(test.size),
                 String.valueOf(test.leaf),
+                String.valueOf(test.leafdensity),
                 density,
                 String.valueOf(test.maxBits),
                 String.valueOf(test.executionTime),
@@ -422,8 +442,8 @@ public abstract class DAPTest {
 
         LOGGER.info(
             String.format((
-                "Test proc=%s size=%d leafSize=%d density=%s maxBits=%d time=%d ms correct=%s error=%s accuracy=%d maxUsedMemory=%d sleepTime=%d ring = %s "),
-                proc, test.size, test.leaf, density, test.maxBits, test.executionTime, resultCheckStr, precisionStr, ring.getAccuracy(), test.maxUsedMemory, sleepTime, ring.toString())
+                "Test proc=%s size=%d leafSize=%d density=%s maxBits=%d time=%d ms correct=%s error=%s accuracy=%d maxUsedMemory=%d sleepTime=%d ring = %s leafdensity = %f"),
+                proc, test.size, test.leaf, density, test.maxBits, test.executionTime, resultCheckStr, precisionStr, ring.getAccuracy(), test.maxUsedMemory, sleepTime, ring.toString(), leafdensity)
         );
 
     }
@@ -534,12 +554,14 @@ public abstract class DAPTest {
         Ring ring;
 
         long startTime;
+
+        double leafdensity;
         long executionTime;
         long maxUsedMemory;
         boolean isCorrect;
         Element precision;
 
-        public Test(int size, int leaf, int density, int maxBits, int count, boolean checkResult, Ring ring) {
+        public Test(int size, int leaf, double leafdensity, int density, int maxBits, int count, boolean checkResult, Ring ring) {
             this.size = size;
             this.leaf = leaf;
             this.density = density;
@@ -547,6 +569,7 @@ public abstract class DAPTest {
             this.count = count;
             this.checkResult = checkResult;
             this.ring = ring;
+            this.leafdensity = leafdensity;
         }
     }
 }
