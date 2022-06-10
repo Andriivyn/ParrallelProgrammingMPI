@@ -19,7 +19,7 @@ public class MatrSAdjMatrixTest extends DAPTest {
     private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSMult4Test.class);
     protected MatrSAdjMatrixTest() {
         super("MatrSAdjMatrix", 7701, 0);
-        ring = new Ring("Z[]");
+        //ring = new Ring("Z[]");
     }
 
     @Override

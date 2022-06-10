@@ -770,6 +770,7 @@ public class MatrSMult4 extends Drop {
             case(7725): {
                 v1 = (MatrixS) inData[1];
                 v2 = (MatrixS) inData[2];
+                break;
             }
             case (102):
             case (103): {
@@ -960,9 +961,6 @@ public class MatrSMult4 extends Drop {
             }
             case (7712): {
                 Element ds = inData[3].multiply(inData[4], ring).divide(inData[2], ring);
-                break;
-            } case (3): {
-                Element ds = inData[2].multiply(inData[3], ring).divide(inData[4], ring);
                 amin.resultForOutFunction[4] = ds;
                 break;
             }
@@ -1091,6 +1089,11 @@ public class MatrSMult4 extends Drop {
                 Element finalN = inData[6];
                 MatrixS M22_2 = MatrixS.join(resmat).divideByNumber(d11.
                         multiply(d11, ring), ring);
+
+                MatrixS M22_3 = M22_2.multiplyLeftI(Array.involution(m21.Ei, (int) finalN.value));
+                res = new Element[]{M22_2, input[4], M22_3};
+
+                break;
             }
             case(7714):
             case(7723): {
