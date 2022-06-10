@@ -11,7 +11,6 @@ import com.mathpar.parallel.dap.multiply.MatrixS.MatrSMultStrassWin7;
 import java.util.ArrayList;
 
 public class MatrSTriangInvStrassWin7 extends Drop {
-    private static int leafSize = 2;
     private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSTriangInvStrassWin7.class);
     private static int[][] _arcs = new int[][]{
             {1, 0, 0, 2, 2, 0, 3, 1, 0},
@@ -71,9 +70,5 @@ public class MatrSTriangInvStrassWin7 extends Drop {
         resInv[3] = (MatrixS) input[2];
 
         return new MatrixS[]{MatrixS.join(resInv)};
-    }
-    @Override
-    public void setLeafSize(int dataSize) {
-        leafSize = dataSize;
     }
 }

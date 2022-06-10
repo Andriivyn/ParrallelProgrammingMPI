@@ -14,7 +14,6 @@ import java.util.ArrayList;
 
 public class MatrSAdjMatrix extends Drop {
 
-    private static int leafSize = 2;
     private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSAdjMatrix.class);
     private static int[][] _arcs = new int[][]{
             {1,0,0,  2,2,0,  3,1,1,  5,3,0,  5,2,2,  14,2,0,
@@ -191,6 +190,4 @@ public class MatrSAdjMatrix extends Drop {
         return new Element[] {res, y, d};
     }
 
-    @Override
-    public void setLeafSize(int dataSize) { leafSize = dataSize; }
 }

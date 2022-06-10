@@ -14,8 +14,6 @@ import java.util.ArrayList;
 
 public class MatrSMult4 extends Drop {
     private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSMult4.class);
-    protected static int leafSize = 4;
-
 
     private static int[][] _arcs = new int[][]{
             {1, 0, 0, 1, 4, 1, 1, 1, 2, 1, 6, 3, 2, 0, 0, 2, 5, 1, 2, 1, 2, 2, 7, 3,
@@ -1293,8 +1291,5 @@ public class MatrSMult4 extends Drop {
         return ms.isItLeaf(leafSize,leafdensity);
     }
 
-    @Override
-    public void setLeafSize(int dataSize) {
-        leafSize = dataSize;
-    }
+
 }

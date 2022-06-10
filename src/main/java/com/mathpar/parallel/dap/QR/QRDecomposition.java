@@ -12,7 +12,6 @@ import com.mathpar.parallel.dap.multiply.multiplyVar.MultiplyVarMatrix;
 import java.util.ArrayList;
 
 public class QRDecomposition extends Drop {
-    protected static int leafSize = 4;
     private static int[][] _arcs = new int[][]{
             {2,0,0, 4,1,4, 1,2,0, 4,3,6}, // input
             {3,0,3, 2,1,1}, // QR1
@@ -103,10 +102,5 @@ public class QRDecomposition extends Drop {
         result[1] = MatrixS.join(R);
 
         return result;
-    }
-
-    @Override
-    public void setLeafSize(int dataSize) {
-        leafSize = dataSize;
     }
 }

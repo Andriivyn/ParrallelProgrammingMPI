@@ -10,8 +10,6 @@ import com.mathpar.parallel.dap.core.Drop;
 import java.util.ArrayList;
 
 public class MatrDMultStrassWin7  extends Drop {
-    public static int LeafSize = 4;
-
     private final static int[][] _arcs = {
             {       3, 0, 0,    4, 1, 0,    2, 2, 1,    5, 3, 1,
                     1, 4, 0,    1, 5, 1,    2, 6, 0,    3, 7, 1,
@@ -122,11 +120,7 @@ public class MatrDMultStrassWin7  extends Drop {
 
     @Override
     public boolean isItLeaf() {
-        return ((MatrixD) inData[0]).M.length <= LeafSize;
+        return ((MatrixD) inData[0]).M.length <= leafSize;
     }
 
-    @Override
-    public void setLeafSize(int dataSize) {
-        LeafSize = dataSize;
-    }
 }

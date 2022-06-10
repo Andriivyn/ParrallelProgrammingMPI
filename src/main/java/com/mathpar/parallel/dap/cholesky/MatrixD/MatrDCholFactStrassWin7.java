@@ -12,7 +12,7 @@ import com.mathpar.parallel.dap.multiply.MatrixD.MultiplyExtendedDWin;
 import java.util.ArrayList;
 
 public class MatrDCholFactStrassWin7 extends Drop {
-    private static int leafSize = 2;
+
     private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrDCholFactStrassWin7.class);
     private static int[][] _arcs = new int[][]{
             {1, 0, 0, 2, 1, 1, 3, 2, 1},//0. inputFunction
@@ -97,8 +97,4 @@ public class MatrDCholFactStrassWin7 extends Drop {
         return (ms.M.length <= leafSize);
     }
 
-    @Override
-    public void setLeafSize(int dataSize) {
-        leafSize = dataSize;
-    }
 }

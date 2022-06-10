@@ -9,8 +9,6 @@ import com.mathpar.parallel.dap.core.Drop;
 import java.util.ArrayList;
 
 public class MatrSMultStrassWin7 extends Drop {
-    public static int LeafSize = 4;
-
     private final static int[][] _arcs = {
             {       3, 0, 0,    4, 1, 0,    2, 2, 1,    5, 3, 1,
                     1, 4, 0,    1, 5, 1,    2, 6, 0,    3, 7, 1,
@@ -116,10 +114,5 @@ public class MatrSMultStrassWin7 extends Drop {
         else
             res = new MatrixS[]{MatrixS.join(C_matrix).negate(r)};
         return res;
-    }
-
-    @Override
-    public void setLeafSize(int dataSize) {
-        LeafSize = dataSize;
     }
 }

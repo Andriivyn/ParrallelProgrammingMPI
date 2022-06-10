@@ -12,7 +12,6 @@ import com.mathpar.parallel.dap.multiply.MatrixS.MultiplyExtendedSWin;
 import java.util.ArrayList;
 
 public class MatrSCholFactStrassWin7 extends Drop {
-    private static int leafSize = 2;
     private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSCholFactStrassWin7.class);
     private static int[][] _arcs = new int[][]{
             {1, 0, 0, 2, 1, 1, 3, 2, 1},//0. inputFunction
@@ -91,8 +90,4 @@ public class MatrSCholFactStrassWin7 extends Drop {
 
     }
 
-    @Override
-    public void setLeafSize(int dataSize) {
-        leafSize = dataSize;
-    }
 }

@@ -117,7 +117,9 @@ public abstract class Drop implements Serializable {
 
     int getRecNum() {return recNum;}
 
-    public abstract void setLeafSize(int dataSize);
+    public void setLeafSize(int dataSize) {
+        leafSize = dataSize;
+    }
 
     public  boolean isItLeaf() {
         MatrixS ms = (MatrixS)inData[0];

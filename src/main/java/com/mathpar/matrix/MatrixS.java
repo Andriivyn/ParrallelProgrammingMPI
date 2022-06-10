@@ -6645,8 +6645,11 @@ public class MatrixS extends Element {// implements Serializable {
      * @return int  - 1 - Yes  0 - No
      */
 
-    public  boolean isItLeaf(int leafSize, double leafdensity) {  if (leafSize>=size) return true; // little size
+    public  boolean isItLeaf(int leafSize, double leafdensity) {
         //System.out.println("leafdensity = " + leafdensity);
+        //System.out.println("leafSize = " + leafSize);
+        if (leafSize>=size) return true; // little size
+
         long elNumb =getNumberOfElements();
         long lsls =  ((long)leafSize)*leafSize;  if (elNumb>=lsls) return false; // many non-zero elements
         double cc = (double)size; cc= (colSize==-1)?  cc*cc: cc*(double)colSize;

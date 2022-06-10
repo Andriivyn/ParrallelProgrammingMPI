@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import static com.mathpar.matrix.LDUMW.DtoUnit;
 
 public class LdumwFact extends Drop {
-    private static int leafSize = 4;
     private final static MpiLogger LOGGER = MpiLogger.getLogger(LdumwFact.class);
     private static int[][] arcs_ = new int[][]{
             {1, 0, 0, 1, 4, 1, 2, 1, 1, 3, 1, 1, 3, 4, 2, 4, 2, 1, 4, 4, 2, 5, 2, 1, 9, 3, 1, 9, 4, 4, 11, 4, 4, 12, 4, 3, 16, 4, 4},//0. inputFunction

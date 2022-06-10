@@ -11,7 +11,6 @@ import com.mathpar.parallel.dap.multiply.MatrixS.MatrSMult4;
 import java.util.ArrayList;
 
 public class MatrSCholFact4 extends Drop {
-    private static int leafSize = 2;
     private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSCholFact4.class);
     private static int[][] _arcs = new int[][]{
             {1, 0, 0, 2, 1, 1, 3, 2, 1},//0. inputFunction
@@ -93,8 +92,4 @@ public class MatrSCholFact4 extends Drop {
     }
 
 
-    @Override
-    public void setLeafSize(int dataSize) {
-        leafSize = dataSize;
-    }
 }

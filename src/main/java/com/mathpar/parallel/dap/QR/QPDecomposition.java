@@ -14,7 +14,6 @@ import com.mathpar.parallel.dap.multiply.multiplyVar.MultiplyVarConfig;
 import java.util.ArrayList;
 
 public class QPDecomposition extends Drop {
-    protected static int leafSize = 16;
     private static int num = 0;
     private static int[][] _args = new int[][]{
             {3,0,0, 5,1,4, 1,2,0, 2,3,4, 1,4,1, 2,5,6, 4,7,1}, // input
@@ -137,11 +136,5 @@ public class QPDecomposition extends Drop {
         result[1] = MatrixS.join(R);
 
         return result;
-    }
-
-
-    @Override
-    public void setLeafSize(int dataSize) {
-        leafSize = dataSize;
     }
 }

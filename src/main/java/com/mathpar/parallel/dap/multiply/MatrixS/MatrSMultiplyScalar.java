@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 public class MatrSMultiplyScalar extends Drop {
     private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSMultiplyScalar.class);
-    protected static int leafSize = 4;
 
     private static int[][] _arcs = new int[][]{
             //Зв'язки від вхідної функції до всіх інших дропів
@@ -77,10 +76,5 @@ public class MatrSMultiplyScalar extends Drop {
         MatrixS B = (MatrixS) input[1];
         MatrixS[] res = new MatrixS[]{A.add(B, ring)};
         return res;
-    }
-
-    @Override
-    public void setLeafSize(int dataSize) {
-        leafSize = dataSize;
     }
 }

@@ -22,7 +22,6 @@ import java.util.ArrayList;
  */
 public class Multiply extends Drop {
   private final static MpiLogger LOGGER = MpiLogger.getLogger(Multiply.class);
-  protected static int leafSize = 4;
 
     //Зв'язки в графі між дропами, перше значення трійки відповідає за номер дропу в графі,
     // друге - за позицію у вихідному масиві(результат який буде прописуватись в інші дропи),
@@ -110,11 +109,6 @@ public class Multiply extends Drop {
     public boolean isItLeaf() {
         MatrixS ms = (MatrixS) inData[0];
         return (ms.size <= leafSize);
-    }
-
-    @Override
-    public void setLeafSize(int dataSize) {
-        leafSize = dataSize;
     }
 
 }
