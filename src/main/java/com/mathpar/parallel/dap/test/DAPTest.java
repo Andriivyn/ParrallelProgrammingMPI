@@ -295,7 +295,7 @@ public abstract class DAPTest {
                     int accuracy = Integer.parseInt(value);
 
                     ring.setAccuracy(accuracy);
-                    ring.setMachineEpsilonR(accuracy - 20);
+                    ring.setMachineEpsilonR(accuracy - 5);
                     ring.setFLOATPOS(accuracy + 10);
                 }
             } else if (arg.startsWith(seqComputingArg)) {

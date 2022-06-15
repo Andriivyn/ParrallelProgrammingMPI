@@ -17,7 +17,7 @@ public class LdumwFactTest extends DAPTest {
 
     protected LdumwFactTest() {
         super("LdumwFactTest", 23, 0);
-        //ring = new Ring("Z[]");
+        ring = new Ring("Z[]");
     }
 
     @Override
