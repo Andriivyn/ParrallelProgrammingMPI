@@ -32,10 +32,17 @@ public class LdumwFactTest extends DAPTest {
         ldumwDto.setD(LdumwFact.invForD(ldumwDto.D(), ring));
 
         MatrixS A = (MatrixS) initData[0];
+        LOGGER.info("init = " + A);
         Element a = initData[1];
 
         LdumwDto ldumwDtoSequential = LDUMW.LDUMW(A, a, ring);
 
+       // LOGGER.info("ldumwDto = " + ldumwDto);
+
+        //LOGGER.info("ldumwDtoSequential = " + ldumwDtoSequential);
+
+        LOGGER.info("Check = " + ldumwDto.L().multiply(ldumwDto.D(), ring).multiply(ldumwDto.U(), ring));
+        LOGGER.info("Check seq = " + ldumwDtoSequential.L().multiply(ldumwDtoSequential.D(), ring).multiply(ldumwDtoSequential.U(), ring));
         if (ldumwDto.equals(ldumwDtoSequential)) {
             return new Pair<>(true, null);
         }

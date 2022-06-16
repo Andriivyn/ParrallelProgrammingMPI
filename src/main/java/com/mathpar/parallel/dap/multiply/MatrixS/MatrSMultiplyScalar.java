@@ -51,7 +51,7 @@ public class MatrSMultiplyScalar extends Drop {
     //Послідовний обрахунок листових вершин
     @Override
     public void sequentialCalc(Ring ring) {
-        // LOGGER.info("in sequentialCalc indata = " + inData[0] + ",  "+inData[1]);
+      //   LOGGER.info("MatrSMultiplyScalar in sequentialCalc indata = " + inData[0] + ",  "+inData[1]);
         MatrixS A = (MatrixS) inData[0];
         MatrixS B = (MatrixS) inData[1];
         MatrixS C = (MatrixS) inData[2];

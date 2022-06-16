@@ -33,12 +33,17 @@ public class MatrSAdjMatrixTest extends DAPTest {
         MatrixS initM = (MatrixS) initData[0];
         LOGGER.info("Input matrix: " + initM);
         AdjMatrixS resAdj = (AdjMatrixS) resultData[0];
-        //AdjMatrixS resAdj = new AdjMatrixS(initM, ring.numberONE,  ring);
+        AdjMatrixS resAdj1 = new AdjMatrixS(initM, ring.numberONE,  ring);
         LOGGER.info("Adj matrix = " + resAdj.A);
+        LOGGER.info("Adj matrix seq = " + resAdj1.A);
         LOGGER.info("Output matrix det = " + resAdj.Det);
+        LOGGER.info("Output matrix det seq = " + resAdj1.Det);
         MatrixS divided = resAdj.A.divideByNumbertoFraction(resAdj.Det, ring);
         MatrixS rr = initM.multiply(divided, ring);
+        MatrixS divided1 = resAdj1.A.divideByNumbertoFraction(resAdj1.Det, ring);
+        MatrixS rr1 = initM.multiply(divided1, ring);
         LOGGER.info("Output: " + rr);
+        LOGGER.info("Output seq: " + rr1);
         boolean succeed = rr.isOne(ring);
         return new Pair<>(succeed, null);
     }
@@ -50,9 +55,16 @@ public class MatrSAdjMatrixTest extends DAPTest {
 
     @Override
     protected MatrixS matrix(int size, int density, int maxBits, Ring ring){
-//        int [][]mat = {{6, -5, 8, 4}, {9,7,5,2}, {7,5,3,7}, {-4,8,-8,-3}};
-//        MatrixS matrix = new MatrixS(mat, ring);
-        MatrixS matrix = new MatrixS(size, size, density, new int[]{maxBits}, new Random(),ring.numberONE(), ring);
+        int [][]mat = {{20, 21, 2,  16, 0,  16, 15, 11},
+                {24, 31, 22, 3,  3,  6,  14, 13},
+                {12, 12, 2,  10, 20, 28, 6,  12},
+                {10, 16, 15, 25, 25, 11, 30, 15},
+                {1,  5,  30, 7,  9,  13, 16, 29},
+                {19, 11, 2,  15, 18, 4,  7,  4 },
+                {24, 2,  4,  16, 19, 19, 7,  22},
+                {26, 17, 30, 14, 3,  3,  6,  7 }};
+        MatrixS matrix = new MatrixS(mat, ring);
+        //MatrixS matrix = new MatrixS(size, size, density, new int[]{maxBits}, new Random(),ring.numberONE(), ring);
         // LOGGER.trace("bef matrix = " + matrix);
 //        for (int i = 0; i < size; i++) {
 //            for (int j = 0; j < size; j++) {

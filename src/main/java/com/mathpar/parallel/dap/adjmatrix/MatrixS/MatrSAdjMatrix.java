@@ -122,9 +122,13 @@ public class MatrSAdjMatrix extends Drop {
     public void sequentialCalc(Ring ring) {
         MatrixS m = (MatrixS) inData[0];
         Element d0 = inData[1];
+        LOGGER.info("in seqcalc det0 = " + d0);
+        LOGGER.info("in seqcalc m = " + m);
         AdjMatrixS adjM = new AdjMatrixS(m, d0,  ring);
         Element resD = adjM.Det;
         MatrixS y = adjM.S.ES_min_dI(resD, adjM.Ei, adjM.Ej, ring);
+        LOGGER.info("in seqcalc adj = " + adjM.A);
+        LOGGER.info("in seqcalc det = " + adjM.Det);
         outData[0] = adjM;
         outData[1] = y;
         outData[2] = resD;
