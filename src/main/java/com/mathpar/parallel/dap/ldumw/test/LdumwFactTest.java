@@ -37,7 +37,7 @@ public class LdumwFactTest extends DAPTest {
 
         LdumwDto ldumwDtoSequential = LDUMW.LDUMW(A, a, ring);
 
-       // LOGGER.info("ldumwDto = " + ldumwDto);
+        //LOGGER.info("ldumwDto = " + ldumwDto);
 
         //LOGGER.info("ldumwDtoSequential = " + ldumwDtoSequential);
 

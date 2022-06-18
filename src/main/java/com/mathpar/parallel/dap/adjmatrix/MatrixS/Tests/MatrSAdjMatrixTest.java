@@ -55,16 +55,16 @@ public class MatrSAdjMatrixTest extends DAPTest {
 
     @Override
     protected MatrixS matrix(int size, int density, int maxBits, Ring ring){
-        int [][]mat = {{20, 21, 2,  16, 0,  16, 15, 11},
+       /* int [][]mat = {{20, 21, 2,  16, 0,  16, 15, 11},
                 {24, 31, 22, 3,  3,  6,  14, 13},
                 {12, 12, 2,  10, 20, 28, 6,  12},
                 {10, 16, 15, 25, 25, 11, 30, 15},
                 {1,  5,  30, 7,  9,  13, 16, 29},
                 {19, 11, 2,  15, 18, 4,  7,  4 },
                 {24, 2,  4,  16, 19, 19, 7,  22},
-                {26, 17, 30, 14, 3,  3,  6,  7 }};
-        MatrixS matrix = new MatrixS(mat, ring);
-        //MatrixS matrix = new MatrixS(size, size, density, new int[]{maxBits}, new Random(),ring.numberONE(), ring);
+                {26, 17, 30, 14, 3,  3,  6,  7 }};*/
+        //MatrixS matrix = new MatrixS(mat, ring);
+        MatrixS matrix = new MatrixS(size, size, density, new int[]{maxBits}, new Random(),ring.numberONE(), ring);
         // LOGGER.trace("bef matrix = " + matrix);
 //        for (int i = 0; i < size; i++) {
 //            for (int j = 0; j < size; j++) {
