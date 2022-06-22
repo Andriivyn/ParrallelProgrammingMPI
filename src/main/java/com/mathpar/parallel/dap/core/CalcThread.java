@@ -376,7 +376,7 @@ public class CalcThread implements Runnable {
 
             } else {
                 if (currentDrop.isItLeaf()) {
-               //     LOGGER.trace("Drop is leaf " + currentDrop.aminId + " id = "+ currentDrop.dropId);
+                    LOGGER.info("Drop is leaf " + currentDrop.aminId + " id = "+ currentDrop.dropId);
                     currentDrop.sequentialCalc(ring);
 
                    /* for (int i = 0; i <currentDrop.inputDataLength ; i++) {
@@ -390,7 +390,7 @@ public class CalcThread implements Runnable {
                     }*/
 
                     if (currentDrop.aminId == -1 && myRank == 0) {
-                       // LOGGER.trace("go to finish whole task");
+                        LOGGER.info("go to finish whole task");
                         finishWholeTask(currentDrop.outData);
                     } else if (currentDrop.procId == myRank) {
 

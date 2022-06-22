@@ -2478,11 +2478,12 @@ public class MatrixS extends Element {// implements Serializable {
             Element[] ri = new Element[m];
             r[i] = ri;
             for (int j = 0; j < m; j++) {
-                ri[j] = new Fraction(Mi[j], s).cancel(ring);
+                ri[j] = Mi[j].divideToFraction(s, ring);
             }
         }
         return new MatrixS(size, colNumb, r, col);
     }
+
 
     /**
      * Процедура разбиения матрицы  на 4 равных квадратных блока.
@@ -2989,6 +2990,71 @@ public class MatrixS extends Element {// implements Serializable {
         }
         return new MatrixS(hb, colNumb, MM, cc);
     }
+
+    public MatrixS expandToPow2with0(int sizeClm) {
+        int n = Math.max(col.length, sizeClm);
+        n = Math.max(n, size);
+        int hb = Integer.highestOneBit(n);
+        if ((hb==size)&&(hb==n)) return this;
+        else{ if(hb!=n) hb <<= 1;
+            Element[][] MM=new Element[hb][0];int[][] cc=new int[hb][0];
+            System.arraycopy(M, 0, MM, 0, M.length);
+            System.arraycopy(col, 0, cc, 0, col.length);
+            return new MatrixS(hb, colNumb, MM, cc); }
+    }
+
+    /** Go backfrom expand matrices in Cholesky and in LDU
+     *
+     * @param mats - thr resulting matrices of a size 2^N
+     * @param n - rows number
+     * @param m  - columns number
+     */
+    public static void backFromExpand(MatrixS[] mats, int n, int m) {
+        int k=mats.length; Element[] Eempty=new Element[0]; int[] intEmpty=new int[0];
+        if (k<3){  for (int i = n; i < mats[0].M.length; i++) {mats[0].M[i]=Eempty;mats[0].col[i]=intEmpty;}
+            mats[0].size=n;   mats[0].colNumb=n;
+        }
+        if (k==2){
+            for (int i = n; i < mats[0].M.length; i++) {mats[1].M[i]=Eempty; mats[1].col[i]=intEmpty;}
+            mats[1].size=n; mats[1].colNumb=n;
+        }
+        if (k==3){
+            for (int i = n; i < mats[0].M.length; i++) {
+                mats[0].M[i]=Eempty; mats[1].M[i]=Eempty; mats[2].M[i]=Eempty;
+                mats[0].col[i]=intEmpty;  mats[1].col[i]=intEmpty; mats[2].col[i]=intEmpty;
+            }
+            mats[0].size=n;  mats[1].size=n; mats[2].size=Math.min(m, n);
+            mats[0].colNumb=Math.min(n, mats[0].colNumb);
+            mats[1].colNumb=Math.min(n, mats[1].colNumb);
+            mats[1].colNumb=Math.min(m, mats[1].colNumb);
+            //       System.out.println(mats[2]+"mats[2].colNumb)--="+m+mats[2].colNumb);
+            mats[2].colNumb=Math.max(m, mats[2].colNumb);
+        }
+    }
+
+    public static void backFromExpand(MatrixS mats, int n, int m) {
+        Element[] Eempty=new Element[0]; int[] intEmpty=new int[0];
+        for (int i = n; i < mats.M.length; i++) {mats.M[i]=Eempty;mats.col[i]=intEmpty;}
+        mats.size=n;   mats.colNumb=Math.min(m, mats.colNumb);
+    }
+
+    /** Maximum absolute value (\abs(a_{i,j})) of the all
+     *  matrix elements
+     *
+     * @param r ring
+     * @return max_{this} abs(a_{i,j})
+     */
+    @Override
+    public Element maxAbs(Ring ring) {
+        Element res=ring.numberZERO;
+        for (int i = 0; i < M.length; i++) {
+            for (int j = 0; j < M[i].length; j++) {
+                res = M[i][j].abs(ring).max(res, ring);
+            }
+        }
+        return res;
+    }
+
 
     /** Дополнение матрицы снизу и справа нулями до матрицы размера ближайшей
      * степени двойки. Возвращается квадратная матрица порядка 2^k,
@@ -6254,6 +6320,84 @@ public class MatrixS extends Element {// implements Serializable {
         }
         return (firsIsMin) ? new int[]{a, b} : new int[]{b, a};
     }
+
+
+        /** Procedure  mod from Matrix. The interval= [0,1,..,s-1].
+
+          *  Последовательная процедура.
+
+          *  @param s число - mod
+
+         *  @return this * dod(s)
+
+          */
+
+                public MatrixS mod(Element s, Ring ring) {
+
+                int n = M.length;
+
+                if (s.isZero(ring)) {return zeroMatrix(n);}
+
+                Element[][] r = new Element[n][0];
+
+                for (int i = 0; i < n; i++) {
+
+                        Element[] Mi = M[i];
+
+                        int m = Mi.length;
+
+                        Element[] ri = new Element[m];
+
+                        r[i] = ri;
+
+                        for (int j = 0; j < m; j++) {ri[j] = Mi[j].mod(s, ring);}
+
+                   }
+
+                return new MatrixS(size, colNumb, r, col);
+
+            }
+
+
+
+            /** Procedure  Mod from Matrix. The interval= [-(s-1)/2,..0,..,(s-1)/2].
+
+      *  Последовательная процедура.
+
+     *  @param s число - mod
+
+      *  @return this * dod(s)
+
+      */
+
+        public MatrixS Mod(Element s, Ring ring) {
+
+            int n = M.length;
+
+               if (s.isZero(ring)) {return zeroMatrix(n);}
+
+                Element[][] r = new Element[n][0];
+
+                for (int i = 0; i < n; i++) {
+
+                        Element[] Mi = M[i];
+
+                        int m = Mi.length;
+
+                        Element[] ri = new Element[m];
+
+                        r[i] = ri;
+
+                        for (int j = 0; j < m; j++) {ri[j] = Mi[j].Mod(s, ring);}
+
+                   }
+
+                return new MatrixS(size, colNumb, r, col);
+
+           }
+
+
+
 
     /**
      * Orbit of group.

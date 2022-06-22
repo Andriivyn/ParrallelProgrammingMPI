@@ -19,13 +19,33 @@ public class LdumwDto extends Element {
     private MatrixS Ibar;
     private MatrixS J;
     private MatrixS Jbar;
-    private final Element a_n;
+    public final Element a_n;
+    public MatrixS D_inv;
+
 
     public LdumwDto(MatrixS l, MatrixS d, MatrixS u, Element a_n) {
         L = l;
         D = d;
         U = u;
         this.a_n = a_n;
+    }
+
+    public LdumwDto(MatrixS l, MatrixS d, MatrixS dhat, MatrixS dbar,
+                    MatrixS u, MatrixS m, MatrixS w, MatrixS i,
+                    MatrixS ibar, MatrixS j, MatrixS jbar, Element a_n, MatrixS dinv) {
+        L = l;
+        D = d;
+        Dhat = dhat;
+        Dbar = dbar;
+        U = u;
+        M = m;
+        W = w;
+        I = i;
+        Ibar = ibar;
+        J = j;
+        Jbar = jbar;
+        this.a_n = a_n;
+        D_inv = dinv;
     }
 
     public LdumwDto(MatrixS l, MatrixS d, MatrixS dhat, MatrixS dbar,
@@ -44,37 +64,33 @@ public class LdumwDto extends Element {
         Jbar = jbar;
         this.a_n = a_n;
     }
+    static Element doFraction(Element a, Element b, Ring ring) {int ra=ring.algebra[0];
+        if((ra==Ring.Zp32)||(ra==Ring.R)||(ra==Ring.R64)||(ra==Ring.Zp)||(ra==Ring.Complex)) return a.divide(b, ring);
+        return new Fraction(a, b);
+    }
 
-    void IJMap(Element a, Ring ring) {
-        int[] forMaxCol = new int[1];
-        MatrixS[] IandJ = doIJfromD(D, forMaxCol, ring);
-        I = IandJ[0];
-        J = IandJ[1];
-        int maxCol = forMaxCol[0];
-        Ibar = makeIbar(I, ring);
-        Jbar = makeIbar(J, ring);
-        maxCol = Math.max(maxCol, D.col.length);
-        Element[][] Md = new Element[maxCol][];
+    void IJMap (Element a, Ring ring){
+        int[] forMaxCol= new int[1];
+        MatrixS[] IandJ= doIJfromD(D, forMaxCol, ring);
+        I=IandJ[0];J=IandJ[1]; int maxCol=forMaxCol[0];
+        Ibar=makeIbar(I, ring);
+        Jbar=makeIbar(J, ring);
+        maxCol=Math.max(maxCol, D.col.length);
+        Element[][] Md=new Element[maxCol][];
         int[][] cold = new int[maxCol][];
-        Element[][] MdB = new Element[maxCol][0];
+        Element[][] MdB=new Element[maxCol][0];
         int[][] coldB = new int[maxCol][0];
         System.arraycopy(D.col, 0, cold, 0, D.col.length);
-        //  Element an_an=a_n.multiply(a_n, ring);
-        for (int i = 0; i < D.M.length; i++)
-            if (D.M[i].length > 0) {
-                Md[i] = new Element[]{a.divideToFraction(D.M[i][0].multiply(a_n, ring), ring)};
-            }
-        if (Ibar.isZero(ring)) {
-            Dbar = MatrixS.zeroMatrix(D.size);
-        } else {
-            int maxColN = 0;
+        for (int i = 0; i<D.M.length; i++) if(D.M[i].length>0){
+            Md[i]=new Element[]{a.divideToFraction(D.M[i][0].multiply(a_n, ring), ring)};
+        }
+        if (Ibar.isZero(ring)) { Dbar = MatrixS.zeroMatrix(D.size);}
+        else {int maxColN = 0;
             // new fraction 1 divide a_n
             Element a_nInv = (a_n.isOne(ring) || a_n.isMinusOne(ring)) ? a_nInv = a_n
-                    : new Fraction(ring.numberONE, a_n);
+                    : doFraction(ring.numberONE, a_n, ring);
             int j = 0;
-            while (Jbar.col[j].length == 0) {
-                j++;
-            }
+            while (Jbar.col[j].length == 0) {j++;}
             // i - runs in Ibar? j runs in Jbar. We build the diagonal in the square Ibar x Jbar
             for (int i = 0; i < Ibar.col.length; i++) {
                 if (Ibar.col[i].length > 0) {
@@ -84,9 +100,7 @@ public class LdumwDto extends Element {
                     MdB[i] = new Element[]{ring.numberONE};
                     j++;
                     maxColN = j;
-                    while ((j < Jbar.col.length) && (Jbar.col[j].length == 0)) {
-                        j++;
-                    }
+                    while ((j < Jbar.col.length) && (Jbar.col[j].length == 0)) {j++;}
                 }
             }
             Dbar = new MatrixS(D.size, maxColN, MdB, coldB);
@@ -94,72 +108,46 @@ public class LdumwDto extends Element {
         Dhat = new MatrixS(D.size, maxCol, Md, cold);
     }
 
-    public static MatrixS makeIbar(MatrixS II, Ring ring) {
-        int colNumb = 0;
-        int len = (II.M.length < II.size) ? II.size : II.M.length;
-        Element[][] MI = new Element[len][];
-        int[][] colI = new int[len][];
+    public static MatrixS  makeIbar(MatrixS II, Ring ring){ int colNumb=0;
+        int len=(II.M.length < II.size)? II.size: II.M.length;
+        Element[][] MI=new Element[len][];
+        int[][] colI=new int[len][];
         Element[] one = new Element[]{ring.numberONE};
         Element[] zero = new Element[0];
         int[] zeroI = new int[0];
         int i = 0;
-        for (; i < II.M.length; i++) {
-            if (II.col[i].length > 0) {
-                MI[i] = zero;
-                colI[i] = zeroI;
-            } else {
-                MI[i] = one;
-                colI[i] = new int[]{i};
-                colNumb = i;
-            }
+        for (; i<II.M.length; i++){
+            if(II.col[i].length>0){MI[i]= zero; colI[i]=zeroI;}
+            else {MI[i]= one; colI[i]=new int[]{i};colNumb=i; }
         }
-        for (; i < II.size; i++) {
-            MI[i] = one;
-            colI[i] = new int[]{i};
-            colNumb = i;
-        }
-        return new MatrixS(II.size, colNumb + 1, MI, colI);
+        for (; i<II.size; i++){MI[i]= one; colI[i]=new int[]{i}; colNumb=i; }
+        return new MatrixS(II.size, colNumb+1, MI, colI);
     }
 
-    static MatrixS[] doIJfromD(MatrixS D, int[] forMaxColN, Ring ring) {
-        Element[][] MI = new Element[D.M.length][];
+    static MatrixS[]  doIJfromD (MatrixS D, int[] forMaxColN, Ring ring){
+        Element[][] MI=new Element[D.M.length][];
         Element[] one = new Element[]{ring.numberONE};
         Element[] zero = new Element[0];
         int[] zeroI = new int[0];
-        for (int i = 0; i < D.M.length; i++) {
-            MI[i] = (D.M[i].length > 0) ? one : zero;
-        }
+        for (int i = 0; i<D.M.length; i++){MI[i]= (D.M[i].length>0)? one: zero;}
         int[][] colI = new int[D.M.length][];
-        int maxCol = 0, maxColOut = 0;
-        for (int i = 0; i < D.col.length; i++) {
-            if (D.col[i].length > 0) {
-                colI[i] = new int[]{i};
-                maxColOut = Math.max(maxCol, i);
-                MI[i] = one;
-                maxCol = Math.max(maxCol, D.col[i][0]);
-            } else {
-                colI[i] = zeroI;
-                MI[i] = zero;
-            }
-        }
-        maxCol++;
-        maxColOut++;
-        int mmax = Math.max(maxCol, maxColOut);
-        Element[][] MJ = new Element[maxCol][0];
+        int maxCol=0, maxColOut=0;
+        for (int i = 0; i<D.col.length; i++){
+            if (D.col[i].length>0){ colI[i]=new int[]{i};
+                maxColOut=Math.max (maxCol, i );
+                MI[i]=one; maxCol=Math.max (maxCol, D.col[i][0]);}
+            else {colI[i]=zeroI; MI[i]=zero;}
+        };   maxCol++; maxColOut++;int mmax=Math.max (maxCol,maxColOut);
+        Element[][] MJ=new Element[maxCol][0];
         int[][] colJ = new int[maxCol][0];
-        for (int i = 0; i < D.col.length; i++) {
-            if (D.col[i].length > 0) {
-                int cc = D.col[i][0];
-                colJ[cc] = new int[]{cc};
-                MJ[cc] = one;
-            }
-        }
-        MatrixS I = new MatrixS(D.size, mmax, MI, colI);
-        MatrixS J = new MatrixS(D.size, mmax, MJ, colJ);
-        forMaxColN[0] = maxCol;
-        return new MatrixS[]{I, J};
+        for (int i = 0; i<D.col.length; i++){
+            if (D.col[i].length>0){  int cc=D.col[i][0];
+                colJ[cc]=new int[]{cc}; MJ[cc]=one;} }
+        MatrixS I=new MatrixS(D.size, mmax,  MI, colI);
+        MatrixS J=new MatrixS(D.size, mmax,  MJ, colJ);
+        forMaxColN[0]=maxCol;
+        return new MatrixS[]{I,J};
     }
-
     public MatrixS L() {
         return L;
     }

@@ -290,13 +290,34 @@ public class Element implements Serializable, Comparable<Element>, Cloneable {
         }
     }
 
-    public Element divideToFraction(Element x, Ring ring) {
-        if (x.isOne(ring)) return this;
+    public Element divideToFraction(Element x, Ring ring) { int ra= ring.algebra[0];
+
+                if((ra==Ring.R64)||(ra==Ring.R)||(ra==Ring.Zp32)||(ra==Ring.Zp)||(ra==Ring.Complex)) return divide(x, ring);
+
+                    if(x.isOne(ring))return this;
         if (x.isMinusOne(ring)) return this.negate(ring);
         if (this == NAN || x == NAN || x.isZero(ring)) {
             return NAN;
         }
         return new Fraction(this, x);
+    }
+
+    public Element maxAbs(Element val, Ring ring) {
+        if (!(this.isItNumber() && val.isItNumber())){
+            ring.exception.append("Not exist maxAbs for not number arguments" );
+            return null;}
+        Element ww= val.abs(ring);
+        Element th= this.abs(ring);
+        return (th.compareTo(ww) >= 0 ? th : ww);
+    }
+
+    public Element maxAbs(Ring ring) {
+        ring.exception.append("Not exist maxAbs for this Element. " );
+        return null;}
+
+
+    public Element max(Element val, Ring ring) {
+        return max(this,val, ring);
     }
 
 //    /**

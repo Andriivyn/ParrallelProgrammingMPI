@@ -3960,7 +3960,11 @@ public class NumberR extends Element {
             return (this.isZero(ring)) ? NAN : this.isNegative() ? x.inverse(ring) : x;}
         if (x.numbElementType() > com.mathpar.number.Ring.R) {
             return x.multiply(this, ring);}
-        return multiply(((NumberR) (x.toNumber(Ring.R, ring))), ring.MC);
+        Element ee=x.toNumber(Ring.R, ring);
+
+        //  System.out.println("&=");
+
+               return multiply( ((NumberR) ee), ring.MC);
     }
 
     @Override

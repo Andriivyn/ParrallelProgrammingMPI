@@ -290,7 +290,7 @@ public class NumberZp32 extends NumberZ64 {
 
     @Override
     public NumberZp32 random(int[] randomType, Random rnd, Ring ring) {
-        int nbits = randomType[randomType.length - 2];
+        int nbits = randomType[randomType.length - 1];
         return new NumberZp32((long) rnd.nextInt(1 << nbits) % ring.MOD32);
     }
 

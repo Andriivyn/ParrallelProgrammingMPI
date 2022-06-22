@@ -461,7 +461,9 @@ public class Fraction extends Element {
     
     public Element cancel(Ring ring) {
         Element numM = num;
-        Element denomM = denom;
+        Element denomM = denom; int ra=ring.algebra[0];
+
+               if((ra==Ring.R64)||(ra==Ring.R)||(ra==Ring.Zp32)||(ra==Ring.Zp)||(ra==Ring.Complex)) return num.divide(denom, ring);
         if (numM.numbElementType() == Ring.INFTYorNAN
                 | denomM.numbElementType() == Ring.INFTYorNAN) 
             return numM.divide(denomM, ring);
