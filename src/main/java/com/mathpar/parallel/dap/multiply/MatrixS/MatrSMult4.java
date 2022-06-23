@@ -450,11 +450,11 @@ public class MatrSMult4 extends Drop {
                         .divideByNumber(F11.A_n(), ring);
 
 
-                LOGGER.info("F11.J(): " + F11.J());
-                LOGGER.info("F11.M(): " + F11.M());
-                LOGGER.info("F11.A_n(): " + F11.A_n());
-                LOGGER.info("A12: " + A12);
-                LOGGER.info("X_U2: " + X_U2);
+                //LOGGER.info("F11.J(): " + F11.J());
+                //LOGGER.info("F11.M(): " + F11.M());
+                //LOGGER.info("F11.A_n(): " + F11.A_n());
+                //LOGGER.info("A12: " + A12);
+                //LOGGER.info("X_U2: " + X_U2);
                 outData[0] = X_U2;
                 break;
             }
@@ -470,11 +470,11 @@ public class MatrSMult4 extends Drop {
 //                LOGGER.info(" F11.M()=" + F11.M());
 //                LOGGER.info(" A12=" + A12);
 //                LOGGER.info("-------------------------/103-------------------------------");
-                LOGGER.info("A12_0: " + A12_0);
-                LOGGER.info("A12_2: " + A12_2);
+              //  LOGGER.info("A12_0: " + A12_0);
+              //  LOGGER.info("A12_2: " + A12_2);
 
-                LOGGER.info("F11.Dbar(): " + A12_0);
-                LOGGER.info("A12_0: " + 0);
+              //  LOGGER.info("F11.Dbar(): " + A12_0);
+              //  LOGGER.info("A12_0: " + 0);
                 outData[0] = A12_0;
                 outData[1] = A12_2;
                 break;
@@ -494,8 +494,8 @@ public class MatrSMult4 extends Drop {
 //                LOGGER.info("-------------------------/104-------------------------------");
                 outData[0] = A21_0;
                 outData[1] = A21_2;
-                LOGGER.info("A21_0: " + A21_0);
-                LOGGER.info("A21_2: " + A21_2);
+              //  LOGGER.info("A21_0: " + A21_0);
+              //  LOGGER.info("A21_2: " + A21_2);
                 break;
             }
             case (105): {
@@ -508,7 +508,7 @@ public class MatrSMult4 extends Drop {
                         .divideByNumber(F11.A_n(), ring);
 //                LOGGER.info("-------------------------/105-------------------------------");
                 outData[0] = X_L3;
-                LOGGER.info("X_L3: " + X_L3);
+             //   LOGGER.info("X_L3: " + X_L3);
                 break;
             }
             case (107): {
@@ -527,18 +527,18 @@ public class MatrSMult4 extends Drop {
                         .multiply(A12_1, ring), ring);
 
 
-                LOGGER.info("A21_1 = " + A21_1);
-                LOGGER.info("D11PLUS = " + D11PLUS);
-                LOGGER.info("A12_1 = " + A12_1);
+               // LOGGER.info("A21_1 = " + A21_1);
+              //  LOGGER.info("D11PLUS = " + D11PLUS);
+              //  LOGGER.info("A12_1 = " + A12_1);
 //                LOGGER.info("-------------------------/107-------------------------------");
                 outData[0] = A22_0;
-                LOGGER.info("A22_0: " + A22_0);
-                LOGGER.info("A21_0: " + A21_0);
-                LOGGER.info("A12_0: " + A12_0);
-                LOGGER.info("F11.A_n(): " + F11.A_n());
-                LOGGER.info("F11.Dhat(): " + F11.Dhat());
-                LOGGER.info("F11.D(): " + F11.D());
-                LOGGER.info("A12_1: " + A12_1);
+             //   LOGGER.info("A22_0: " + A22_0);
+              //  LOGGER.info("A21_0: " + A21_0);
+              //  LOGGER.info("A12_0: " + A12_0);
+             //   LOGGER.info("F11.A_n(): " + F11.A_n());
+             //   LOGGER.info("F11.Dhat(): " + F11.Dhat());
+             //   LOGGER.info("F11.D(): " + F11.D());
+            //    LOGGER.info("A12_1: " + A12_1);
 
 
 
@@ -565,7 +565,7 @@ public class MatrSMult4 extends Drop {
 //                LOGGER.info("-------------------------/109-------------------------------");
                 outData[0] = A22_1;
                 outData[1] = X_A22_2;
-                LOGGER.info("A22_1: " + A22_1);
+               /* LOGGER.info("A22_1: " + A22_1);
                 LOGGER.info("X_A22_2: " + X_A22_2);
 
                 LOGGER.info("A22: " + A22);
@@ -576,7 +576,7 @@ public class MatrSMult4 extends Drop {
                 LOGGER.info("a: " + a);
 
                 LOGGER.info("F21.Dbar(): " + F21.Dbar());
-                LOGGER.info("F21.M(): " + F21.M());
+                LOGGER.info("F21.M(): " + F21.M());*/
                 break;
             }
             case (110): {
@@ -585,7 +585,7 @@ public class MatrSMult4 extends Drop {
 
                 MatrixS UU = F21.U().multiply(F11.U(), ring);
                 outData[0] = UU;
-                LOGGER.info("UU: " + UU);
+                //LOGGER.info("UU: " + UU);
                 break;
             }
             case (112): {
@@ -608,7 +608,7 @@ public class MatrSMult4 extends Drop {
 
                 MatrixS I12lambdaM2=(F12.I().multiplyByNumber(invLambda, ring)).add(F12.Ibar(), ring);
                 MatrixS invD12hat = I12lambdaM2.multiply(F12.Dhat(), ring);
-                LOGGER.info("I12lambdaM2 -- = "+ A22_2);
+                /*LOGGER.info("I12lambdaM2 -- = "+ A22_2);
                 LOGGER.info("invD12hat -- = "+ ak2);
                 LOGGER.info("F12.Ibar() -- = "+ F12.Ibar());
 
@@ -626,17 +626,17 @@ public class MatrSMult4 extends Drop {
 
                 LOGGER.info("A22_2 -- = "+ A22_2);
                 LOGGER.info("ak2 -- = "+ ak2);
-                LOGGER.info("a -- = "+ a);
+                LOGGER.info("a -- = "+ a);*/
                 MatrixS A22_3 = A22_2.divideByNumber(ak2, ring).divideByNumber(a, ring);
 
                 outData[0] = lambda;
                 outData[1] = as;
                 outData[2] = A22_3;
                 outData[3] = invD12hat;
-                LOGGER.info("lambda: " + lambda);
+                /*LOGGER.info("lambda: " + lambda);
                 LOGGER.info("as: " + as);
                 LOGGER.info("A22_3: " + A22_3);
-                LOGGER.info("invD12hat: " + invD12hat);
+                LOGGER.info("invD12hat: " + invD12hat);*/
 
                 break;
             }
@@ -654,7 +654,7 @@ public class MatrSMult4 extends Drop {
                 U2 = U2.add(U2H, ring);
 //                LOGGER.info("-------------------------/113-------------------------------");
                 outData[0] = U2;
-                LOGGER.info("U2: " + U2);
+               // LOGGER.info("U2: " + U2);
                 break;
             }
             case (114): {
@@ -665,7 +665,7 @@ public class MatrSMult4 extends Drop {
                         .multiply(A22_1, ring); // L3H1
 //                LOGGER.info("-------------------------/114-------------------------------");
                 outData[0] = Y_L3;
-                LOGGER.info("Y_L3: " + Y_L3);
+              //  LOGGER.info("Y_L3: " + Y_L3);
                 break;
             }
             case (116): {
@@ -683,7 +683,7 @@ public class MatrSMult4 extends Drop {
 
 //                LOGGER.info("-------------------------/116-------------------------------");
                 outData[0] = X_L;
-                LOGGER.info("X_L: " + X_L);
+                //LOGGER.info("X_L: " + X_L);
                 break;
             }
             case (118): {
@@ -705,7 +705,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS L3 = X_L3.add(Y_L3, ring);
 //                LOGGER.info("-------------------------/118-------------------------------");
                 outData[0] = L3;
-                LOGGER.info("L3: " + L3);
+               // LOGGER.info("L3: " + L3);
                 break;
             }
             case (121): {
@@ -719,7 +719,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS X_U = F22.U().multiply(U12tilde, ring);
 //                LOGGER.info("-------------------------/121-------------------------------");
                 outData[0] = X_U;
-                LOGGER.info("X_U: " + X_U);
+               // LOGGER.info("X_U: " + X_U);
                 break;
             }
 
@@ -732,7 +732,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS LL = F21.L().multiply(F22.L(), ring);
 //                LOGGER.info("-------------------------/123-------------------------------");
                 outData[0] = LL;
-                LOGGER.info("LL: " + LL);
+            //    LOGGER.info("LL: " + LL);
                 break;
             }
         }
@@ -1333,7 +1333,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS A22_2 = MatrixS.join(resmat).multiply(F12.Dbar(), ring);
                 MatrixS A22_3 = A22_2.divideByNumber(input[7], ring).divideByNumber(a, ring);
 
-                LOGGER.info("A22_3 outputfunc = " +A22_3);
+                //LOGGER.info("A22_3 outputfunc = " +A22_3);
                 res = new Element[]{
                         input[4], input[5], A22_3, input[6]
                 };

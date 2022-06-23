@@ -111,11 +111,11 @@ public class LdumwFact extends Drop {
         MatrixS A = (MatrixS) inData[0];
 
         Element a = inData[1];
-        LOGGER.info("A = " + A);
-        LOGGER.info("a = " + a);
+       // LOGGER.info("A = " + A);
+       // LOGGER.info("a = " + a);
         LdumwDto FF = LDUMW.LDUWMIJdetD(A, a, ring);
 
-        LOGGER.info("FF = " + FF);
+       /* LOGGER.info("FF = " + FF);
         LOGGER.info("FFdhat = " + FF.Dhat());
         LOGGER.info("M = " + FF.M());
         LOGGER.info("W = " + FF.W());
@@ -123,7 +123,7 @@ public class LdumwFact extends Drop {
         LOGGER.info("J = " + FF.J());
         LOGGER.info("a_n = " + FF.a_n);
         LOGGER.info("Dinv = " + FF.D_inv);
-        LOGGER.info("Check = " + FF.L().multiply(FF.D(), ring).multiply(FF.U(), ring));
+        LOGGER.info("Check = " + FF.L().multiply(FF.D(), ring).multiply(FF.U(), ring));*/
 
         outData[0] = FF;
         outData[1] = FF.A_n();
@@ -188,7 +188,7 @@ public class LdumwFact extends Drop {
             Element an_an = a_n.multiply(a_n, ring);
             L = new MatrixS(a_n);
             D = new MatrixS(aan);
-            System.out.println("DDropOut11 = " + D);
+            //System.out.println("DDropOut11 = " + D);
             Element a2Inv = (an_an.isOne(ring) || an_an.isMinusOne(ring))
                     ? an_an : LDUMW.doFraction(ring.numberONE, an_an, ring);
             Dhat = new MatrixS(a2Inv);
@@ -231,8 +231,7 @@ public class LdumwFact extends Drop {
                 F11.D(), F12.D().multiplyByNumber(lambda2, ring),
                 F21.D(), F22.D()});
 
-
-        System.out.println("DDropOut = " + D);
+       // System.out.println("DDropOut = " + D);
 
         U = MatrixS.join(new MatrixS[]{UU, U2, MatrixS.zeroMatrix(), X_U});
 
@@ -304,7 +303,8 @@ public class LdumwFact extends Drop {
 
         ldumw.setM(M);
         ldumw.setW(W);
-        LOGGER.info("in output");
+        //ldumw.setD(LdumwFact.invForD(ldumw.D(), ring));
+       // LOGGER.info("in output");
         return new Element[]{ldumw, ldumw.A_n()};
     }
 

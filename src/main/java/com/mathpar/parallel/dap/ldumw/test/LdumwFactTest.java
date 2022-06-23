@@ -18,7 +18,7 @@ public class LdumwFactTest extends DAPTest {
 
     protected LdumwFactTest() {
         super("LdumwFactTest", 23, 0);
-        ring = new Ring("Z[]");
+        ring = new Ring("Zp32[]");
         ring.setMOD32(97L);
     }
 
@@ -39,7 +39,7 @@ public class LdumwFactTest extends DAPTest {
 
         LdumwDto ldumwDtoSequential = LDUMW.LDUWMIJdetD(A, a, ring);
 
-        LOGGER.info("ldumwDto L = " + ldumwDto.L() +  "D = " +ldumwDto.D()  + "U = " + ldumwDto.U() );
+        //LOGGER.info("ldumwDto L = " + ldumwDto.L() +  "D = " +ldumwDto.D()  + "U = " + ldumwDto.U() );
 
       //  LOGGER.info("ldumwDtoSequential L = " + ldumwDtoSequential.L() +  "D = " +ldumwDtoSequential.D()  + "U = " + ldumwDtoSequential.U() );
 
@@ -122,7 +122,7 @@ public class LdumwFactTest extends DAPTest {
  {0,  0,  0,  0,  0,  17, 0,  0, 0,  22, 0,  17, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1, 0,  0,  0,  0,  0,  0 },
  {0,  0,  0,  0,  7,  0,  0,  0, 0,  0,  0,  0,  0,  0,  0,  20, 0,  0,  22, 0,  0,  0,  0,  0,  0,  0, 0,  17, 0,  0,  0,  0 },
  {0,  0,  0,  0,  0,  0,  0,  0, 11, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  29, 0,  0,  0 }};
-         //MatrixS matrix = new MatrixS(mat1, ring);
+       //  MatrixS matrix = new MatrixS(mat, ring);
          MatrixS matrix = new MatrixS(size, size, density, new int[]{maxBits}, new Random(),ring.numberONE(), ring);
         // LOGGER.trace("bef matrix = " + matrix);
 //        for (int i = 0; i < size; i++) {

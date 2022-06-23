@@ -152,28 +152,12 @@ public class LDUMW {
         LDUMW FF = new LDUMW(A1); FF.getLDU(A1, ring.numberONE, ring);
         MatrixS[] rr= new MatrixS[]{
             FF.L, invForD(FF.D, ring), FF.U, FF.W, FF.M , FF.I, FF.J ,  new MatrixS(FF.a_n ) , FF.D};
-
-
-           System.out.println("$$$$$L="+FF.L);  System.out.println("D="+invForD(FF.D, ring));
-           System.out.println("U="+FF.U);
-           System.out.println("M="+FF.M);
-           System.out.println("W="+FF.W);
-           System.out.println("I="+FF.I);System.out.println("FF.J="+FF.J);
-           System.out.println("Ann="+FF.a_n);      System.out.println("FF.Dinv="+FF.D);
        return rr;}
 
 
     public static LdumwDto LDUWMIJdetD(MatrixS A, Element a, Ring ring){
         MatrixS A1=A.expandToPow2with0(A.colNumb);
-        System.out.println("AAAA = " +a);
         LDUMW FF = new LDUMW(A1); FF.getLDU(A1, a, ring);
-        System.out.println("!L="+FF.L);  System.out.println("D="+invForD(FF.D, ring));
-        System.out.println("!U="+FF.U);
-        System.out.println("!M="+FF.M);
-        System.out.println("!W="+FF.W);
-        System.out.println("!I="+FF.I);System.out.println("FF.J="+FF.J);
-        System.out.println("Ann="+FF.a_n);      System.out.println("FF.Dinv="+FF.D);
-        System.out.println("invForD(FF.D, ring)=  "+invForD(FF.D, ring));
         return new LdumwDto(
                 FF.L, FF.D, FF.Dhat, FF.Dbar,
                 FF.U, FF.M, FF.W, FF.I,
@@ -331,8 +315,8 @@ public class LDUMW {
      MatrixS  A22_2=(F21.Dbar.multiply(F21.M, ring)).multiply(A22_1, ring);
               A22_2=A22_2.multiply(F12.W.multiply(F12.Dbar, ring), ring);  
      MatrixS A22_3=A22_2.divideByNumber(ak2, ring).divideByNumber(a, ring);
-     System.out.println("A21_1 = "+ A21_1+ "D11PLUS= "+ D11PLUS+ "A12_1 = "+ A12_1   );
-          System.out.println("A22_0 = "+ A22_0+ "A22_1 = "+ A22_1 + "A22_2 = "+ A22_2  + "; ak2 = "+ak2+";  a= " +  a   );
+    // System.out.println("A21_1 = "+ A21_1+ "D11PLUS= "+ D11PLUS+ "A12_1 = "+ A12_1   );
+     //     System.out.println("A22_0 = "+ A22_0+ "A22_1 = "+ A22_1 + "A22_2 = "+ A22_2  + "; ak2 = "+ak2+";  a= " +  a   );
 
 
                   LDUMW F22 = new LDUMW(A22_3);
