@@ -142,6 +142,7 @@ public abstract class Drop implements Serializable {
     }
 
     public void independentCalc(Ring ring, Amin amin){return;};
+    public  Element[] recentCalc(Ring ring){return outData;};
 
     public void setVars(){return;}
 

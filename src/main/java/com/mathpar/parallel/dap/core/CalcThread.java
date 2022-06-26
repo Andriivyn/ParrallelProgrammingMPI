@@ -189,7 +189,9 @@ public class CalcThread implements Runnable {
 
         if (amin.parentAmin == -1 && myRank == 0 && Array.isEmptyArray(vokzal)) {
             //LOGGER.info("go finish");
-            finishWholeTask(amin.outputData);
+            Drop resDrop = Drop.getDropObject(amin.type, amin.config);
+            resDrop.outData = amin.outputData;
+            finishWholeTask(resDrop);
         } else if (amin.parentProc != myRank) {
             Drop resultAmine = Drop.doNewDrop(amin.type, amin.key, amin.config, amin.aminIdInPine, amin.parentDrop,
                     amin.parentProc, amin.recNumb, amin.inputData);
@@ -212,8 +214,8 @@ public class CalcThread implements Runnable {
 
     }
 
-    private void finishWholeTask(Element[] outputData) {
-        result = outputData;
+    private void finishWholeTask(Drop resDrop) {
+        result = resDrop.recentCalc(ring);
         finish = true;
     }
 
@@ -391,7 +393,7 @@ public class CalcThread implements Runnable {
 
                     if (currentDrop.aminId == -1 && myRank == 0) {
                        // LOGGER.info("go to finish whole task");
-                        finishWholeTask(currentDrop.outData);
+                        finishWholeTask(currentDrop);
                     } else if (currentDrop.procId == myRank) {
 
                         writeResultsToAmin(currentDrop);

@@ -46,7 +46,7 @@ public class MatrSAdjMatrixTest extends DAPTest {
         LOGGER.info("Output: " + rr);
         LOGGER.info("Output seq: " + rr1);
         boolean succeed = rr.isOne(ring);
-        return new Pair<>(succeed, null);
+        return new Pair<>(succeed, rr.maxAbs(ring));
     }
 
     @Override

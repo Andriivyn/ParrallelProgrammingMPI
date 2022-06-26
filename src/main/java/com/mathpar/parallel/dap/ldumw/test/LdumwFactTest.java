@@ -31,25 +31,36 @@ public class LdumwFactTest extends DAPTest {
     @Override
     protected Pair<Boolean, Element> checkResult(DispThread dispThread, String[] args, Element[] initData, Element[] resultData, Ring ring) {
         LdumwDto ldumwDto = (LdumwDto) resultData[0];
-        ldumwDto.setD(LdumwFact.invForD(ldumwDto.D(), ring));
+        //ldumwDto.setD(LdumwFact.invForD(ldumwDto.D(), ring));
 
         MatrixS A = (MatrixS) initData[0];
-        LOGGER.info("init = " + A);
-        Element a = initData[1];
-
-        LdumwDto ldumwDtoSequential = LDUMW.LDUWMIJdetD(A, a, ring);
+        //LOGGER.info("init = " + A);
 
         //LOGGER.info("ldumwDto L = " + ldumwDto.L() +  "D = " +ldumwDto.D()  + "U = " + ldumwDto.U() );
 
       //  LOGGER.info("ldumwDtoSequential L = " + ldumwDtoSequential.L() +  "D = " +ldumwDtoSequential.D()  + "U = " + ldumwDtoSequential.U() );
 
         LOGGER.info("Check = " + ldumwDto.L().multiply(ldumwDto.D(), ring).multiply(ldumwDto.U(), ring));
-       // LOGGER.info("Check seq = " + ldumwDtoSequential.L().multiply(ldumwDtoSequential.D(), ring).multiply(ldumwDtoSequential.U(), ring));
-        if (ldumwDto.equals(ldumwDtoSequential)) {
-            return new Pair<>(true, null);
-        }
+/*
+        MatrixS[] res=LDUMW.LDUWMIJdetD(A,ring);
+        MatrixS L=res[0]; MatrixS D=res[1]; MatrixS U=res[2];
+        MatrixS M=res[3]; MatrixS MMM=M; MatrixS W=res[4];
+        MatrixS I=res[5];  MatrixS J=res[6]; MatrixS Ann=res[7]; MatrixS Dinv=res[8];
 
-        return new Pair<>(false, null);
+        System.out.println("L="+L);  System.out.println("D="+D);
+        System.out.println("U="+U);
+        LOGGER.info("Check seq = " + L.multiply(D, ring).multiply(U, ring));*/
+        //System.out.println("M="+M);
+       // System.out.println("W="+W);
+
+
+        MatrixS AmLDU =ldumwDto.L().multiply(ldumwDto.D(), ring).multiply(ldumwDto.U(), ring).subtract(A,ring);
+
+       /* if (ldumwDto.equals(ldumwDtoSequential)) {
+            return new Pair<>(true, null);
+        }*/
+
+        return new Pair<>(AmLDU.isZero(ring), AmLDU.maxAbs(ring));
     }
 
     public static void main(String[] args) throws InterruptedException, ClassNotFoundException, MPIException, IOException {
@@ -122,7 +133,7 @@ public class LdumwFactTest extends DAPTest {
  {0,  0,  0,  0,  0,  17, 0,  0, 0,  22, 0,  17, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1, 0,  0,  0,  0,  0,  0 },
  {0,  0,  0,  0,  7,  0,  0,  0, 0,  0,  0,  0,  0,  0,  0,  20, 0,  0,  22, 0,  0,  0,  0,  0,  0,  0, 0,  17, 0,  0,  0,  0 },
  {0,  0,  0,  0,  0,  0,  0,  0, 11, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  29, 0,  0,  0 }};
-       //  MatrixS matrix = new MatrixS(mat, ring);
+        //MatrixS matrix = new MatrixS(mat1, ring);
          MatrixS matrix = new MatrixS(size, size, density, new int[]{maxBits}, new Random(),ring.numberONE(), ring);
         // LOGGER.trace("bef matrix = " + matrix);
 //        for (int i = 0; i < size; i++) {
@@ -144,11 +155,10 @@ public class LdumwFactTest extends DAPTest {
         LOGGER.info("A= "+A);
         LOGGER.info("a= "+a);
 
-        LdumwDto FF = LDUMW.LDUWMIJdetD(A, a, ring);
+        LdumwDto FF = LDUMW.LDUWMIJdetDto(A, ring);
 
         LOGGER.info("Check seq = " + FF.L().multiply(FF.D(), ring).multiply(FF.U(), ring));
 
         return new Element[] {FF, FF.A_n()};
     }
-
 }

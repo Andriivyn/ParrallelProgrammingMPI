@@ -333,4 +333,13 @@ public class LdumwFact extends Drop {
     public void setLeafSize(int dataSize) {
         leafSize = dataSize;
     }
+
+
+    @Override
+    public Element[] recentCalc(Ring ring) {
+        LdumwDto ldumwDto = (LdumwDto) outData[0];
+        ldumwDto.setD(LdumwFact.invForD(ldumwDto.D(), ring));
+        outData[0] = ldumwDto;
+        return outData;
+    };
 }
