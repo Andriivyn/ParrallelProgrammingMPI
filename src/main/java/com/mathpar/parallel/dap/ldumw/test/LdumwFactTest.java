@@ -40,7 +40,7 @@ public class LdumwFactTest extends DAPTest {
 
       //  LOGGER.info("ldumwDtoSequential L = " + ldumwDtoSequential.L() +  "D = " +ldumwDtoSequential.D()  + "U = " + ldumwDtoSequential.U() );
 
-        LOGGER.info("Check = " + ldumwDto.L().multiply(ldumwDto.D(), ring).multiply(ldumwDto.U(), ring));
+       // LOGGER.info("Check = " + ldumwDto.L().multiply(ldumwDto.D(), ring).multiply(ldumwDto.U(), ring));
 /*
         MatrixS[] res=LDUMW.LDUWMIJdetD(A,ring);
         MatrixS L=res[0]; MatrixS D=res[1]; MatrixS U=res[2];
@@ -133,7 +133,7 @@ public class LdumwFactTest extends DAPTest {
  {0,  0,  0,  0,  0,  17, 0,  0, 0,  22, 0,  17, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1, 0,  0,  0,  0,  0,  0 },
  {0,  0,  0,  0,  7,  0,  0,  0, 0,  0,  0,  0,  0,  0,  0,  20, 0,  0,  22, 0,  0,  0,  0,  0,  0,  0, 0,  17, 0,  0,  0,  0 },
  {0,  0,  0,  0,  0,  0,  0,  0, 11, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0,  0,  29, 0,  0,  0 }};
-        //MatrixS matrix = new MatrixS(mat1, ring);
+      //  MatrixS matrix = new MatrixS(mat, ring);
          MatrixS matrix = new MatrixS(size, size, density, new int[]{maxBits}, new Random(),ring.numberONE(), ring);
         // LOGGER.trace("bef matrix = " + matrix);
 //        for (int i = 0; i < size; i++) {

@@ -368,7 +368,7 @@ public class CalcThread implements Runnable {
        // LOGGER.info("go to get task");
         currentDrop = getTask(0);
         if (currentDrop != null) {
-          //  LOGGER.info("get drop number = " + currentDrop.number + " type = " + currentDrop.type + " proc = "+currentDrop.procId);
+            ///LOGGER.info("get drop number = " + currentDrop.number + " type = " + currentDrop.type + " proc = "+currentDrop.procId);
             //LOGGER.info("currentdrop out data = " + Array.toString(currentDrop.outData));
             if (!Array.isEmpty(currentDrop.outData)) {
              //   LOGGER.trace("Drop result");
@@ -378,7 +378,7 @@ public class CalcThread implements Runnable {
 
             } else {
                 if (currentDrop.isItLeaf()) {
-                   // LOGGER.info("Drop is leaf " + currentDrop.aminId + " id = "+ currentDrop.dropId);
+                  //  LOGGER.info("Drop is leaf " + currentDrop.aminId + " id = "+ currentDrop.dropId);
                     currentDrop.sequentialCalc(ring);
 
                    /* for (int i = 0; i <currentDrop.inputDataLength ; i++) {
@@ -392,12 +392,12 @@ public class CalcThread implements Runnable {
                     }*/
 
                     if (currentDrop.aminId == -1 && myRank == 0) {
-                       // LOGGER.info("go to finish whole task");
+                     //   LOGGER.info("go to finish whole task");
                         finishWholeTask(currentDrop);
                     } else if (currentDrop.procId == myRank) {
 
                         writeResultsToAmin(currentDrop);
-                       //LOGGER.info("after writeResultsToAmin");
+                     //  LOGGER.info("after writeResultsToAmin");
 
                     } else {
                         //LOGGER.trace(" bef add aerodrome results");
@@ -405,7 +405,7 @@ public class CalcThread implements Runnable {
                     }
                   //  LOGGER.trace("after drop is leaf vokzal empty = " + Tools.isEmptyArray(vokzal));
                 } else {
-                  //LOGGER.info("drop is not a leaf");
+                 // LOGGER.info("drop is not a leaf");
                     inputDataToAmin();
                 }
             }

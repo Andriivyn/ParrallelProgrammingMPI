@@ -111,8 +111,8 @@ public class LdumwFact extends Drop {
         MatrixS A = (MatrixS) inData[0];
 
         Element a = inData[1];
-       // LOGGER.info("A = " + A);
-       // LOGGER.info("a = " + a);
+        //LOGGER.info("A = " + A);
+        //LOGGER.info("a = " + a);
         LdumwDto FF = LDUMW.LDUWMIJdetD(A, a, ring);
 
        /* LOGGER.info("FF = " + FF);

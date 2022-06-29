@@ -2,6 +2,7 @@ package com.mathpar.parallel.dap.multiply.MatrixS;
 
 import com.mathpar.log.MpiLogger;
 import com.mathpar.matrix.AdjMatrixS;
+import com.mathpar.matrix.LDUMW;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Array;
 import com.mathpar.number.Element;
@@ -450,11 +451,11 @@ public class MatrSMult4 extends Drop {
                         .divideByNumber(F11.A_n(), ring);
 
 
-                //LOGGER.info("F11.J(): " + F11.J());
-                //LOGGER.info("F11.M(): " + F11.M());
-                //LOGGER.info("F11.A_n(): " + F11.A_n());
-                //LOGGER.info("A12: " + A12);
-                //LOGGER.info("X_U2: " + X_U2);
+                /*LOGGER.info("F11.J(): " + F11.J());
+                LOGGER.info("F11.M(): " + F11.M());
+                LOGGER.info("F11.A_n(): " + F11.A_n());
+                LOGGER.info("A12: " + A12);
+                LOGGER.info("X_U2: " + X_U2);*/
                 outData[0] = X_U2;
                 break;
             }
@@ -467,14 +468,14 @@ public class MatrSMult4 extends Drop {
                 MatrixS A12_0 = F11.M().multiply(A12, ring);
                 MatrixS A12_2 = F11.Dbar().multiply(A12_0, ring)
                         .divideByNumber(a, ring);
-//                LOGGER.info(" F11.M()=" + F11.M());
-//                LOGGER.info(" A12=" + A12);
-//                LOGGER.info("-------------------------/103-------------------------------");
-              //  LOGGER.info("A12_0: " + A12_0);
-              //  LOGGER.info("A12_2: " + A12_2);
 
-              //  LOGGER.info("F11.Dbar(): " + A12_0);
-              //  LOGGER.info("A12_0: " + 0);
+                /*LOGGER.info(" F11.M()=" + F11.M());
+                LOGGER.info(" A12=" + A12);
+                LOGGER.info("A12_0: " + A12_0);
+                LOGGER.info("A12_2: " + A12_2);
+                LOGGER.info("F11.Dbar(): " + A12_0);
+                LOGGER.info("A12_0: " + 0);*/
+
                 outData[0] = A12_0;
                 outData[1] = A12_2;
                 break;
@@ -490,12 +491,12 @@ public class MatrSMult4 extends Drop {
                         .divideByNumber(a, ring);
 
 //                LOGGER.info(" S A21_0=" + A21_0);
-//                LOGGER.info(" S A21_2=" + A21_2);
+//                                LOGGER.info(" S A21_2=" + A21_2);
 //                LOGGER.info("-------------------------/104-------------------------------");
                 outData[0] = A21_0;
                 outData[1] = A21_2;
-              //  LOGGER.info("A21_0: " + A21_0);
-              //  LOGGER.info("A21_2: " + A21_2);
+               // LOGGER.info("A21_0: " + A21_0);
+                //LOGGER.info("A21_2: " + A21_2);
                 break;
             }
             case (105): {
@@ -527,18 +528,20 @@ public class MatrSMult4 extends Drop {
                         .multiply(A12_1, ring), ring);
 
 
-               // LOGGER.info("A21_1 = " + A21_1);
-              //  LOGGER.info("D11PLUS = " + D11PLUS);
-              //  LOGGER.info("A12_1 = " + A12_1);
+
 //                LOGGER.info("-------------------------/107-------------------------------");
                 outData[0] = A22_0;
-             //   LOGGER.info("A22_0: " + A22_0);
-              //  LOGGER.info("A21_0: " + A21_0);
-              //  LOGGER.info("A12_0: " + A12_0);
-             //   LOGGER.info("F11.A_n(): " + F11.A_n());
-             //   LOGGER.info("F11.Dhat(): " + F11.Dhat());
-             //   LOGGER.info("F11.D(): " + F11.D());
-            //    LOGGER.info("A12_1: " + A12_1);
+
+               /* LOGGER.info("A21_1 = " + A21_1);
+                LOGGER.info("D11PLUS = " + D11PLUS);
+                LOGGER.info("A12_1 = " + A12_1);
+                LOGGER.info("A22_0: " + A22_0);
+                LOGGER.info("A21_0: " + A21_0);
+                LOGGER.info("A12_0: " + A12_0);
+                LOGGER.info("F11.A_n(): " + F11.A_n());
+                LOGGER.info("F11.Dhat(): " + F11.Dhat());
+                LOGGER.info("F11.D(): " + F11.D());
+                LOGGER.info("A12_1: " + A12_1);*/
 
 
 
@@ -565,7 +568,7 @@ public class MatrSMult4 extends Drop {
 //                LOGGER.info("-------------------------/109-------------------------------");
                 outData[0] = A22_1;
                 outData[1] = X_A22_2;
-               /* LOGGER.info("A22_1: " + A22_1);
+              /*  LOGGER.info("A22_1: " + A22_1);
                 LOGGER.info("X_A22_2: " + X_A22_2);
 
                 LOGGER.info("A22: " + A22);
@@ -604,11 +607,11 @@ public class MatrSMult4 extends Drop {
                 Element as = lambda.multiply(am, ring);
                 Element ak2 = ak.multiply(ak, ring);
 
-                Element invLambda = ring.numberONE.divide(lambda, ring);
+                Element invLambda = LDUMW.doFraction(ring.numberONE, lambda, ring);
 
                 MatrixS I12lambdaM2=(F12.I().multiplyByNumber(invLambda, ring)).add(F12.Ibar(), ring);
                 MatrixS invD12hat = I12lambdaM2.multiply(F12.Dhat(), ring);
-                /*LOGGER.info("I12lambdaM2 -- = "+ A22_2);
+               /* LOGGER.info("I12lambdaM2 -- = "+ A22_2);
                 LOGGER.info("invD12hat -- = "+ ak2);
                 LOGGER.info("F12.Ibar() -- = "+ F12.Ibar());
 
@@ -1099,7 +1102,7 @@ public class MatrSMult4 extends Drop {
                 Element ak2 = ak.multiply(ak, ring);
 
 
-                Element invLambda = ring.numberONE.divide(lambda, ring);
+                Element invLambda = LDUMW.doFraction(ring.numberONE,lambda, ring);
 
                 MatrixS I12lambdaM2=(F12.I().multiplyByNumber(invLambda, ring)).add(F12.Ibar(), ring);
                 MatrixS invD12hat = I12lambdaM2.multiply(F12.Dhat(), ring);
