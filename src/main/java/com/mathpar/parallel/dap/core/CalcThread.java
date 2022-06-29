@@ -94,8 +94,11 @@ public class CalcThread implements Runnable {
     }
     public void putDropInVokzal(Drop drop) {
         //LOGGER.trace("put drop in vokzal rec " + drop.recNum);
-      //  LOGGER.info("put drop in vokzal num = " + drop.number + ", id = " + drop.dropId + ", amin = " + drop.aminId);
+        //LOGGER.info("put drop in vokzal rec = " + drop.recNum + ", id = " + drop.dropId + ", amin = " + drop.aminId);
         vokzal[drop.recNum].add(drop);
+
+       // LOGGER.info("vokzal[drop.recNum] = " + vokzal[drop.recNum].get(vokzal[drop.recNum].size()-1));
+       // LOGGER.info("mylevel " + DispThread.myLevel + " myLevelH = " + DispThread.myLevelH);
         if (drop.numberOfDaughterProc == -2) {
             drop.numberOfDaughterProc = -1;
         }
@@ -104,13 +107,18 @@ public class CalcThread implements Runnable {
             DispThread.myLevelH = drop.recNum;
         }
 
+        if(drop.recNum < DispThread.myLevel){
+            DispThread.myLevel = drop.recNum;
+        }
+
         if (DispThread.myLevel == 20 || DispThread.myLevel > DispThread.myLevelH) {
             DispThread.myLevel = DispThread.myLevelH;
         }
+        //LOGGER.info("mylevel " + DispThread.myLevel + " myLevelH = " + DispThread.myLevelH);
     }
 
     public void writeResultsToAmin(Drop drop) {
-        //LOGGER.info("writeResultsToAmin + ");
+       // LOGGER.info("writeResultsToAmin + ");
         int aminId = drop.aminId;
         int dropId = drop.dropId;
 
@@ -126,20 +134,27 @@ public class CalcThread implements Runnable {
             int from = aminDrop.arcs[dropId + 1][i + 1];
             int to = aminDrop.arcs[dropId + 1][i + 2];
 
+
+         //   LOGGER.info("number of from = " + (dropId+1) + "recnum = " + drop.recNum);
+         //   LOGGER.info("number of dep = " + number + " to " +to+ " from "+from);
+
             if (aminDrop.arcs[number].length != 0) {
                 Drop dependantDrop = amin.branch.get(number - 1);
                 synchronized (dependantDrop) {
 
                     dependantDrop.inData[to] = drop.outData[from];
-                    //LOGGER.info("dependantDrop = " + dependantDrop.type+ " to " +to+ " from "+from);
+                  //  LOGGER.info("dependantDrop type = " + dependantDrop.type+ " to " +to+ " from "+from);
                     if (dependantDrop.hasFullInputData()){
-                       // LOGGER.info("putDropInVokzal");
+                    //    LOGGER.info("putDropInVokzal");
                         putDropInVokzal(dependantDrop);}
                 }
             } else {
                 //LOGGER.info("resultForOutFunction");
                 amin.resultForOutFunction[to] = drop.outData[from];
-               // LOGGER.info("amin = " + amin);
+                /*LOGGER.info("amin = " + amin);
+                LOGGER.info("amin key = " + amin.key);
+                LOGGER.info("drop key = " + drop.key);
+                LOGGER.info("amin id = " + amin.aminIdInPine + " amine type = " + amin.type);*/
                 if (amin.hasFullOutput()) {
                     //LOGGER.info("putResultsToAminOutput");
                     putResultsToAminOutput(amin);
@@ -171,7 +186,7 @@ public class CalcThread implements Runnable {
     }
 
     private void addToAerodromeResults(Drop dropRes) {
-       // LOGGER.info("addToAerodromeResults");
+        //LOGGER.info("addToAerodromeResults");
         synchronized (aerodromeResults) {
             // LOGGER.warn("put amin num = " + amin.aminIdInPine);
             aerodromeResults.add(dropRes);
@@ -365,20 +380,26 @@ public class CalcThread implements Runnable {
         }
     }
     private void ProcFunc() throws MPIException {
-       // LOGGER.info("go to get task");
+        //LOGGER.info("go to get task");
         currentDrop = getTask(0);
         if (currentDrop != null) {
-            ///LOGGER.info("get drop number = " + currentDrop.number + " type = " + currentDrop.type + " proc = "+currentDrop.procId);
+           // LOGGER.info("get drop id = " + currentDrop.dropId + "rec num = " + currentDrop.recNum + " amin  id = " + currentDrop.aminId);
+
             //LOGGER.info("currentdrop out data = " + Array.toString(currentDrop.outData));
             if (!Array.isEmpty(currentDrop.outData)) {
-             //   LOGGER.trace("Drop result");
+                //LOGGER.info("Drop result");
 
-                //LOGGER.info("amin = " + currentDrop.aminId);
+               // LOGGER.info("amin = " + currentDrop.aminId);
+
                 writeResultsToAmin(currentDrop);
+
+               /* LOGGER.info("isEmptyVokzal = "+ Array.isEmptyArray(vokzal));
+                LOGGER.info("mylevel " + DispThread.myLevel + " myLevelH = " + DispThread.myLevelH);
+                LOGGER.info("after writeResultsToAmin");*/
 
             } else {
                 if (currentDrop.isItLeaf()) {
-                  //  LOGGER.info("Drop is leaf " + currentDrop.aminId + " id = "+ currentDrop.dropId);
+                   // LOGGER.info("Drop is leaf " + currentDrop.aminId + " id = "+ currentDrop.dropId);
                     currentDrop.sequentialCalc(ring);
 
                    /* for (int i = 0; i <currentDrop.inputDataLength ; i++) {
@@ -392,15 +413,15 @@ public class CalcThread implements Runnable {
                     }*/
 
                     if (currentDrop.aminId == -1 && myRank == 0) {
-                     //   LOGGER.info("go to finish whole task");
+                        //LOGGER.info("go to finish whole task");
                         finishWholeTask(currentDrop);
                     } else if (currentDrop.procId == myRank) {
 
                         writeResultsToAmin(currentDrop);
-                     //  LOGGER.info("after writeResultsToAmin");
+                       //LOGGER.info("after writeResultsToAmin");
 
                     } else {
-                        //LOGGER.trace(" bef add aerodrome results");
+                       // LOGGER.info(" bef add aerodrome results");
                         addToAerodromeResults(currentDrop);
                     }
                   //  LOGGER.trace("after drop is leaf vokzal empty = " + Tools.isEmptyArray(vokzal));

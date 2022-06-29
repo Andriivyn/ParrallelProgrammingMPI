@@ -268,7 +268,7 @@ public class MatrSMult4 extends Drop {
                 outData[0] = ((M22.multiplyByNumber(d11, ring))
                         .subtract(M21.multiplyRecursive(M12_1.multiplyLeftE(m11.Ej, m11.Ei), ring), ring))
                         .divideByNumber(d0, ring);
-              //  LOGGER.info("7705 mult = " + outData[0]);
+               // LOGGER.info("7705 mult = " + outData[0]);
                 break;
             }
 
@@ -277,7 +277,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS B = (MatrixS) inData[1];
                 Element d = inData[2];
                 outData[0] = A.multiplyDivRecursive(B, d.negate(ring), ring);
-               // LOGGER.info("7707 mult = " + outData[0]);
+              //  LOGGER.info("7707 mult = " + outData[0]);
                 break;
             }
 
@@ -286,7 +286,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS A1 = ((AdjMatrixS) inData[0]).A;
                 MatrixS A2 = ((AdjMatrixS) inData[1]).A;
                 outData[0] = A1.multiply(A2, ring);
-               // LOGGER.info("7720, 7708 mult = " + outData[0]);
+              //  LOGGER.info("7720, 7708 mult = " + outData[0]);
                 break;
             }
 
@@ -294,7 +294,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS A21 = ((AdjMatrixS) inData[0]).A;
                 MatrixS M22_1 = (MatrixS) inData[1];
                 outData[0] = A21.multiply(M22_1, ring).negate(ring);
-                //LOGGER.info("7709 mult = " + outData[0]);
+              //  LOGGER.info("7709 mult = " + outData[0]);
                 break;
             }
 
@@ -303,7 +303,7 @@ public class MatrSMult4 extends Drop {
                 AdjMatrixS m21 = (AdjMatrixS) inData[1];
                 Element d11 = inData[2];
                 outData[0] = m11.S.multiplyDivRecursive(m21.A.multiplyLeftE(m21.Ej, m21.Ei), d11, ring);
-               // LOGGER.info("7710 mult = " + outData[0]);
+              //  LOGGER.info("7710 mult = " + outData[0]);
                 break;
             }
 
@@ -314,7 +314,7 @@ public class MatrSMult4 extends Drop {
                 AdjMatrixS m12 = (AdjMatrixS) inData[2];
                 Element d11 = inData[3];
                 outData[0] = M22_1.multiplyDivRecursive(A1.multiplyLeftE(m12.Ej, m12.Ei), d11, ring);
-                //LOGGER.info("7721, 7711 mult = " + outData[0]);
+               // LOGGER.info("7721, 7711 mult = " + outData[0]);
                 break;
             }
 
@@ -333,7 +333,7 @@ public class MatrSMult4 extends Drop {
                 outData[0] = M22_2;
                 outData[1] = ds;
                 outData[2] = M22_3;
-                //LOGGER.info("7712 mult = " + outData[0]);
+               // LOGGER.info("7712 mult = " + outData[0]);
                // LOGGER.info("7712 mult = " + outData[2]);
                 break;
             }
@@ -347,7 +347,7 @@ public class MatrSMult4 extends Drop {
                 Element d11 = inData[5];
                 outData[0] = (M21.multiplyDivMulRecursive(m11.A.multiplyLeftE(m11.Ej, m11.Ei), d0, d12, ring).add(K2, ring))
                         .divideByNumber(d11.negate(ring), ring);
-                //LOGGER.info("7714 mult = " + outData[0]);
+               // LOGGER.info("7714 mult = " + outData[0]);
                 break;
             }
 
@@ -380,7 +380,7 @@ public class MatrSMult4 extends Drop {
                 outData[0] = (A1.subtract((M12_1.multiplyLeftI(m11.Ei)).
                         multiplyDivRecursive(A1.multiplyLeftE(m12.Ej, m12.Ei), d11, ring), ring)
                 ).divideMultiply(d11, d22, ring);
-                //LOGGER.info("7717 mult = " + outData[0]);
+              //  LOGGER.info("7717 mult = " + outData[0]);
                 break;
             }
 
@@ -392,7 +392,7 @@ public class MatrSMult4 extends Drop {
                 AdjMatrixS m22 = (AdjMatrixS) inData[4];
                 outData[0] = ((M22_2.multiplyLeftI(m21.Ei))
                         .multiplyDivRecursive(y22, ds.negate(ring), ring)).add(m22.S, ring);
-                //LOGGER.info("7719 mult = " + outData[0]);
+              //  LOGGER.info("7719 mult = " + outData[0]);
                 break;
             }
 
@@ -406,7 +406,7 @@ public class MatrSMult4 extends Drop {
                 outData[0] = (A2.subtract((M22_2.multiplyLeftI(m21.Ei)).
                         multiplyDivRecursive(A2.multiplyLeftE(m22.Ej, m22.Ei), ds, ring), ring)
                 ).divideByNumber(d21, ring);
-                //LOGGER.info("7722 mult = " + outData[0]);
+              //  LOGGER.info("7722 mult = " + outData[0]);
                 break;
             }
 
@@ -419,7 +419,7 @@ public class MatrSMult4 extends Drop {
                 Element d21 = inData[5];
                 outData[0] = (m11.S.multiplyDivMulRecursive(m21.A.multiplyLeftE(m21.Ej, m21.Ei), d11, d22, ring).add(K1, ring))
                         .divideByNumber(d21.negate(ring), ring);
-                //LOGGER.info("7723 mult = " + outData[0]);
+              //  LOGGER.info("7723 mult = " + outData[0]);
                 break;
             }
 
@@ -428,7 +428,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS G = (MatrixS) inData[1];
                 Element d12 = inData[2];
                 outData[0] = P.multiplyDivRecursive(G, d12, ring);
-                //LOGGER.info("7724 mult = " + outData[0]);
+              //  LOGGER.info("7724 mult = " + outData[0]);
                 break;
             }
 
@@ -438,7 +438,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS G = (MatrixS) inData[2];
                 Element d12 = inData[3];
                 outData[0] = (L.add(F.multiplyRecursive(G, ring), ring)).divideByNumber(d12, ring);
-                //LOGGER.info("7725 mult = " + outData[0]);
+               // LOGGER.info("7725 mult = " + outData[0]);
                 break;
             }
             case (102): {
@@ -765,7 +765,7 @@ public class MatrSMult4 extends Drop {
             default: {
                 v1 = (MatrixS) input[0];
                 v2 = (MatrixS) input[1];
-               // LOGGER.info("inputf mult 7702,7712,7713,7718,7724, v1 = "+ v1 + " ,v2 = "+ v2);
+                //LOGGER.info("inputf mult 7702,7712,7713,7718,7724, v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(2):{
@@ -779,7 +779,7 @@ public class MatrSMult4 extends Drop {
             case(7703):{
                 v1 = ((AdjMatrixS) input[0]).A;
                 v2 = (MatrixS) input[1];
-               // LOGGER.info("inputf mult 7703 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7703 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7705): {
@@ -787,27 +787,27 @@ public class MatrSMult4 extends Drop {
                 MatrixS M12_1 = (MatrixS) inData[3];
                 AdjMatrixS m11 = (AdjMatrixS) inData[4];
                 v2 = M12_1.multiplyLeftE(m11.Ej, m11.Ei);
-               // LOGGER.info("inputf mult 7705 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7705 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7707): {
                 v1 = ((AdjMatrixS) input[0]).S;
                 v2 = (MatrixS) inData[1];
-               // LOGGER.info("inputf mult 7707 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7707 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7708):
             case(7720): {
                 v1 = ((AdjMatrixS) input[0]).A;
                 v2 = ((AdjMatrixS) input[1]).A;
-                //LOGGER.info("inputf mult 7708,7720 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7708,7720 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
 
             case(7709): {
                 v1 = ((AdjMatrixS) input[0]).A;
                 v2 = (MatrixS) inData[1];
-                //LOGGER.info("inputf mult 7709 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7709 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7710): {
@@ -815,7 +815,7 @@ public class MatrSMult4 extends Drop {
                 AdjMatrixS m21 = (AdjMatrixS) inData[1];
                 v1 = S11;
                 v2 = m21.A.multiplyLeftE(m21.Ej, m21.Ei);
-                //LOGGER.info("inputf mult 7710 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7710 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7711):
@@ -825,14 +825,14 @@ public class MatrSMult4 extends Drop {
                 AdjMatrixS m12 = (AdjMatrixS) inData[2];
                 v1 = M22_1;
                 v2 = A1.multiplyLeftE(m12.Ej, m12.Ei);
-                //LOGGER.info("inputf mult 7711, 7721 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7711, 7721 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7714): {
                 v1 = (MatrixS) inData[0];
                 AdjMatrixS m11 = (AdjMatrixS) inData[1];
                 v2 = m11.A.multiplyLeftE(m11.Ej, m11.Ei);
-                //LOGGER.info("inputf mult 7714 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7714 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7716): {
@@ -844,7 +844,7 @@ public class MatrSMult4 extends Drop {
                 v1 = (Q1.subtract((M12_1.multiplyLeftI(m11.Ei).multiplyByNumber(d21, ring)), ring))
                         .divideByNumber(d11, ring);
                 v2 = (MatrixS) inData[5];
-                //LOGGER.info("inputf mult 7716 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7716 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7717):
@@ -855,7 +855,7 @@ public class MatrSMult4 extends Drop {
                 AdjMatrixS m12 = (AdjMatrixS) inData[3];
                 v1 = M12_1.multiplyLeftI(m11.Ei);
                 v2 = A1.multiplyLeftE(m12.Ej, m12.Ei);
-                //LOGGER.info("inputf mult 7717,7722 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7717,7722 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7719): {
@@ -864,20 +864,20 @@ public class MatrSMult4 extends Drop {
                 MatrixS y22 = (MatrixS) inData[2];
                 v1 = M22_2.multiplyLeftI(m21.Ei);
                 v2 = y22;
-                //LOGGER.info("inputf mult 7719 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7719 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7723): {
                 v1 = ((AdjMatrixS) input[0]).S;
                 AdjMatrixS m21 = (AdjMatrixS) inData[1];
                 v2 = m21.A.multiplyLeftE(m21.Ej, m21.Ei);
-                //LOGGER.info("inputf mult 7723 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7723 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case(7725): {
                 v1 = (MatrixS) inData[1];
                 v2 = (MatrixS) inData[2];
-                //LOGGER.info("inputf mult 7725 v1 = "+ v1 + " ,v2 = "+ v2);
+              //  LOGGER.info("inputf mult 7725 v1 = "+ v1 + " ,v2 = "+ v2);
                 break;
             }
             case (102):
@@ -1068,9 +1068,9 @@ public class MatrSMult4 extends Drop {
             case (7705): {
                 MatrixS s1 = ((MatrixS) inData[0]).multiplyByNumber(inData[1], ring);
                 amin.resultForOutFunction[4] = s1;
-               // LOGGER.info("indepcalc 7705  inData[0] = " + inData[0]);
-               // LOGGER.info("indepcalc 7705  inData[1] = " + inData[1]);
-                //LOGGER.info("indepcalc 7705 = " + s1);
+               /* LOGGER.info("indepcalc 7705  inData[0] = " + inData[0]);
+                LOGGER.info("indepcalc 7705  inData[1] = " + inData[1]);
+                LOGGER.info("indepcalc 7705 = " + s1);*/
                 break;
             }
             case (7712): {
@@ -1083,7 +1083,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS S12 = ((AdjMatrixS) inData[6]).S;
                 Element d21 = inData[3];
                 amin.resultForOutFunction[4] = S12.multiplyByNumber(d21, ring);
-                //LOGGER.info("indepcalc 7712 = " + amin.resultForOutFunction[4]);
+               // LOGGER.info("indepcalc 7712 = " + amin.resultForOutFunction[4]);
                 break;
             }
             case (112): {
@@ -1150,13 +1150,13 @@ public class MatrSMult4 extends Drop {
             case(7713):
             case(7720): {
                 res = new MatrixS[]{MatrixS.join(resmat)};
-                //LOGGER.info("outfunc res 7708 7713 7720  = "+ res[0]);
+               // LOGGER.info("outfunc res 7708 7713 7720  = "+ res[0]);
                 break;
             }
             case(1):
             case(7709): {
                 res = new MatrixS[]{MatrixS.join(resmat).negate(ring)};
-                //LOGGER.info("outfunc res 7709  = "+ res[0]);
+               // LOGGER.info("outfunc res 7709  = "+ res[0]);
                 break;
             }
             case (2): {
@@ -1170,7 +1170,7 @@ public class MatrSMult4 extends Drop {
                 Element d = inData[2];
                 MatrixS result1 = MatrixS.join(resmat).divideByNumber(d.negate(ring), ring);
                 res = new MatrixS[]{result1};
-                //LOGGER.info("outfunc res 7702 7707 7718  = "+ res[0]);
+               // LOGGER.info("outfunc res 7702 7707 7718  = "+ res[0]);
                 break;
             }
             case(7703): {
@@ -1180,7 +1180,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS M12_1 = MatrixS.join(resmat).divideByNumber(d0, ring);
                 MatrixS M12_2 = M12_1.multiplyLeftI(Array.involution(m11.Ei, (int) finalN.value));
                 res = new MatrixS[]{M12_1, M12_2};
-                //LOGGER.info("outfunc res 7703  = "+ res[0]);
+               // LOGGER.info("outfunc res 7703  = "+ res[0]);
                 break;
             }
             case(7705): {
@@ -1189,7 +1189,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS s2 = MatrixS.join(resmat);
                 MatrixS result1 = s1.subtract(s2, ring).divideByNumber(d0, ring);
                 res = new MatrixS[]{result1};
-                //LOGGER.info("outfunc res 7705  = "+ res[0]);
+              //  LOGGER.info("outfunc res 7705  = "+ res[0]);
                 break;
             }
             case(7710):
@@ -1197,7 +1197,7 @@ public class MatrSMult4 extends Drop {
                 Element d11 = inData[2];
                 MatrixS result1 = MatrixS.join(resmat).divideByNumber(d11, ring);
                 res = new MatrixS[]{result1};
-                //LOGGER.info("outfunc res 7724 7710  = "+ res[0]);
+               // LOGGER.info("outfunc res 7724 7710  = "+ res[0]);
                 break;
             }
             case(7711):
@@ -1218,7 +1218,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS M22_3 = M22_2.multiplyLeftI(Array.involution(m21.Ei, (int) finalN.value));
                 res = new Element[]{M22_2, input[4], M22_3};
 
-                //LOGGER.info("outfunc res 7712 = "+ M22_2 + " --- " + M22_3);
+               // LOGGER.info("outfunc res 7712 = "+ M22_2 + " --- " + M22_3);
                 break;
             }
             case(7714):
@@ -1241,7 +1241,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS s3 = MatrixS.join(resmat).add(s2, ring);
                 MatrixS result1 = s3.divideByNumber(d11, ring);;
                 res = new MatrixS[]{result1};
-                //LOGGER.info("outfunc res 7716  = "+ res[0]);
+              //  LOGGER.info("outfunc res 7716  = "+ res[0]);
                 break;
             }
             case(7717): {
@@ -1252,7 +1252,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS s2 = A1.subtract(s1, ring);
                 MatrixS result1 = s2.divideMultiply(d11, d22, ring);
                 res = new MatrixS[]{result1};
-                //LOGGER.info("outfunc res 7717  = "+ res[0]);
+             //   LOGGER.info("outfunc res 7717  = "+ res[0]);
                 break;
             }
             case (7719): {
@@ -1261,7 +1261,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS s1 = MatrixS.join(resmat).divideByNumber(ds.negate(ring), ring);
                 MatrixS result1 = s1.add(m22.S, ring);
                 res = new MatrixS[]{result1};
-                //LOGGER.info("outfunc res 7719  = "+ res[0]);
+              //  LOGGER.info("outfunc res 7719  = "+ res[0]);
                 break;
             }
             case (7722): {
@@ -1272,7 +1272,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS s2 = A2.subtract(s1, ring);
                 MatrixS result1 = s2.divideByNumber(d21, ring);
                 res = new MatrixS[]{result1};
-                //LOGGER.info("outfunc res 7722  = "+ res[0]);
+              //  LOGGER.info("outfunc res 7722  = "+ res[0]);
                 break;
             }
             case (7725): {
@@ -1281,7 +1281,7 @@ public class MatrSMult4 extends Drop {
                 MatrixS s1 = L.add(MatrixS.join(resmat), ring);
                 MatrixS result1 = s1.divideByNumber(d12, ring);
                 res = new MatrixS[]{result1};
-                //LOGGER.info("outfunc res 7725  = "+ res[0]);
+              //  LOGGER.info("outfunc res 7725  = "+ res[0]);
                 break;
             }
             case (102): {

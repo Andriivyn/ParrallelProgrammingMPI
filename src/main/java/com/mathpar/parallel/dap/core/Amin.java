@@ -71,6 +71,11 @@ public class Amin {
     }
 
     public boolean hasFullOutput(){
+
+      /*  for (int j = 0; j < resultForOutFunction.length; j++) {
+            LOGGER.info("resultForOutFunction[j] = "+ resultForOutFunction[j]);
+        }*/
+
         for (int j = 0; j < resultForOutFunction.length; j++) {
             //LOGGER.info("resultForOutFunction[j] = "+ resultForOutFunction[j]);
             if (resultForOutFunction[j] == null) {

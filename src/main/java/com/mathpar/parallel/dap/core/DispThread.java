@@ -340,7 +340,7 @@ public class DispThread {
             //long time = System.currentTimeMillis();
             Transport.sendObject(curTask, destination, Transport.Tag.TASK);
 
-            //LOGGER.info("send drop type = "+curTask.type+" to = " + destination + " drop num = " + curTask.number );
+           // LOGGER.info("send drop type = "+curTask.type+" to = " + destination + " drop key = " + curTask.key );
 
             //LOGGER.info("time = "+(System.currentTimeMillis()-time)+"send drop to = " + destination + ", list of free = " + freeProcs.toString());
         }

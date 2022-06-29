@@ -3258,7 +3258,7 @@ int[] ttt=new int[100];  for (int i = 0; i < 100; i++) {ttt[i]=10 *i; }
     public static boolean isEmptyArray(ArrayList<Drop>[] vokzal) {
         for (int i = 0; i < vokzal.length; i++) {
             if (vokzal[i].size()!=0) {
-               // LOGGER.trace("not empty level = " + i);
+               // System.out.println("not empty level = " + i);
                 return false;
             }
 

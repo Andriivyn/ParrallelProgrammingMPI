@@ -128,7 +128,7 @@ public class MatrSAdjMatrix extends Drop {
         Element resD = adjM.Det;
         MatrixS y = adjM.S.ES_min_dI(resD, adjM.Ei, adjM.Ej, ring);
         //LOGGER.info("in seqcalc adj = " + adjM.A);
-        //LOGGER.info("in seqcalc det = " + adjM.Det);
+       // LOGGER.info("in seqcalc det = " + adjM.Det);
         outData[0] = adjM;
         outData[1] = y;
         outData[2] = resD;
