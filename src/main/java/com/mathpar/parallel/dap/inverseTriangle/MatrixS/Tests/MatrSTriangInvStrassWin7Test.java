@@ -27,7 +27,7 @@ public class MatrSTriangInvStrassWin7Test extends DAPTest {
     }
 
     @Override
-    protected MatrixS[] initData(int size, int density, int maxBitsForElements, Ring ring) {
+    protected MatrixS[] initData(int size, double density, int maxBitsForElements, Ring ring) {
         return new MatrixS[]{matrix(size, density, maxBitsForElements, ring)};
     }
 
@@ -61,7 +61,7 @@ public class MatrSTriangInvStrassWin7Test extends DAPTest {
     }
 
     @Override
-    protected MatrixS matrix(int size, int density, int maxBitsForElements, Ring ring) {
+    protected MatrixS matrix(int size, double density, int maxBitsForElements, Ring ring) {
 
         MatrixS mat = new MatrixS(size, size, density, new int[]{maxBitsForElements}, new Random(), ring.numberONE(), ring);
 

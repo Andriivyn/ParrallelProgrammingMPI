@@ -52,7 +52,7 @@ public class UTVn2Test extends DAPTest {
     }
 
     @Override
-    protected MatrixS[] initData(int size, int density, int maxBits, Ring ring) {
+    protected MatrixS[] initData(int size, double density, int maxBits, Ring ring) {
         return new MatrixS[]{matrix(size, density, maxBits, ring)};
     }
 

@@ -29,7 +29,7 @@ public class MatrDTriangInv4Test extends DAPTest {
     }
 
     @Override
-    protected MatrixD[] initData(int size, int density, int maxBitsForElements, Ring ring) {
+    protected MatrixD[] initData(int size, double density, int maxBitsForElements, Ring ring) {
         MatrixD matrix = new MatrixD(matrix(size, density, maxBitsForElements, ring));
         return new MatrixD[]{matrix};
     }
@@ -64,7 +64,7 @@ public class MatrDTriangInv4Test extends DAPTest {
     }
 
     @Override
-    protected MatrixS matrix(int size, int density, int maxBitsForElements, Ring ring) {
+    protected MatrixS matrix(int size, double density, int maxBitsForElements, Ring ring) {
 
             MatrixS mat = new MatrixS(size, size, density, new int[]{maxBitsForElements}, new Random(), ring.numberONE(), ring);
 

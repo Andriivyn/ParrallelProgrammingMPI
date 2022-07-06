@@ -26,25 +26,19 @@ public class CalcThread implements Runnable {
 
     public Thread thread;
     Ring ring;
-
     private ArrayList<Amin> pine;
     ArrayList<Drop>[] vokzal;
     //список готових результатов для отправки родительским процессорам(отправляет диспетчер)
     volatile ArrayList<Drop> aerodromeResults;
     ArrayList<Drop> ownTrack;
-
     Element[] result;
     Drop currentDrop;
     static int myRank;
-
     volatile boolean finish;
     volatile boolean flToExit;
     volatile boolean IamFree;
-    boolean changeTrack;
     long currentMemory;
-
     static long counterCycle = 0;
-
     long calcWorkTime = 0;
     long calcWaitTime = 0;
 
@@ -62,9 +56,6 @@ public class CalcThread implements Runnable {
         vokzal = new ArrayList[21];
         myRank = MPI.COMM_WORLD.getRank();
         IamFree = false;
-        changeTrack = false;
-        //LeavesStack = new Stack<>();
-
         for (int i = 0; i < vokzal.length; i++) {
             vokzal[i] = new ArrayList<Drop>();
         }
@@ -319,7 +310,6 @@ public class CalcThread implements Runnable {
         //LOGGER.trace("ownTrack.size" + ownTrack.size());
         synchronized (ownTrack) {
             DispThread.trackLevel = ownTrack.size() == 0 ? 20 : ownTrack.stream().min(Comparator.comparing(Drop::getRecNum)).get().recNum;
-            changeTrack = false;
         }
     }
 

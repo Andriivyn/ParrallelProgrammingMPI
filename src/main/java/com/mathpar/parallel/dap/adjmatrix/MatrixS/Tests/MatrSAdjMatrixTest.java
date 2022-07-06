@@ -24,7 +24,7 @@ public class MatrSAdjMatrixTest extends DAPTest {
     }
 
     @Override
-    protected Element[] initData(int size, int density, int maxBits, Ring ring) {
+    protected Element[] initData(int size, double density, int maxBits, Ring ring) {
         MatrixS M = matrix(size, density, maxBits, ring);
         return new Element[]{M, ring.numberONE};
     }
@@ -55,7 +55,7 @@ public class MatrSAdjMatrixTest extends DAPTest {
     }
 
     @Override
-    protected MatrixS matrix(int size, int density, int maxBits, Ring ring){
+    protected MatrixS matrix(int size, double density, int maxBits, Ring ring){
        /* int [][]mat = {{20, 21, 2,  16, 0,  16, 15, 11},
                 {24, 31, 22, 3,  3,  6,  14, 13},
                 {12, 12, 2,  10, 20, 28, 6,  12},

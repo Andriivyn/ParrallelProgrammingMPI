@@ -4626,32 +4626,37 @@ public class MatrixS extends Element {// implements Serializable {
         this(randomScalarArr2d(r, c, density, randomType, ran, ring), ring);
     }
 
-    /**
-     * Method for constructin of random matrixS of  polynomials or numbers
-     *
-     * @param r          -- row numbers
-     * @param c          -- column numbers
-     * @param density    -- is an integer of range 0,1...100 (100=100%);
-     *                       of range -1...-100 (-100=1%, -50=0.5%,-1=0.01%).
+    public MatrixS(
+            int r, int c, double density,
+            int[] randomType,
+            Random ran,
+            Element one, Ring ring
+    ) {
+        this(randomScalarArr2d(r, c, density, randomType, ran, ring), ring);
+    }
+
+    /** Method for construction of random 2D array of  polynomials or numbers
+
+     * @param r -- row numbers
+     * @param c -- column numbers
+     * @param density -- is an integer of range 0,1...10000.
      * @param randomType -- array of:
-     *                   [maxPowers_1_var,.., maxPowers-last_var,  type of coeffs, density of polynomials, nbits]
-     *                   The density is an integer of range 0,1...100.
-     * @param ran        -- Random issue
-     * @param one        -- one of the matrix elements ring
+     *   [maxPowers_1_var,.., maxPowers-last_var,  type of coeffs, density of polynomials, nbits]
+     *   The density is an integer of range 0,1...100.
+     * @param ran -- Random issue
+     * @param one -- one of the matrix elements ring
      * @return array2d of Elements
      */
-    public static Element[][] randomScalarArr2d(
-        int r, int c, int Density,
-        int[] randomType,
-        Random ran,
-        Ring ring
-    ) {
+    public static Element[][] randomScalarArr2d(int r, int c, int Density,
+                                                int[] randomType,
+                                                Random ran,
+                                                Ring ring) {
         Element one = Ring.oneOfType(ring.algebra[0]);
         //System.out.println("" + Array.toString(randomType));
         if (randomType.length > 2) {
             one = Polynom.polynomFromNumber(one, ring);
         }
-        double density = (Density >= 0) ? Density / 100.0 : (-Density)/10000;
+        double density = (Density >= 0) ? Density / 100.0 : 0.01 / (Density);
         Element zero = one.myZero(ring);
         Element[][] M = new Element[r][c];
         if (density == 1.0) {
@@ -4669,6 +4674,26 @@ public class MatrixS extends Element {// implements Serializable {
             }
         }
         return M;
+    }
+
+    /**  RandomScalarArr2d() with  Double variable density parameter.
+     *         (exactly in PERCENT:  double "100" is denoted 100 percent density)
+     *    Example:  MatrixS  A= new MatrixS (4, 4, 100.0, new int[]{5},, new Random(), new Ring(Z[]));
+     * @param r - number of rows
+     * @param c - number of columns
+     * @param Density   - density in PERCENTS
+     * @param randomType Example: (1) new int{}{4} - for matrix of numbers (0..15);
+     *                  (2)  new int{}{3,100,4} - for matrix of 1 variable polynomials with degree 3,
+     *                    which have all 100 percent nonzero monomials with number coefficients (0..2^{4}-1)=(0..15);
+     *                (3)   new int{}{2,100,3,100,4} - for matrix of 2 variable polynomials with highest degree 2 and 3...
+     * @param ran     Example:  new Random();
+     * @param ring  for example:   new Ring("R64[]") for double value numbers;
+     *                             new Ring("R64[x,y]") for polynomials with 2 variables over Doubles
+     * @return  -- random 2-d array of Elements of given type
+     */
+    public static Element[][] randomScalarArr2d(int r, int c, double Density, int[] randomType, Random ran, Ring ring) {
+        int density= (int) (Density*100);
+        return    randomScalarArr2d(r, c, density, randomType, ran, ring);
     }
 
     /**

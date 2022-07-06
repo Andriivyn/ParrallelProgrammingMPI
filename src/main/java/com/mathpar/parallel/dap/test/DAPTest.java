@@ -14,6 +14,7 @@ import org.javatuples.Pair;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.DoubleFunction;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -60,7 +61,7 @@ public abstract class DAPTest {
 
     private int defaultDataSize = 128;
     private int defaultLeafSize = 32;
-    protected int defaultDensity = 100; // => 100%
+    protected double defaultDensity = 100; // => 100%
     private final int defaultMaxBits = 5;
 
     private int testsPerDataSize = 1;
@@ -83,7 +84,7 @@ public abstract class DAPTest {
         this.key = key;
     }
 
-    protected abstract Element[] initData(int size, int density, int maxBits, Ring ring);
+    protected abstract Element[] initData(int size, double density, int maxBits, Ring ring);
 
     protected MatrixD[] initData(int size, int mod, Ring ring)
     {
@@ -125,7 +126,7 @@ public abstract class DAPTest {
 
                     if (rank == root) {
                         LOGGER.info(String.format(
-                                "Test.%d started! size=%d leaf=%d density=%d maxBits=%d",
+                                "Test.%d started! size=%d leaf=%d density=%f maxBits=%d",
                                 i, test.size, test.leaf, test.density, test.maxBits
                         ));
 
@@ -248,7 +249,7 @@ public abstract class DAPTest {
 
         List<Integer> sizes = new LinkedList<>();
         List<Integer> leaves = new LinkedList<>();
-        List<Integer> density = new LinkedList<>();
+        List<Double> density = new LinkedList<>();
         List<Integer> maxBits = new LinkedList<>();
 
         Arrays.stream(args).forEach(arg -> {
@@ -270,7 +271,7 @@ public abstract class DAPTest {
                 String value = getValue(arg);
 
                 if (value != null) {
-                    density.addAll(getIntValues(value, x -> x + 10));
+                    density.addAll(getDoubleValues(value, x -> x + 10));
                 }
             } else if (arg.startsWith(maxBitsArg)) {
                 String value = getValue(arg);
@@ -321,7 +322,7 @@ public abstract class DAPTest {
         return generateTests(sizes, leaves, density, maxBits);
     }
 
-    private List<Test> generateTests(List<Integer> sizes, List<Integer> leaves, List<Integer> density, List<Integer> maxBits) {
+    private List<Test> generateTests(List<Integer> sizes, List<Integer> leaves, List<Double> density, List<Integer> maxBits) {
         List<Test> tests = new LinkedList<>();
 
         setDefaultData(sizes, leaves, density, maxBits);
@@ -338,7 +339,7 @@ public abstract class DAPTest {
         return tests;
     }
 
-    private void setDefaultData(List<Integer> sizes, List<Integer> leaves, List<Integer> density, List<Integer> maxBits) {
+    private void setDefaultData(List<Integer> sizes, List<Integer> leaves, List<Double> density, List<Integer> maxBits) {
         if (sizes.isEmpty()) {
             sizes.add(defaultDataSize);
         }
@@ -377,6 +378,17 @@ public abstract class DAPTest {
                 .collect(Collectors.toList());
     }
 
+    private List<Double> getDoubleValues(String values, DoubleFunction function) {
+
+        String[] seqValues = values.split(",");
+
+        return Arrays.stream(seqValues)
+                .map(x -> parseRange(x, function))
+                .flatMap(Collection::stream)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
     private List<Integer> parseRange(String values, IntFunction function) {
         List<Integer> integers = new LinkedList<>();
         String[] rangeValues = values.split(":");
@@ -397,6 +409,31 @@ public abstract class DAPTest {
 
         } else {
             integers.add(Integer.parseInt(rangeValues[0]));
+        }
+
+        return integers;
+    }
+
+    private List<Double> parseRange(String values, DoubleFunction function) {
+        List<Double> integers = new LinkedList<>();
+        String[] rangeValues = values.split(":");
+
+        if (rangeValues.length > 1) {
+            double v0 = Double.parseDouble(rangeValues[0]);
+            double v1 = Double.parseDouble(rangeValues[1]);
+
+            double min = Math.min(v0, v1);
+            double max = Math.max(v0, v1);
+
+            double current = min;
+
+            while (current <= max) {
+                integers.add(current);
+                current = (int) function.apply(current);
+            }
+
+        } else {
+            integers.add(Double.parseDouble(rangeValues[0]));
         }
 
         return integers;
@@ -537,7 +574,7 @@ public abstract class DAPTest {
         return sb.toString();
     }
 
-    protected MatrixS matrix(int size, int density, int maxBits, Ring ring) {
+    protected MatrixS matrix(int size, double density, int maxBits, Ring ring) {
         return new MatrixS(size, size, density, new int[]{maxBits}, new Random(System.currentTimeMillis()), ring.numberONE(), ring);
     }
     protected MatrixD matrix(int size, int mod, Ring ring) {
@@ -547,7 +584,7 @@ public abstract class DAPTest {
     private static class Test {
         int size;
         int leaf;
-        int density;
+        double density;
         int maxBits;
         int count;
         boolean checkResult;
@@ -561,7 +598,7 @@ public abstract class DAPTest {
         boolean isCorrect;
         Element precision;
 
-        public Test(int size, int leaf, double leafdensity, int density, int maxBits, int count, boolean checkResult, Ring ring) {
+        public Test(int size, int leaf, double leafdensity, double density, int maxBits, int count, boolean checkResult, Ring ring) {
             this.size = size;
             this.leaf = leaf;
             this.density = density;

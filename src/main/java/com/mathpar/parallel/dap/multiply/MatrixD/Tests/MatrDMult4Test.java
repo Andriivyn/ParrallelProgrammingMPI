@@ -22,7 +22,7 @@ public class MatrDMult4Test extends DAPTest {
     }
 
     @Override
-    protected MatrixD[] initData(int size, int density, int maxBits, Ring ring) {
+    protected MatrixD[] initData(int size, double density, int maxBits, Ring ring) {
         return new MatrixD[]{new MatrixD(matrix(size, density, maxBits, ring)),  new MatrixD(matrix(size, density, maxBits, ring))};
     }
 
@@ -52,7 +52,7 @@ public class MatrDMult4Test extends DAPTest {
     }
 
     @Override
-    protected MatrixS matrix(int size, int density, int maxBits, Ring ring){
+    protected MatrixS matrix(int size, double density, int maxBits, Ring ring){
         MatrixS matrix = new MatrixS(size, size, density, new int[]{maxBits}, new Random(),ring.numberONE(), ring);
         // LOGGER.trace("bef matrix = " + matrix);
        for (int i = 0; i < size; i++) {

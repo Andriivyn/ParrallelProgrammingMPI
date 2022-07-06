@@ -742,7 +742,7 @@ public class LDUMW {
                 {0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 0, 0, 0}};
 
-        int density = 10;
+        int density = 100;
         int r = 128;
         int[] randomType = new int[]{5};
         boolean good = true;
@@ -753,7 +753,9 @@ public class LDUMW {
             w++;
             MatrixS tmp = //new MatrixS(mat, ring);
               new MatrixS(r,r,density, randomType, new Random(), ring.numberONE(), ring);
+            long starttime = System.currentTimeMillis();
             MatrixS[] res = LDUWMIJdetD(tmp, ring);
+            long endtime = System.currentTimeMillis() - starttime;
             MatrixS L = res[0];
             MatrixS D = res[1];
             MatrixS U = res[2];
@@ -764,7 +766,7 @@ public class LDUMW {
             MatrixS J = res[6];
             MatrixS Ann = res[7];
             MatrixS Dinv = res[8];
-            System.out.println("tmp=" + tmp);
+            /*System.out.println("tmp=" + tmp);
             System.out.println("L=" + L);
             System.out.println("D=" + D);
             System.out.println("U=" + U);
@@ -774,7 +776,8 @@ public class LDUMW {
             System.out.println("J=" + J);
             System.out.println("Ann=" + Ann);
             System.out.println("Dinv=" + Dinv);
-            System.out.println("L.multiply(D, ring).multiply(U, ring) = " + L.multiply(D, ring).multiply(U, ring));
+            System.out.println("L.multiply(D, ring).multiply(U, ring) = " + L.multiply(D, ring).multiply(U, ring));*/
+            System.out.println("size = " + r + " time = " + endtime);
             MatrixS AmLDU = L.multiply(D, ring).multiply(U, ring).subtract(tmp, ring);
             if (AmLDU.isZero(ring)) { // System.out.println(" "+AmLDU+tmp+L+D+U+W+M);
                 System.out.println("VERY GOOD");

@@ -23,7 +23,7 @@ public class LdumwFactTest extends DAPTest {
     }
 
     @Override
-    protected Element[] initData(int size, int density, int maxBits, Ring ring) {
+    protected Element[] initData(int size, double density, int maxBits, Ring ring) {
         MatrixS A = matrix(size, density, 5, ring);
         return new Element[]{A, ring.numberONE};
     }
@@ -74,7 +74,7 @@ public class LdumwFactTest extends DAPTest {
     }
 
     @Override
-    protected MatrixS matrix(int size, int density, int maxBits, Ring ring){
+    protected MatrixS matrix(int size, double density, int maxBits, Ring ring){
         /*int [][]mat = {{0, 0,  0,  0, 0,  15, 0,  0, 0, 0,  0, 0,  0, 0, 0,  0 },
                 {0, 0,  0,  0, 0,  0,  0,  0, 0, 0,  0, 0,  0, 0, 0,  0 },
                 {0, 21, 0,  0, 0,  12, 0,  8, 0, 14, 3, 0,  0, 0, 0,  0 },
