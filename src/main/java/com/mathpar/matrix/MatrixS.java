@@ -4639,7 +4639,7 @@ public class MatrixS extends Element {// implements Serializable {
 
      * @param r -- row numbers
      * @param c -- column numbers
-     * @param density -- is an integer of range 0,1...10000.
+     * @param Density -- is an integer of range 0,1...10000.
      * @param randomType -- array of:
      *   [maxPowers_1_var,.., maxPowers-last_var,  type of coeffs, density of polynomials, nbits]
      *   The density is an integer of range 0,1...100.

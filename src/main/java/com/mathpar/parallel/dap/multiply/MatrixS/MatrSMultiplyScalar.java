@@ -56,7 +56,7 @@ public class MatrSMultiplyScalar extends Drop {
         MatrixS B = (MatrixS) inData[1];
         MatrixS C = (MatrixS) inData[2];
         MatrixS D = (MatrixS) inData[3];
-        MatrixS R = A.multiply(B, ring).add(C.multiply(D, ring), ring);
+        MatrixS R = A.multiplyRecursive(B, ring).add(C.multiplyRecursive(D, ring), ring);
 
         outData[0] = R;
     }

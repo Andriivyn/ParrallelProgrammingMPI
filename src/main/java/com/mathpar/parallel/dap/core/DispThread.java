@@ -6,6 +6,7 @@
 package com.mathpar.parallel.dap.core;
 
 import com.mathpar.log.MpiLogger;
+import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
 import java.io.IOException;
@@ -131,9 +132,9 @@ public class DispThread {
         //counter.DoneThread();
     }
 
-    private void receiveTask(int prank) throws MPIException, IOException, ClassNotFoundException {
+    private void receiveTask(int prank) throws MPIException, IOException {
         Drop drop = (Drop) Transport.recvObject(prank, Transport.Tag.TASK);
-        //LOGGER.info("revc drop type " + drop.type + " number = " + drop.number);
+        LOGGER.info("revc drop type " + drop.type + " from = " + prank + " size = "+ ((MatrixS)drop.inData[0]).size);
         if(receiveTaskTime==0)
             receiveTaskTime = System.currentTimeMillis() - executeTime;
 
@@ -334,7 +335,7 @@ public class DispThread {
             drop.numberOfDaughterProc = destination;
             addDaugter(destination, drop);
             curTask = Drop.doNewDrop(drop.type, drop.key, drop.config, drop.aminId, drop.dropId, drop.procId, drop.recNum, drop.inData);
-            //LOGGER.info("send drop to = " + destination + ", list of free = " + freeProcs.toString());
+            LOGGER.info("send drop to = " + destination);
 
             curTask.fullDrop = drop.fullDrop;
             //long time = System.currentTimeMillis();
@@ -441,7 +442,7 @@ public class DispThread {
             if (key != null) {
                 int destination = (int) key;
                 Transport.iSendIntArray(procsToSend, destination, Transport.Tag.FREE_PROC);
-                //LOGGER.info("send free to " + destination + ", " + Arrays.toString(procsToSend));
+                LOGGER.info("send free to " + destination + ", " + Arrays.toString(procsToSend));
             }
             i++;
         }
@@ -489,6 +490,8 @@ public class DispThread {
                 {
                     if(terminal[i].size()!= 0) LOGGER.info("i = " + i + "  " + terminal[i].size());
                 }*/
+
+                LOGGER.info("send free to parent to " + firstParent + " " + freeProcs.toString());
                 Transport.iSendIntArray(free, firstParent, Transport.Tag.FREE_PROC);
                 freeProcs.clear();
                 sendFreeToDaughter = false;
@@ -653,7 +656,7 @@ public class DispThread {
                     Object[] res = {dropRes.outData, parentAmin, dropRes.dropId, sentLevel};
                     //long time = System.currentTimeMillis();
                     Transport.sendObjects(res, dropRes.procId, Transport.Tag.RESULT);
-                   // LOGGER.info("send result to " + dropRes.procId /*+ " time = " + (System.currentTimeMillis()-time)*/);
+                    LOGGER.info("send result to " + dropRes.procId /*+ " time = " + (System.currentTimeMillis()-time)*/);
                     iterator.remove();
                     deleteParent(dropRes.procId, parentAmin, dropRes.dropId);
 
