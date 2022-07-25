@@ -1,7 +1,7 @@
 package com.mathpar.parallel.dap.ldumw;
 
 import com.mathpar.log.MpiLogger;
-import com.mathpar.matrix.LDUMW;
+import com.mathpar.matrix.LSUWM;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
@@ -11,13 +11,13 @@ import com.mathpar.parallel.dap.multiply.MatrixS.MatrSMult4;
 
 import java.util.ArrayList;
 
-import static com.mathpar.matrix.LDUMW.DtoUnit;
+import static com.mathpar.matrix.LSUWM.StoUnit;
 
 public class LdumwFact extends Drop {
     private final static MpiLogger LOGGER = MpiLogger.getLogger(LdumwFact.class);
     private static int[][] arcs_ = new int[][]{
             {1, 0, 0, 1, 4, 1, 2, 1, 1, 3, 1, 1, 3, 4, 2, 4, 2, 1, 4, 4, 2, 5, 2, 1, 9, 3, 1, 9, 4, 4, 11, 4, 4, 12, 4, 3, 16, 4, 4},//0. inputFunction
-            {2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 6, 1, 1, 7, 0, 0, 8, 1, 1, 9, 0, 0, 10, 0, 0, 11, 0, 3, 14, 0, 0, 16, 0, 2, 19, 0, 0},//1. F11 = LDU
+            {2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 6, 1, 1, 7, 0, 0, 8, 1, 1, 9, 0, 0, 10, 0, 0, 11, 0, 3, 14, 0, 0, 16, 0, 2, 19, 0, 0},//1. F11 = LSU
             {12, 0, 2},//2. X_U2
             {6, 1, 0, 7, 0, 2},//3. A12_0  and  A12_2
             {7, 0, 1, 8, 1, 0},//4. A21_0  and  A21_2
@@ -113,7 +113,7 @@ public class LdumwFact extends Drop {
         Element a = inData[1];
         //LOGGER.info("A = " + A);
         //LOGGER.info("a = " + a);
-        LdumwDto FF = LDUMW.LDUWMIJdetD(A, a, ring);
+        LdumwDto FF = LSUWM.LDUWMIJdetD(A, a, ring);
 
        /* LOGGER.info("FF = " + FF);
         LOGGER.info("FFdhat = " + FF.Dhat());
@@ -166,7 +166,7 @@ public class LdumwFact extends Drop {
             M = MatrixS.scalarMatrix(n, a, ring);
             W = MatrixS.scalarMatrix(n, a, ring);
             Element aInv = (a.isOne(ring) || a.isMinusOne(ring))
-                    ? a : LDUMW.doFraction(ring.numberONE, a, ring);
+                    ? a : LSUWM.doFraction(ring.numberONE, a, ring);
             Dhat = MatrixS.scalarMatrix(n, aInv, ring);
             a_n = a;
             Dbar = MatrixS.scalarMatrix(n, ONE, ring);
@@ -190,7 +190,7 @@ public class LdumwFact extends Drop {
             D = new MatrixS(aan);
             //System.out.println("DDropOut11 = " + D);
             Element a2Inv = (an_an.isOne(ring) || an_an.isMinusOne(ring))
-                    ? an_an : LDUMW.doFraction(ring.numberONE, an_an, ring);
+                    ? an_an : LSUWM.doFraction(ring.numberONE, an_an, ring);
             Dhat = new MatrixS(a2Inv);
             Dbar = MatrixS.zeroMatrix(n);
             U = new MatrixS(a_n);
@@ -250,7 +250,7 @@ public class LdumwFact extends Drop {
                 .multiply(F11.Dhat() // Done
                         .multiply(F11.M(), ring), ring); // Done
         MatrixS L3prim = L3.negate(ring).multiply(L1_m1, ring);
-        MatrixS DhUnit = DtoUnit(D, ring.numberONE, ring);
+        MatrixS DhUnit = StoUnit(D, ring.numberONE, ring);
 
         DhUnit = DhUnit.add(ldumw.Dbar(), ring).transpose();
 
@@ -263,23 +263,23 @@ public class LdumwFact extends Drop {
         U2prim = U2prim.multiply(U2.negate(ring), ring);
 
         // Du=
-        MatrixS D11prim = DtoUnit(F11.D(), ring.numberONE, ring).add(F11.Dbar(), ring);
-        MatrixS D12prim = DtoUnit(F21.D(), ak, ring).add(F21.Dbar().multiplyByNumber(a, ring), ring);
-        MatrixS D21prim = DtoUnit(F12.D(), al, ring).add(F12.Dbar().multiplyByNumber(a, ring), ring);
-        MatrixS D22prim = DtoUnit(F22.D(), as, ring).add(F22.Dbar().multiplyByNumber(a, ring), ring);
+        MatrixS D11prim = StoUnit(F11.D(), ring.numberONE, ring).add(F11.Dbar(), ring);
+        MatrixS D12prim = StoUnit(F21.D(), ak, ring).add(F21.Dbar().multiplyByNumber(a, ring), ring);
+        MatrixS D21prim = StoUnit(F12.D(), al, ring).add(F12.Dbar().multiplyByNumber(a, ring), ring);
+        MatrixS D22prim = StoUnit(F22.D(), as, ring).add(F22.Dbar().multiplyByNumber(a, ring), ring);
 
         MatrixS V11A = F21.W().multiply(F21.Dbar(), ring).multiply(Eprim[0], ring);
         MatrixS V11B = F11.W().multiply(D11prim, ring).multiply(V11A, ring);
-        MatrixS V11 = V11B.multiplyByNumber(LDUMW.doFraction(a_n, ak.multiply(al, ring), ring), ring);
+        MatrixS V11 = V11B.multiplyByNumber(LSUWM.doFraction(a_n, ak.multiply(al, ring), ring), ring);
         MatrixS V12A = F21.W().multiply(D12prim, ring).multiply(Eprim[1], ring);
         MatrixS V12B = F11.W().multiply(F11.Dbar(), ring).multiply(V12A, ring);
-        MatrixS V12 = V12B.multiplyByNumber(LDUMW.doFraction(a_n, ak.multiply(al, ring).multiply(a, ring), ring), ring);
+        MatrixS V12 = V12B.multiplyByNumber(LSUWM.doFraction(a_n, ak.multiply(al, ring).multiply(a, ring), ring), ring);
         MatrixS V21A = F12.W().multiply(D21prim, ring).multiply(F22.W(), ring).multiply(F22.Dbar(), ring);
         MatrixS V21B = V21A.multiply(Eprim[2], ring);
-        MatrixS V21 = V21B.multiplyByNumber(LDUMW.doFraction(ring.numberONE, am.multiply(a, ring), ring), ring);
+        MatrixS V21 = V21B.multiplyByNumber(LSUWM.doFraction(ring.numberONE, am.multiply(a, ring), ring), ring);
         MatrixS V22A = F12.W().multiply(F12.Dbar(), ring).multiply(F22.W(), ring).multiply(D22prim, ring);
         MatrixS V22B = V22A.multiply(Eprim[3], ring);
-        MatrixS V22 = V22B.multiplyByNumber(LDUMW.doFraction(ring.numberONE, a.multiply(am, ring), ring), ring);
+        MatrixS V22 = V22B.multiplyByNumber(LSUWM.doFraction(ring.numberONE, a.multiply(am, ring), ring), ring);
 
 
         W = MatrixS.join(new MatrixS[]{V11.add(U2prim.multiply(V21, ring), ring),
@@ -287,16 +287,16 @@ public class LdumwFact extends Drop {
 
         MatrixS N11A = Eprim[0].multiply(F12.Dbar(), ring).multiply(F12.M(), ring);
         MatrixS N11B = N11A.multiply(D11prim, ring).multiply(F11.M(), ring);
-        MatrixS N11 = N11B.multiplyByNumber(LDUMW.doFraction(a_n, ak.multiply(am, ring), ring), ring);
+        MatrixS N11 = N11B.multiplyByNumber(LSUWM.doFraction(a_n, ak.multiply(am, ring), ring), ring);
         MatrixS N21A = Eprim[2].multiply(D21prim, ring).multiply(F12.M(), ring);
         MatrixS N21B = N21A.multiply(F11.Dbar(), ring).multiply(F11.M(), ring);
-        MatrixS N21 = N21B.multiplyByNumber(LDUMW.doFraction(a_n, ak.multiply(am, ring).multiply(a, ring), ring), ring);
+        MatrixS N21 = N21B.multiplyByNumber(LSUWM.doFraction(a_n, ak.multiply(am, ring).multiply(a, ring), ring), ring);
         MatrixS N12A = Eprim[1].multiply(F22.Dbar(), ring).multiply(F22.M(), ring);
         MatrixS N12B = N12A.multiply(D12prim, ring).multiply(F21.M(), ring);
-        MatrixS N12 = N12B.multiplyByNumber(LDUMW.doFraction(ring.numberONE, al.multiply(a, ring), ring), ring);
+        MatrixS N12 = N12B.multiplyByNumber(LSUWM.doFraction(ring.numberONE, al.multiply(a, ring), ring), ring);
         MatrixS N22A = Eprim[3].multiply(D22prim, ring).multiply(F22.M(), ring);
         MatrixS N22B = N22A.multiply(F21.Dbar(), ring).multiply(F21.M(), ring);
-        MatrixS N22 = N22B.multiplyByNumber(LDUMW.doFraction(ring.numberONE, a.multiply(al, ring), ring), ring);
+        MatrixS N22 = N22B.multiplyByNumber(LSUWM.doFraction(ring.numberONE, a.multiply(al, ring), ring), ring);
 
         M = MatrixS.join(new MatrixS[]{N11.add(N12.multiply(L3prim, ring), ring),
                 N12, N21.add(N22.multiply(L3prim, ring), ring), N22});
@@ -317,9 +317,9 @@ public class LdumwFact extends Drop {
                 Element enew;
                 if (ee.isNegative()) {
                     enew = (ee.isMinusOne(ring)) ? ee :
-                            LDUMW.doFraction(ring.numberMINUS_ONE, ee.negate(ring), ring);
+                            LSUWM.doFraction(ring.numberMINUS_ONE, ee.negate(ring), ring);
                 } else {
-                    enew = (ee.isOne(ring)) ? ee : LDUMW.doFraction(ring.numberONE, ee, ring);
+                    enew = (ee.isOne(ring)) ? ee : LSUWM.doFraction(ring.numberONE, ee, ring);
                 }
                 MI[i] = new Element[]{enew};
             } else {

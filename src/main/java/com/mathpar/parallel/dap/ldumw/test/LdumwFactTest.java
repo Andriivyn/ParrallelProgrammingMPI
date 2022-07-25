@@ -1,12 +1,11 @@
 package com.mathpar.parallel.dap.ldumw.test;
 
-import com.mathpar.matrix.LDUMW;
+import com.mathpar.matrix.LSUWM;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
 import com.mathpar.parallel.dap.core.DispThread;
 import com.mathpar.parallel.dap.ldumw.LdumwDto;
-import com.mathpar.parallel.dap.ldumw.LdumwFact;
 import com.mathpar.parallel.dap.test.DAPTest;
 import mpi.MPIException;
 import org.javatuples.Pair;
@@ -42,7 +41,7 @@ public class LdumwFactTest extends DAPTest {
 
        // LOGGER.info("Check = " + ldumwDto.L().multiply(ldumwDto.D(), ring).multiply(ldumwDto.U(), ring));
 /*
-        MatrixS[] res=LDUMW.LDUWMIJdetD(A,ring);
+        MatrixS[] res=LDUMW.LSUWMIJdetS(A,ring);
         MatrixS L=res[0]; MatrixS D=res[1]; MatrixS U=res[2];
         MatrixS M=res[3]; MatrixS MMM=M; MatrixS W=res[4];
         MatrixS I=res[5];  MatrixS J=res[6]; MatrixS Ann=res[7]; MatrixS Dinv=res[8];
@@ -155,7 +154,7 @@ public class LdumwFactTest extends DAPTest {
         LOGGER.info("A= "+A);
         LOGGER.info("a= "+a);
 
-        LdumwDto FF = LDUMW.LDUWMIJdetDto(A, ring);
+        LdumwDto FF = LSUWM.LDUWMIJdetDto(A, ring);
 
         LOGGER.info("Check seq = " + FF.L().multiply(FF.D(), ring).multiply(FF.U(), ring));
 

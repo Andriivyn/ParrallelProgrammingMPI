@@ -210,5 +210,5 @@ public class AlgorithmsConfig {
     public static final String BELLMAN_EQUATION2_PATH = "com.mathpar.parallel.webCluster.algorithms.tropic.bellmanEquation2";
     public static final String BELLMAN_INEQUALITY1_PATH = "com.mathpar.parallel.webCluster.algorithms.tropic.bellmanInequality1";
     public static final String BELLMAN_INEQUALITY2_PATH = "com.mathpar.parallel.webCluster.algorithms.tropic.bellmanInequality2";
-    public static final String ETD_PATH = "com.mathpar.matrix.LDU.ETD";
+    public static final String ETD_PATH = "com.mathpar.matrix.LSU.ETD";
 }

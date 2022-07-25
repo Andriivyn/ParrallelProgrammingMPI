@@ -94,7 +94,7 @@ public class AP {
 //                }, new Ring("Z[x]"));
 //        if (root) {
 //            time = System.currentTimeMillis();
-//            MatrixS[] lxs = A.LDU(ring);
+//            MatrixS[] lxs = A.LSU(ring);
 //            time=System.currentTimeMillis()-time;
 //            System.out.println("time without MPI="+time);
 //        }
@@ -128,7 +128,7 @@ public class AP {
 //                }, new Ring("Z[x]"));
 //        if (root) {
 //            time = System.currentTimeMillis();
-//            MatrixS[] lxs = A.LDU(ring);
+//            MatrixS[] lxs = A.LSU(ring);
 //            time=System.currentTimeMillis()-time;
 //            System.out.println("time without MPI="+time);
 //        }
@@ -174,7 +174,7 @@ public class AP {
         }
         return n;
     }
-    /* Время вычисления LDU разложения для MatrixS над Z.
+    /* Время вычисления LSU разложения для MatrixS над Z.
      	32	64	128	256
 1
 2

@@ -31,7 +31,7 @@ import mpi.MPIException;
 public class ETDmpi {
     public static long time = 0;
     public static long timeExchAndRecoveryAndBack = 0;
-    //mpirun -np 4 java -cp /home/ridkeim/NetBeansProjects/mathpar/target/classes:/home/ridkeim/.m2/repository/org/slf4j/slf4j-api/1.7.8/slf4j-api-1.7.8.jar com.mathpar.matrix.LDU.ETDmpi
+    //mpirun -np 4 java -cp /home/ridkeim/NetBeansProjects/mathpar/target/classes:/home/ridkeim/.m2/repository/org/slf4j/slf4j-api/1.7.8/slf4j-api-1.7.8.jar com.mathpar.matrix.LSU.ETDmpi
     
     public static MatrixS[] ETDParralel(MatrixS T, int result_id) throws MPIException, IOException, ClassNotFoundException{
         int myrank = MPI.COMM_WORLD.getRank();

@@ -36,7 +36,7 @@ public class LDUMWParallel {
      * MDUMWParallel is the main algorithm of matrix A decomposition.
      * The matrices {L,D,U,M,W I, J, [det], Dinv} are returned.
      * You can obtain:
-     * A=LDU,
+     * A=LSU,
      * Inverse(A)=A^{-1}= WDM such that: A*A^{-1}*A=A and A^{-1}*A*A^{-1}=A^{-1}.
      * GInverse(A) is obtained due to 3 calls of MDUMWParallel();
      * Elements of matrix D are inverse of integers, and all other matrices are integer matrices.
@@ -223,8 +223,8 @@ public class LDUMWParallel {
     }
 
     /**
-     * LDU is the basic matrix A decomposition.
-     * A=LDU,
+     * LSU is the basic matrix A decomposition.
+     * A=LSU,
      * L - lower triangular, U - upper triangular,
      * D  - truncated weighted permutation matrix.
      * If elements of matrix A are integers then
@@ -279,14 +279,14 @@ public class LDUMWParallel {
 
 
 //        LDUMWParallel F12 = new LDUMWParallel(A12_2);// step6
-//        F12.getLDU(A12_2, ak, ring);// step6
+//        F12.getLSU(A12_2, ak, ring);// step6
 //        Element am = F12.a_n;// step6
 //        MatrixS A12_1 = F11.Dhat.multiplyByNumber(ak, ring).multiply(A12_0, ring);// step7
 //        MatrixS A21_1 = A21_0.multiplyByNumber(ak, ring).multiply(F11.Dhat, ring);// step7
 //        MatrixS D11PLUS = F11.D.transpose();// step7
 //        MatrixS A22_0 = A21_1.multiply(D11PLUS.multiply(A12_1, ring), ring);// step7
 //        LDUMWParallel F21 = new LDUMWParallel(A21_2);// step8
-//        F21.getLDU(A21_2, ak, ring);// step8
+//        F21.getLSU(A21_2, ak, ring);// step8
 //        Element al = F21.a_n;// step8
 
 //        MatrixS A22_1 = (A22.multiplyByNumber(ak2, ring).multiplyByNumber(a, ring)// step9
@@ -553,7 +553,7 @@ public class LDUMWParallel {
 
 
 //        LDUMWParallel F22 = new LDUMWParallel(A22_3);
-//        F22.getLDU(A22_3, as, ring);
+//        F22.getLSU(A22_3, as, ring);
 //        a_n = F22.a_n;
         MatrixS J12lambda = (F12.J.multiplyByNumber(lambda, ring)).add(F12.Jbar, ring);
 //        MatrixS I12lambda = (F12.I.multiplyByNumber(lambda, ring)).add(F12.Ibar, ring);
@@ -998,7 +998,7 @@ public class LDUMWParallel {
 
             MatrixS AmLDU = L.multiply(D, ring).multiply(U, ring).subtract(tmp, ring);
 //              long t1=System.currentTimeMillis();
-            //  MatrixS Inv=  GInverse(tmp, ring);   // LDU(tmp, ring);
+            //  MatrixS Inv=  GInverse(tmp, ring);   // LSU(tmp, ring);
             System.out.println("w=" + w);
             if (AmLDU.isZero(ring)) {
                 System.out.println("GOOD??==" + AmLDU.isZero(ring));

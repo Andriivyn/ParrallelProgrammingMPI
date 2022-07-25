@@ -2,7 +2,7 @@ package com.mathpar.parallel.dap.multiply.MatrixS;
 
 import com.mathpar.log.MpiLogger;
 import com.mathpar.matrix.AdjMatrixS;
-import com.mathpar.matrix.LDUMW;
+import com.mathpar.matrix.LSUWM;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Array;
 import com.mathpar.number.Element;
@@ -10,7 +10,6 @@ import com.mathpar.number.Ring;
 import com.mathpar.parallel.dap.core.Amin;
 import com.mathpar.parallel.dap.core.Drop;
 import com.mathpar.parallel.dap.ldumw.LdumwDto;
-import liquibase.pro.packaged.L;
 
 import java.util.ArrayList;
 
@@ -607,7 +606,7 @@ public class MatrSMult4 extends Drop {
                 Element as = lambda.multiply(am, ring);
                 Element ak2 = ak.multiply(ak, ring);
 
-                Element invLambda = LDUMW.doFraction(ring.numberONE, lambda, ring);
+                Element invLambda = LSUWM.doFraction(ring.numberONE, lambda, ring);
 
                 MatrixS I12lambdaM2=(F12.I().multiplyByNumber(invLambda, ring)).add(F12.Ibar(), ring);
                 MatrixS invD12hat = I12lambdaM2.multiplyRecursive(F12.Dhat(), ring);
@@ -1102,7 +1101,7 @@ public class MatrSMult4 extends Drop {
                 Element ak2 = ak.multiply(ak, ring);
 
 
-                Element invLambda = LDUMW.doFraction(ring.numberONE,lambda, ring);
+                Element invLambda = LSUWM.doFraction(ring.numberONE,lambda, ring);
 
                 MatrixS I12lambdaM2=(F12.I().multiplyByNumber(invLambda, ring)).add(F12.Ibar(), ring);
                 MatrixS invD12hat = I12lambdaM2.multiplyRecursive(F12.Dhat(), ring);

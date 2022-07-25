@@ -3003,7 +3003,7 @@ public class MatrixS extends Element {// implements Serializable {
             return new MatrixS(hb, colNumb, MM, cc); }
     }
 
-    /** Go backfrom expand matrices in Cholesky and in LDU
+    /** Go backfrom expand matrices in Cholesky and in LSU
      *
      * @param mats - thr resulting matrices of a size 2^N
      * @param n - rows number
@@ -5992,7 +5992,7 @@ public class MatrixS extends Element {// implements Serializable {
     }
 
     /**
-     * LDU decomposition in the domain
+     * LSU decomposition in the domain
      *
      * @param ring -- the commutative domain
      * @return three matrices {L,D,U} of matrixS-tipe:
