@@ -129,7 +129,7 @@ public class F extends Element implements Cloneable {
     public final static int CONJUGATE = 87; // сопряженная матрица 
     //   general inverse Murra-Penrousa   
     public final static int GENINVERSE = 88; // обобщенная обратная Мурра-Пенроуза
-    public final static int LSU = 89; // разложение матрицы в произведение нижней треугольной, диагональной и верхней треугольной
+    public final static int LDU = 89; // разложение матрицы в произведение нижней треугольной, диагональной и верхней треугольной
     public final static int BRUHATDECOMPOSITION = 90; // разложение Брюа
     public final static int ELEMENTOF = 91; // объявление наименования элементов данной матрицы или вектора
     public final static int TABLE = 92; //  задать таблицу
@@ -516,7 +516,7 @@ public class F extends Element implements Cloneable {
         FUNC_NAMES[PLDUQWDK] = "PlduQwk";
         FUNC_NAMES[LDUWDK] = "LDUWK";
         FUNC_NAMES[LDU_M] = "LDUm";
-        FUNC_NAMES[LSU] = "LSU";
+        FUNC_NAMES[LDU] = "LDU";
         FUNC_NAMES[BRUHATDECOMPOSITION] = "BruhatDecomposition";
         FUNC_NAMES[INVERSELC] = "inverseLC";
         FUNC_NAMES[IC] = "ic";
