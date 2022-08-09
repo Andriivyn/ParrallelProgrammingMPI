@@ -78,18 +78,22 @@ public class Transport {
     }*/
 
     public static void sendObject(Object a, int proc, Tag tag) throws MPIException, IOException {
+        //LOGGER.info("in sendObject ");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
         oos.writeObject(a);
         byte[] tmp = bos.toByteArray();
-        LOGGER.trace(String.format("send to=%d bytes=%d tag=%s", proc, tmp.length, tag));
-        ByteBuffer buf = MPI.newByteBuffer(tmp.length);
-        buf.put(tmp);
+       // LOGGER.info(String.format("send to=%d bytes=%d tag=%s", proc, tmp.length, tag));
+      //  ByteBuffer buf = MPI.newByteBuffer(tmp.length);
+      //  buf.put(tmp);
         startsend = System.currentTimeMillis();
 
-        MPI.COMM_WORLD.send(buf, tmp.length, MPI.BYTE, proc, tag.ordinal());
+        //LOGGER.info("bef send ");
+        MPI.COMM_WORLD.send(tmp, tmp.length, MPI.BYTE, proc, tag.ordinal());
 
         endsend = System.currentTimeMillis();
+
+        LOGGER.info("time sending = " + (endsend-startsend));
        // DispThread.sleepSendTime += endsend - startsend;
     }
 
@@ -100,9 +104,9 @@ public class Transport {
         int size = st.getCount(MPI.BYTE);
 
         byte[] arr = new byte[size];
-        ByteBuffer buff = MPI.newByteBuffer(size);
-        MPI.COMM_WORLD.recv(buff, size, MPI.BYTE, proc, tag.ordinal());
-        buff.get(arr, 0, size);
+       // ByteBuffer buff = MPI.newByteBuffer(size);
+        MPI.COMM_WORLD.recv(arr, size, MPI.BYTE, proc, tag.ordinal());
+       // buff.get(arr, 0, size);
         LOGGER.trace(String.format("receive from=%d bytes=%d tag=%s", proc, arr.length, tag));
         ByteArrayInputStream bis = new ByteArrayInputStream(arr);
         ObjectInputStream ois = null;

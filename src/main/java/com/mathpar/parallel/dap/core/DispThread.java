@@ -44,23 +44,19 @@ public class DispThread {
     Queue<Integer> approvedOutput;
     boolean recv;
     int waitfrom;
-
     int childsLevel;
     int totalLevel;
-
     static boolean flagOfMyDeparture = false;
     int mode;
     static int myLevel;
     static int myLevelH;
     static int sentLevel;
     static int trackLevel;
-
     int firstParent;
     static long usedMemory;
     long currentMemory;
     // Map<Integer, Long> timecount;
     long sleepSendTime = 0;
-
     long receiveTaskTime = 0;
     int [] listcount;
     boolean sendFreeToDaughter;
@@ -68,6 +64,7 @@ public class DispThread {
     static String checkline = "";
     //static long timegettask = 0;
     int flagOfDaughterLevel = 0;
+    int reservedLevel = 0;
 
 
     public DispThread(long sTime, String[] args, Ring ring) throws MPIException {
@@ -103,7 +100,6 @@ public class DispThread {
         //timecount = new HashMap<>();
         ownTrack = new ArrayList<>();
         reftoTerminal = new ConcurrentHashMap<>();
-
         waitfrom = myRank;
         disp = Thread.currentThread();
         disp.setPriority(10);
@@ -134,7 +130,7 @@ public class DispThread {
 
     private void receiveTask(int prank) throws MPIException, IOException {
         Drop drop = (Drop) Transport.recvObject(prank, Transport.Tag.TASK);
-        LOGGER.info("revc drop type " + drop.type + " from = " + prank + " size = "+ ((MatrixS)drop.inData[0]).size);
+        LOGGER.info("revc drop type " + drop.type + " from = " + prank + " size = "+ ((MatrixS)drop.inData[0]).size+ " time = " + (System.currentTimeMillis()-executeTime));
         if(receiveTaskTime==0)
             receiveTaskTime = System.currentTimeMillis() - executeTime;
 
@@ -219,7 +215,7 @@ public class DispThread {
         }
 
         Object[] tmp = Transport.recvObjects(4, daughter, Transport.Tag.RESULT);
-        //LOGGER.info("received result from daughter = " + daughter);
+        LOGGER.info("received result from daughter = " + daughter + " time = " + (System.currentTimeMillis()-executeTime));
         int amin = (int) tmp[1];
         int drop = (int) tmp[2];
         int level = (int) tmp[3];
@@ -323,7 +319,6 @@ public class DispThread {
 
         if (drop != null) {
             sendDrop(drop, destination);
-            sendFreeProc(destination);
             return true;
         }
         return false;
@@ -335,16 +330,35 @@ public class DispThread {
             drop.numberOfDaughterProc = destination;
             addDaugter(destination, drop);
             curTask = Drop.doNewDrop(drop.type, drop.key, drop.config, drop.aminId, drop.dropId, drop.procId, drop.recNum, drop.inData);
-            LOGGER.info("send drop to = " + destination);
+            LOGGER.info("send drop to = " + destination + " time = " + (System.currentTimeMillis()-executeTime));
 
             curTask.fullDrop = drop.fullDrop;
-            //long time = System.currentTimeMillis();
+            long time = System.currentTimeMillis();
             Transport.sendObject(curTask, destination, Transport.Tag.TASK);
-
-           // LOGGER.info("send drop type = "+curTask.type+" to = " + destination + " drop key = " + curTask.key );
+            LOGGER.info("time all send = " + (System.currentTimeMillis()-time));
 
             //LOGGER.info("time = "+(System.currentTimeMillis()-time)+"send drop to = " + destination + ", list of free = " + freeProcs.toString());
         }
+    }
+
+
+    private boolean sendDropOrRequest(int procToSend) throws MPIException, IOException {
+        int proc=procToSend;
+        boolean sent = false;
+            if (!isWaitingForReceiving()) {
+                if (myRank == 0) {
+                   sent = sendDrops(procToSend);
+                } else if (myRank % 2 == 0) {
+                    proc = freeProcs.stream().filter(p -> p % 2 == 1).findAny().orElse(-1);
+                    if (proc != -1)
+                     sent = sendDrops(proc);
+                }
+            }
+            if (myRank != 0 && (proc==-1 ||myRank % 2 == 1)) {
+               if(sendRequestToApproveSending(procToSend)&&freeProcs.contains(procToSend))
+                   freeProcs.remove(procToSend);
+            }
+            return sent;
     }
 
     private void sendRequestToSendDrops() throws IOException, MPIException {
@@ -352,33 +366,38 @@ public class DispThread {
         if (myLevel <= childsLevel && myLevel > 0 && counter.vokzal[myLevel].size() != 0) {
             freeProcs.remove(myRank);
             flagOfMyDeparture = false;
-            if (freeProcs.size() != 0) {
 
+            if (freeProcs.size() != 0) {
                 int vokzalSize = counter.vokzal[myLevel].size();
+
+                LOGGER.info("vokzalSize = " + vokzalSize);
                 if (vokzalSize == 0 || isEmptyVokzal()) {
                     return;
                 }
 
                 int procToSend;
-
-                for (int i = 0; i < freeProcs.size() && counter.vokzal[myLevel].size() != 0; i++) {
-                   // LOGGER.info("freeProcs.size() = " + freeProcs.size());
-                    procToSend = (int) freeProcs.toArray()[i];
-                    if (!isWaitingForReceiving()) {
-                        if (myRank == 0) {
-                            sendDrops(procToSend);
-                        } else if (myRank % 2 == 0) {
-                            procToSend = freeProcs.stream().filter(p -> p % 2 == 1).findAny().orElse(-1);
-                            if (procToSend != -1)
-                                sendDrops(procToSend);
-                        }
+                if (freeProcs.size() > vokzalSize) {
+                    for (int i = 0; i < freeProcs.size() && counter.vokzal[myLevel].size() != 0; i++) {
+                        procToSend = (int) freeProcs.toArray()[i];
+                       if(sendDropOrRequest(procToSend))
+                           sendFreeProc(procToSend);;
                     }
-                    if (myRank != 0 && (procToSend == -1 || myRank % 2 == 1)) {
-                        if (procToSend == -1) procToSend = (int) freeProcs.toArray()[i];
-                        if (sendRequestToApproveSending(procToSend)) {
-                          //  LOGGER.info("send request to send drop to "+ procToSend);
-                            freeProcs.remove(procToSend);
+                } else {
+                    int dropsnum = ((vokzalSize + counter.takenMyLowLevelDrops) / (freeProcs.size() + 1));
+                    int remainder = ((vokzalSize + counter.takenMyLowLevelDrops) % (freeProcs.size() + 1)) - 1;
+                    for (int i = 0; i < freeProcs.size() && counter.vokzal[myLevel].size() != 0; i++) {
+
+                        procToSend = (int) freeProcs.toArray()[i];
+                        for (int j = 0; j < dropsnum; j++) {
+                            sendDropOrRequest(procToSend);
                         }
+
+                        if (remainder > 0) {
+                            sendDropOrRequest(procToSend);
+                            remainder--;
+                        }
+
+                        if (freeProcs.contains(procToSend)) freeProcs.remove(procToSend);
                     }
                 }
             }
@@ -389,10 +408,10 @@ public class DispThread {
     private void sendFreeProc(int destination) throws MPIException {
         if (freeProcs.contains(destination)) {
             freeProcs.remove(destination);
-            LOGGER.trace("remove " + destination);
+            LOGGER.info("remove " + destination);
         }
         int vokzalSize = counter.vokzal[myLevel].size();
-        int chunk = vokzalSize == 0 ? freeProcs.size() : (freeProcs.size()) / (vokzalSize + 2);
+        int chunk = vokzalSize == 0 ? freeProcs.size() : (freeProcs.size()) / (vokzalSize + counter.takenMyLowLevelDrops);
         Iterator<Integer> freeProcIterator = freeProcs.iterator();
         if (chunk >= 1) {
             int[] daughtProcs = new int[chunk];
@@ -442,7 +461,7 @@ public class DispThread {
             if (key != null) {
                 int destination = (int) key;
                 Transport.iSendIntArray(procsToSend, destination, Transport.Tag.FREE_PROC);
-                LOGGER.info("send free to " + destination + ", " + Arrays.toString(procsToSend));
+                //LOGGER.info("send free to " + destination + ", " + Arrays.toString(procsToSend)+ " time = " + (System.currentTimeMillis()-executeTime));
             }
             i++;
         }
@@ -491,7 +510,7 @@ public class DispThread {
                     if(terminal[i].size()!= 0) LOGGER.info("i = " + i + "  " + terminal[i].size());
                 }*/
 
-                LOGGER.info("send free to parent to " + firstParent + " " + freeProcs.toString());
+                //LOGGER.info("send free to parent to " + firstParent + " " + freeProcs.toString()+ " time = " + (System.currentTimeMillis()-executeTime));
                 Transport.iSendIntArray(free, firstParent, Transport.Tag.FREE_PROC);
                 freeProcs.clear();
                 sendFreeToDaughter = false;
@@ -529,7 +548,8 @@ public class DispThread {
     }
 
     private void tagAction(Status info) throws MPIException, IOException, ClassNotFoundException {
-        //  LOGGER.info("in tag action");
+        //if(myRank==1)
+        //LOGGER.info("in tag action time " + (System.currentTimeMillis()-executeTime));
         int tagIndex = info.getTag();
         Transport.Tag tag = Transport.Tag.values()[tagIndex];
         int cnt = info.getCount(MPI.INT);
@@ -656,7 +676,7 @@ public class DispThread {
                     Object[] res = {dropRes.outData, parentAmin, dropRes.dropId, sentLevel};
                     //long time = System.currentTimeMillis();
                     Transport.sendObjects(res, dropRes.procId, Transport.Tag.RESULT);
-                    LOGGER.info("send result to " + dropRes.procId /*+ " time = " + (System.currentTimeMillis()-time)*/);
+                    LOGGER.info("send result to " + dropRes.procId + " time = " + (System.currentTimeMillis()-executeTime));
                     iterator.remove();
                     deleteParent(dropRes.procId, parentAmin, dropRes.dropId);
 
@@ -673,20 +693,20 @@ public class DispThread {
 
     private void sendRequestsForResultsSending() throws MPIException {
         synchronized (counter.aerodromeResults) {
-            Iterator<Drop> iterator = counter.aerodromeResults.iterator();
+           // Iterator<Drop> iterator = counter.aerodromeResults.iterator();
             for (int i = 0; i < counter.aerodromeResults.size(); i++) {
                 Drop dropResult = counter.aerodromeResults.get(i);
-                if (!isWaitingForReceiving()) {
+                if (!isWaitingForReceiving())
                     if (myRank == 0 || (myRank % 2 == 0 && dropResult.procId % 2 == 1)) {
                         sendResultsToParent(dropResult.procId);
                     } else {
-                        LOGGER.trace("send request for sending result to " + dropResult.procId);
+                        //LOGGER.trace("send request for sending result to " + dropResult.procId);
                         sendRequestToApproveSending(dropResult.procId);
                     }
                 }
             }
         }
-    }
+
 
 
     private void resetFields() throws MPIException {
@@ -774,11 +794,14 @@ public class DispThread {
 
         int rootNumb = nodes[0];
 
+        executeTime = System.currentTimeMillis();
+        LOGGER.info("executeTime = " +executeTime);
         if (myRank == rootNumb) {
             rootWork(nodes, startType, key, config, data);
         }
 
-        executeTime = System.currentTimeMillis();
+
+
         oldTime = executeTime - 2000;
         /*if (myRank == rootNumb) {
             LOGGER.info("DDP start with total nodes=" + cntProc);
@@ -795,10 +818,12 @@ public class DispThread {
             }
 
             Status info = null;
+           // if (myRank == 1) LOGGER.info("bef probe time = " + (System.currentTimeMillis()-executeTime));
             do {
                 info = Transport.probeAny();
-                //if (myRank == 1) LOGGER.trace("probe = " + info);
+
                 if (info != null) {
+                   // if (myRank == 1) LOGGER.info("probe time = " + (System.currentTimeMillis()-executeTime));
                     tagAction(info);
                     LOGGER.trace(String.format(" recv = " + recv + " waitfrom = " + waitfrom));
                     LOGGER.trace(String.format(" waitingFromOthers = " + waitingFromOthers.toString()));
@@ -813,7 +838,7 @@ public class DispThread {
                 waitfrom = -1 * waitfrom;
                 LOGGER.trace(" waitfrom<0 " + waitfrom + recv);
             }
-            // if(myRank==0) LOGGER.trace("bef do lite job");
+
             makeRequestsForSending();
             doLiteJob();
 
@@ -840,14 +865,14 @@ public class DispThread {
             //LOGGER.info("Number of cycle of dispatcher = " + countCycleDisp);
             // LOGGER.info("Number of cycle of counter = " + counter.counterCycle);
 
-            // LOGGER.info("sleepSendTime dispatcher = " +  sleepSendTime);
-           // LOGGER.info("Time of working dispatcher = " + (allTime - sleepSendTime));
+            LOGGER.info("sleepSendTime dispatcher = " +  sleepSendTime);
+            LOGGER.info("Time of working dispatcher = " + (allTime - sleepSendTime));
             //LOGGER.info(getResult()[0]);
             LOGGER.info("Used memory = " + getUsedMemory());
 
         }
 
-        /*String s = "";
+        String s = "";
         for (int i = 0; i < listcount.length; i++) {
             if(listcount[i]!=0)
                 s = s + " rec "+i + " - " + listcount[i] + ", ";
@@ -857,7 +882,7 @@ public class DispThread {
                 +"\n allTime of waiting counter = " + counter.calcWaitTime
                 +"\n execute time = " + executeTime
                 +"\n time before receiving first task = " + receiveTaskTime
-                +"\n number of receiving task " + s);*/
+                +"\n number of receiving task " + s);
     }
 
     private void doLiteJob() throws IOException, MPIException {

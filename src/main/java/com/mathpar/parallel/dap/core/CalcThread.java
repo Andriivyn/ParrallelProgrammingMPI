@@ -37,6 +37,8 @@ public class CalcThread implements Runnable {
     volatile boolean finish;
     volatile boolean flToExit;
     volatile boolean IamFree;
+    volatile int takenMyLowLevelDrops = 0;
+
     long currentMemory;
     static long counterCycle = 0;
     long calcWorkTime = 0;
@@ -90,6 +92,8 @@ public class CalcThread implements Runnable {
 
        // LOGGER.info("vokzal[drop.recNum] = " + vokzal[drop.recNum].get(vokzal[drop.recNum].size()-1));
        // LOGGER.info("mylevel " + DispThread.myLevel + " myLevelH = " + DispThread.myLevelH);
+        if(drop.recNum == DispThread.myLevel) takenMyLowLevelDrops = 0;
+
         if (drop.numberOfDaughterProc == -2) {
             drop.numberOfDaughterProc = -1;
         }
@@ -99,12 +103,15 @@ public class CalcThread implements Runnable {
         }
 
         if(drop.recNum < DispThread.myLevel){
+            takenMyLowLevelDrops = 0;
             DispThread.myLevel = drop.recNum;
         }
 
         if (DispThread.myLevel == 20 || DispThread.myLevel > DispThread.myLevelH) {
             DispThread.myLevel = DispThread.myLevelH;
         }
+
+
         //LOGGER.info("mylevel " + DispThread.myLevel + " myLevelH = " + DispThread.myLevelH);
     }
 
@@ -256,12 +263,17 @@ public class CalcThread implements Runnable {
                 list = vokzal[DispThread.myLevelH];
                 drop = list.get(0);
                 list.remove(0);
+
+                if(DispThread.myLevelH==DispThread.myLevel && drop!=null){
+                    takenMyLowLevelDrops+=1;
+                }
                 if (vokzal[DispThread.myLevelH].size() == 0) {
                     changeMyLevelH();
                 }
                 if (drop.numberOfDaughterProc == -1) {
                     drop.numberOfDaughterProc = myRank;
                 }
+
             }
         } else if (thread == 1 && !empty) {
             list = vokzal[DispThread.myLevel];
@@ -288,9 +300,6 @@ public class CalcThread implements Runnable {
             DispThread.myLevelH = 20;
             DispThread.myLevel = 20;
         }
-       // if(changeTrack) changeTrackLevel();
-
-
     }
 
     private void changeMyLevel() {
@@ -335,7 +344,7 @@ public class CalcThread implements Runnable {
         writeResultsAfterInpFunc(currentDrop, curAmin, resInputFunc);
 
         currentDrop.independentCalc(ring, curAmin);
-        //LOGGER.info("end = "+ currentDrop.type);
+        LOGGER.info("vokzal size!! = "+ vokzal[DispThread.myLevel].size());
 
     }
 
