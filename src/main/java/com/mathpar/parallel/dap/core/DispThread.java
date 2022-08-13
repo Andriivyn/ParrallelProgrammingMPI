@@ -335,7 +335,7 @@ public class DispThread {
             curTask.fullDrop = drop.fullDrop;
             long time = System.currentTimeMillis();
             Transport.sendObject(curTask, destination, Transport.Tag.TASK);
-            LOGGER.info("time all send = " + (System.currentTimeMillis()-time));
+           // LOGGER.info("time all send = " + (System.currentTimeMillis()-time));
 
             //LOGGER.info("time = "+(System.currentTimeMillis()-time)+"send drop to = " + destination + ", list of free = " + freeProcs.toString());
         }
@@ -370,21 +370,30 @@ public class DispThread {
             if (freeProcs.size() != 0) {
                 int vokzalSize = counter.vokzal[myLevel].size();
 
-                LOGGER.info("vokzalSize = " + vokzalSize);
+                LOGGER.info("vokzalSize in sendRequestToSendDrops = " + vokzalSize);
+                LOGGER.info("free size in sendRequestToSendDrops = " + freeProcs.size());
                 if (vokzalSize == 0 || isEmptyVokzal()) {
                     return;
                 }
 
+                int chunk = (freeProcs.size()+1) / (vokzalSize + counter.takenMyLowLevelDrops) - 1;
+
                 int procToSend;
                 if (freeProcs.size() > vokzalSize) {
+                    LOGGER.info("freeProcs.size() > vokzalSize");
+                    Iterator<Integer> freeProcIterator = freeProcs.iterator();
                     for (int i = 0; i < freeProcs.size() && counter.vokzal[myLevel].size() != 0; i++) {
                         procToSend = (int) freeProcs.toArray()[i];
-                       if(sendDropOrRequest(procToSend))
-                           sendFreeProc(procToSend);;
+                       if(sendDropOrRequest(procToSend)){
+                           sendFreeProc(procToSend, chunk);
+                       }
                     }
                 } else {
+                    LOGGER.info("freeProcs.size() < vokzalSize");
                     int dropsnum = ((vokzalSize + counter.takenMyLowLevelDrops) / (freeProcs.size() + 1));
                     int remainder = ((vokzalSize + counter.takenMyLowLevelDrops) % (freeProcs.size() + 1)) - 1;
+                    LOGGER.info("dropsnum = " + dropsnum + ", remainder = " + remainder);
+
                     for (int i = 0; i < freeProcs.size() && counter.vokzal[myLevel].size() != 0; i++) {
 
                         procToSend = (int) freeProcs.toArray()[i];
@@ -405,14 +414,17 @@ public class DispThread {
     }
 
 
-    private void sendFreeProc(int destination) throws MPIException {
+    private void sendFreeProc(int destination, int num) throws MPIException {
         if (freeProcs.contains(destination)) {
             freeProcs.remove(destination);
             LOGGER.info("remove " + destination);
         }
         int vokzalSize = counter.vokzal[myLevel].size();
-        int chunk = vokzalSize == 0 ? freeProcs.size() : (freeProcs.size()) / (vokzalSize + counter.takenMyLowLevelDrops);
+        LOGGER.info("vokzsize = " + vokzalSize + ", freesize = " + freeProcs.size() + "takecalc = " + counter.takenMyLowLevelDrops);
+        int chunk=num;
+        if(num==-1)  chunk = vokzalSize == 0 ? freeProcs.size() : (freeProcs.size()) / (vokzalSize + counter.takenMyLowLevelDrops);
         Iterator<Integer> freeProcIterator = freeProcs.iterator();
+        LOGGER.info("chunk = " + chunk);
         if (chunk >= 1) {
             int[] daughtProcs = new int[chunk];
 
@@ -420,7 +432,7 @@ public class DispThread {
                 daughtProcs[j] = freeProcIterator.next();
                 freeProcIterator.remove();
             }
-           // LOGGER.info("send free with drop to "+ destination + " " + Arrays.toString(daughtProcs));
+            LOGGER.info("send free with drop to "+ destination + " " + Arrays.toString(daughtProcs));
 
             Transport.iSendIntArray(daughtProcs, destination, Transport.Tag.FREE_PROC);
         }
@@ -604,6 +616,7 @@ public class DispThread {
        // LOGGER.info("send request to " + prank);
 
         waitingOutput.add(prank);
+        LOGGER.info("sendRequestToApproveSending to " + prank);
 
         return true;
     }
@@ -923,8 +936,10 @@ public class DispThread {
 
             sent = sendResultsToParent(destination);
 
-            if (!sent)
+            if (!sent){
                 sent = sendDrops(destination);
+                if(sent) sendFreeProc(destination, -1);
+            }
 
             if (!sent) cancelSending(destination);
 

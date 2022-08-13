@@ -93,7 +93,7 @@ public class Transport {
 
         endsend = System.currentTimeMillis();
 
-        LOGGER.info("time sending = " + (endsend-startsend));
+        //LOGGER.info("time sending = " + (endsend-startsend));
        // DispThread.sleepSendTime += endsend - startsend;
     }
 
