@@ -115,7 +115,9 @@ public abstract class DAPTest {
         setLeafSize(test.leaf);
         setLeafDensity(test.leafdensity);
 
+        long m = System.currentTimeMillis();
         if (rank == root) {
+            LOGGER.info("bef initData + " + m);
             data = initData(test.size, test.density, test.maxBits, test.ring);
             LOGGER.trace(MemoryManager.check("data init"));
         }
@@ -134,6 +136,9 @@ public abstract class DAPTest {
                         long t1 = System.currentTimeMillis();
                         test.startTime = t1;
                         //LOGGER.info("key = " + key);
+                        long c = System.currentTimeMillis();
+                        LOGGER.info("bef start execute + " +c );
+                        LOGGER.info("diff+ " + (c - m));
                         Element[] result = executeTest(disp, taskType, key, args, finalData, test.ring);
                         long t2 = System.currentTimeMillis();
                         LOGGER.trace(MemoryManager.check("test done"));

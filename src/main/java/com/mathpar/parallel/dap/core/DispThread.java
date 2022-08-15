@@ -377,15 +377,23 @@ public class DispThread {
                 }
 
                 int chunk = (freeProcs.size()+1) / (vokzalSize + counter.takenMyLowLevelDrops) - 1;
+                int remchunk = (freeProcs.size()+1) % (vokzalSize + counter.takenMyLowLevelDrops);
 
                 int procToSend;
                 if (freeProcs.size() > vokzalSize) {
                     LOGGER.info("freeProcs.size() > vokzalSize");
-                    Iterator<Integer> freeProcIterator = freeProcs.iterator();
                     for (int i = 0; i < freeProcs.size() && counter.vokzal[myLevel].size() != 0; i++) {
                         procToSend = (int) freeProcs.toArray()[i];
                        if(sendDropOrRequest(procToSend)){
-                           sendFreeProc(procToSend, chunk);
+                           if(chunk>0) {
+                               if (remchunk > 0) {
+                                   sendFreeProc(procToSend, chunk+1);
+                                   remchunk--;
+                               }else sendFreeProc(procToSend, chunk);
+                           }else if(remchunk>0){
+                               sendFreeProc(procToSend, 1);
+                               remchunk--;
+                           }
                        }
                     }
                 } else {
