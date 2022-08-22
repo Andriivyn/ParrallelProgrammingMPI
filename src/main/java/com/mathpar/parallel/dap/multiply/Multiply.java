@@ -49,6 +49,7 @@ public class Multiply extends Drop {
         //кількість блоків, для формування результату
         resultForOutFunctionLength = 4;
         inputDataLength = 2;
+        outputDataLength = 1;
         //унікальний номер дропа
         number = cnum++;
         arcs = _arcs;
@@ -108,7 +109,7 @@ public class Multiply extends Drop {
     @Override
     public boolean isItLeaf() {
         MatrixS ms = (MatrixS) inData[0];
-        return (ms.size <= leafSize);
+        return ms.isItLeaf(leafSize,leafdensity);
     }
 
 }

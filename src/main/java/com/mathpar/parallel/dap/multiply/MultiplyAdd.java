@@ -17,7 +17,7 @@ public class MultiplyAdd extends Multiply {
   private final static MpiLogger LOGGER = MpiLogger.getLogger(MultiplyAdd.class);
 
     private int[][] _arcs = new int[][] {{1, 0, 0, 1, 4, 1, 2, 1, 0, 2, 6, 1, 3, 0, 0, 3, 5, 1, 4, 1, 0, 4, 7, 1,
-            5, 2, 0, 5, 4, 1, 6, 3, 0, 6, 6, 1, 7, 2, 0, 7, 5, 1, 8, 3, 0, 8, 7, 1, 9, 8, 4},
+            5, 2, 0, 5, 4, 1, 6, 3, 0, 6, 6, 1, 7, 2, 0, 7, 5, 1, 8, 3, 0, 8, 7, 1},
         {2, 0, 2}, {9, 0, 0}, {4, 0, 2}, {9, 0, 1}, {6, 0, 2}, {9, 0, 2}, {8, 0, 2}, {9, 0, 3}, {}};
 
     public MultiplyAdd() {
@@ -26,6 +26,7 @@ public class MultiplyAdd extends Multiply {
         type = 1;
         resultForOutFunctionLength = 5;
         inputDataLength = 3;
+        outputDataLength = 1;
         number = cnum++;
         arcs = _arcs;
     }
@@ -45,6 +46,11 @@ public class MultiplyAdd extends Multiply {
         MatrixS ms1 = (MatrixS) input[1];
         Array.concatTwoArrays(ms.split(), ms1.split(), res);
         return res;
+    }
+
+    @Override
+    public void independentCalc(Ring ring, Amin amin) {
+        amin.resultForOutFunction[4] = inData[3];
     }
 
     @Override

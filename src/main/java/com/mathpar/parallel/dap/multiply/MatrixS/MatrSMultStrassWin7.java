@@ -30,6 +30,7 @@ public class MatrSMultStrassWin7 extends Drop {
         type = 6;
         resultForOutFunctionLength = 7;
         inputDataLength = 2;
+        outputDataLength = 1;
         number = cnum++;
         arcs = _arcs;
     }
@@ -51,7 +52,7 @@ public class MatrSMultStrassWin7 extends Drop {
     public void sequentialCalc(Ring r) {
         MatrixS A = (MatrixS) inData[0];
         MatrixS B = (MatrixS) inData[1];
-        MatrixS C = A.multiply(B, r);
+        MatrixS C = A.multiplyRecursive(B, r);
 
         switch (key){
             case(0): outData[0] =C; break;

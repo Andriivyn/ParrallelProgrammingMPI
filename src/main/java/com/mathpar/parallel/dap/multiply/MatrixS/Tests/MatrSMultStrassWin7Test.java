@@ -19,7 +19,7 @@ public class MatrSMultStrassWin7Test extends DAPTest {
     protected static int defaultMultSize = 4;
 
     protected MatrSMultStrassWin7Test() {
-        super("MatrSMultStrassWin7", 11, 0);
+        super("MatrSMultStrassWin7", 6, 0);
        // ring = new Ring("R[]");
     }
 

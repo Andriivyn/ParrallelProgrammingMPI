@@ -335,7 +335,7 @@ public class DispThread {
             curTask.fullDrop = drop.fullDrop;
             long time = System.currentTimeMillis();
             Transport.sendObject(curTask, destination, Transport.Tag.TASK);
-           // LOGGER.info("time all send = " + (System.currentTimeMillis()-time));
+            LOGGER.info("time all send = " + (System.currentTimeMillis()-time));
 
             //LOGGER.info("time = "+(System.currentTimeMillis()-time)+"send drop to = " + destination + ", list of free = " + freeProcs.toString());
         }
@@ -370,8 +370,8 @@ public class DispThread {
             if (freeProcs.size() != 0) {
                 int vokzalSize = counter.vokzal[myLevel].size();
 
-                LOGGER.info("vokzalSize in sendRequestToSendDrops = " + vokzalSize);
-                LOGGER.info("free size in sendRequestToSendDrops = " + freeProcs.size());
+                LOGGER.info("vokzalSize  = " + vokzalSize);
+                LOGGER.info("free size  = " + freeProcs.size());
                 if (vokzalSize == 0 || isEmptyVokzal()) {
                     return;
                 }
@@ -401,20 +401,21 @@ public class DispThread {
                     int dropsnum = ((vokzalSize + counter.takenMyLowLevelDrops) / (freeProcs.size() + 1));
                     int remainder = ((vokzalSize + counter.takenMyLowLevelDrops) % (freeProcs.size() + 1)) - 1;
                     LOGGER.info("dropsnum = " + dropsnum + ", remainder = " + remainder);
+                    Object[] freeProcsArr = freeProcs.toArray();
 
-                    for (int i = 0; i < freeProcs.size() && counter.vokzal[myLevel].size() != 0; i++) {
+                    for (int i = 0; i < freeProcsArr.length && counter.vokzal[myLevel].size() != 0; i++) {
+                        procToSend = (int) freeProcsArr[i];
 
-                        procToSend = (int) freeProcs.toArray()[i];
-                        for (int j = 0; j < dropsnum; j++) {
+                        for (int j = 0; j < dropsnum; j++)
                             sendDropOrRequest(procToSend);
-                        }
 
                         if (remainder > 0) {
                             sendDropOrRequest(procToSend);
                             remainder--;
                         }
 
-                        if (freeProcs.contains(procToSend)) freeProcs.remove(procToSend);
+                        if (freeProcs.contains(procToSend))
+                            freeProcs.remove(procToSend);
                     }
                 }
             }
@@ -721,7 +722,7 @@ public class DispThread {
                     if (myRank == 0 || (myRank % 2 == 0 && dropResult.procId % 2 == 1)) {
                         sendResultsToParent(dropResult.procId);
                     } else {
-                        //LOGGER.trace("send request for sending result to " + dropResult.procId);
+                        //LOGGER.info("send request for sending result to " + dropResult.procId + " time = " + (System.currentTimeMillis()-executeTime));
                         sendRequestToApproveSending(dropResult.procId);
                     }
                 }

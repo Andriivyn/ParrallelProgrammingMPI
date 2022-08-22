@@ -6,6 +6,7 @@
 package com.mathpar.parallel.dap.core;
 
 import com.mathpar.log.MpiLogger;
+import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Array;
 import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
@@ -43,6 +44,8 @@ public class CalcThread implements Runnable {
     static long counterCycle = 0;
     long calcWorkTime = 0;
     long calcWaitTime = 0;
+
+    long c = 0;
 
     public CalcThread(ArrayList<Amin> p,
                       ArrayList<Drop> ownTr, Ring ring) throws MPIException {
@@ -199,6 +202,11 @@ public class CalcThread implements Runnable {
         //if(amin.parentAmin!=-1)
         //    drop.outData = pine.get(amin.parentAmin).branch.get(amin.parentDrop).outData;
         amin.outputData = drop.outputFunction(amin.resultForOutFunction, ring);
+
+
+        if(((MatrixS)amin.outputData[0]).size==512&& amin.type==5) {
+            LOGGER.info("time to calc AB = " + (System.currentTimeMillis()-c));
+        }
 
         if (amin.parentAmin == -1 && myRank == 0 && Array.isEmptyArray(vokzal)) {
             //LOGGER.info("go finish");
@@ -379,11 +387,11 @@ public class CalcThread implements Runnable {
         }
     }
     private void ProcFunc() throws MPIException {
+
         //LOGGER.info("go to get task");
         currentDrop = getTask(0);
         if (currentDrop != null) {
            // LOGGER.info("get drop id = " + currentDrop.dropId + "rec num = " + currentDrop.recNum + " amin  id = " + currentDrop.aminId);
-
             //LOGGER.info("currentdrop out data = " + Array.toString(currentDrop.outData));
             if (!Array.isEmpty(currentDrop.outData)) {
                 //LOGGER.info("Drop result");
@@ -399,18 +407,8 @@ public class CalcThread implements Runnable {
             } else {
                 if (currentDrop.isItLeaf()) {
                    // LOGGER.info("Drop is leaf " + currentDrop.aminId + " id = "+ currentDrop.dropId);
+
                     currentDrop.sequentialCalc(ring);
-
-                   /* for (int i = 0; i <currentDrop.inputDataLength ; i++) {
-                        LOGGER.trace("after currentDrop.INdata = " + currentDrop.inData[i]);
-
-                    }*/
-
-                   /* for (int i = 0; i <currentDrop.outData.length ; i++) {
-
-                        LOGGER.trace("after currentDrop.outdata = " + currentDrop.outData[i]);
-                    }*/
-
                     if (currentDrop.aminId == -1 && myRank == 0) {
                         //LOGGER.info("go to finish whole task");
                         finishWholeTask(currentDrop);
@@ -421,11 +419,16 @@ public class CalcThread implements Runnable {
 
                     } else {
                        // LOGGER.info(" bef add aerodrome results");
+
                         addToAerodromeResults(currentDrop);
                     }
                   //  LOGGER.trace("after drop is leaf vokzal empty = " + Tools.isEmptyArray(vokzal));
                 } else {
                  // LOGGER.info("drop is not a leaf");
+                    if(((MatrixS)currentDrop.inData[0]).size==512&& currentDrop.type==5) {
+                        LOGGER.info("start to calc AB 512");
+                        c = System.currentTimeMillis();
+                    }
                     inputDataToAmin();
                 }
             }
