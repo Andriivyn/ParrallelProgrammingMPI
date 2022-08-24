@@ -157,8 +157,10 @@ public class CalcThread implements Runnable {
                 LOGGER.info("drop key = " + drop.key);
                 LOGGER.info("amin id = " + amin.aminIdInPine + " amine type = " + amin.type);*/
                 if (amin.hasFullOutput()) {
+                    if(myRank==1) LOGGER.info("go to putresultstoaminoutput "  + (System.currentTimeMillis()-DispThread.executeTime));
                     //LOGGER.info("putResultsToAminOutput");
                     putResultsToAminOutput(amin);
+                    if(myRank==1) LOGGER.info("after putresultstoaminoutput "  + (System.currentTimeMillis()-DispThread.executeTime));
                 }
             }
         }
@@ -201,12 +203,14 @@ public class CalcThread implements Runnable {
         drop.inData = amin.inputData;
         //if(amin.parentAmin!=-1)
         //    drop.outData = pine.get(amin.parentAmin).branch.get(amin.parentDrop).outData;
+        if(myRank==1) LOGGER.info("bef outputfunc "  + (System.currentTimeMillis()-DispThread.executeTime));
         amin.outputData = drop.outputFunction(amin.resultForOutFunction, ring);
+        if(myRank==1) LOGGER.info("after outputfunc "  + (System.currentTimeMillis()-DispThread.executeTime));
 
 
-        if(((MatrixS)amin.outputData[0]).size==512&& amin.type==5) {
+       /* if(((MatrixS)amin.outputData[0]).size==512&& amin.type==5) {
             LOGGER.info("time to calc AB = " + (System.currentTimeMillis()-c));
-        }
+        }*/
 
         if (amin.parentAmin == -1 && myRank == 0 && Array.isEmptyArray(vokzal)) {
             //LOGGER.info("go finish");
@@ -347,9 +351,13 @@ public class CalcThread implements Runnable {
         currentDrop.setNumbOfMyAmine(curAmin.aminIdInPine);
         //System.arraycopy(currentDrop.inData, 0, curAmin.inputData, 0, curAmin.inputData.size());
         curAmin.inputData = currentDrop.inData;
+        if(myRank==1) LOGGER.info("go to inputfunc "  + (System.currentTimeMillis()-DispThread.executeTime));
         resInputFunc = currentDrop.inputFunction(curAmin.inputData, curAmin , ring);
+        if(myRank==1) LOGGER.info("after inputfunc "  + (System.currentTimeMillis()-DispThread.executeTime));
 
+        if(myRank==1) LOGGER.info("go to writeResultsAfterInpFunc " + (System.currentTimeMillis()-DispThread.executeTime));
         writeResultsAfterInpFunc(currentDrop, curAmin, resInputFunc);
+        if(myRank==1) LOGGER.info("after writeResultsAfterInpFunc "  + (System.currentTimeMillis()-DispThread.executeTime));
 
         currentDrop.independentCalc(ring, curAmin);
         LOGGER.info("vokzal size!! = "+ vokzal[DispThread.myLevel].size());
@@ -389,8 +397,11 @@ public class CalcThread implements Runnable {
     private void ProcFunc() throws MPIException {
 
         //LOGGER.info("go to get task");
+        if(myRank==1) LOGGER.info("go to get drop  "  + (System.currentTimeMillis()-DispThread.executeTime));
         currentDrop = getTask(0);
+        if(myRank==1) LOGGER.info("after get drop "  + (System.currentTimeMillis()-DispThread.executeTime));
         if (currentDrop != null) {
+            if(myRank==1) LOGGER.info("Get drop " + (System.currentTimeMillis()-DispThread.executeTime));
            // LOGGER.info("get drop id = " + currentDrop.dropId + "rec num = " + currentDrop.recNum + " amin  id = " + currentDrop.aminId);
             //LOGGER.info("currentdrop out data = " + Array.toString(currentDrop.outData));
             if (!Array.isEmpty(currentDrop.outData)) {
@@ -398,7 +409,9 @@ public class CalcThread implements Runnable {
 
                // LOGGER.info("amin = " + currentDrop.aminId);
 
+                if(myRank==1) LOGGER.info("go to write result to amine -- drop result " + (System.currentTimeMillis()-DispThread.executeTime));
                 writeResultsToAmin(currentDrop);
+                if(myRank==1) LOGGER.info("after write result to amine "  + (System.currentTimeMillis()-DispThread.executeTime));
 
                /* LOGGER.info("isEmptyVokzal = "+ Array.isEmptyArray(vokzal));
                 LOGGER.info("mylevel " + DispThread.myLevel + " myLevelH = " + DispThread.myLevelH);
@@ -408,28 +421,37 @@ public class CalcThread implements Runnable {
                 if (currentDrop.isItLeaf()) {
                    // LOGGER.info("Drop is leaf " + currentDrop.aminId + " id = "+ currentDrop.dropId);
 
+                    if(myRank==1) LOGGER.info("drop is leaf go to seq calc " + (System.currentTimeMillis()-DispThread.executeTime));
                     currentDrop.sequentialCalc(ring);
+                    if(myRank==1) LOGGER.info("after seq calc " + (System.currentTimeMillis()-DispThread.executeTime));
                     if (currentDrop.aminId == -1 && myRank == 0) {
                         //LOGGER.info("go to finish whole task");
                         finishWholeTask(currentDrop);
                     } else if (currentDrop.procId == myRank) {
 
+                        if(myRank==1) LOGGER.info("");
+                        if(myRank==1) LOGGER.info("2go to write result to amine -- drop result "  + (System.currentTimeMillis()-DispThread.executeTime));
                         writeResultsToAmin(currentDrop);
+                        if(myRank==1) LOGGER.info("2after write result to amine " + (System.currentTimeMillis()-DispThread.executeTime));
                        //LOGGER.info("after writeResultsToAmin");
 
                     } else {
                        // LOGGER.info(" bef add aerodrome results");
-
+                        if(myRank==1) LOGGER.info("go to addToAerodromeResults " + (System.currentTimeMillis()-DispThread.executeTime));
                         addToAerodromeResults(currentDrop);
+                        if(myRank==1) LOGGER.info("after addToAerodromeResults " + (System.currentTimeMillis()-DispThread.executeTime));
+
                     }
                   //  LOGGER.trace("after drop is leaf vokzal empty = " + Tools.isEmptyArray(vokzal));
                 } else {
                  // LOGGER.info("drop is not a leaf");
-                    if(((MatrixS)currentDrop.inData[0]).size==512&& currentDrop.type==5) {
+                  /*  if(((MatrixS)currentDrop.inData[0]).size==512&& currentDrop.type==5) {
                         LOGGER.info("start to calc AB 512");
                         c = System.currentTimeMillis();
-                    }
+                    }*/
+                    if(myRank==1) LOGGER.info("go to inputDataToAmin " + (System.currentTimeMillis()-DispThread.executeTime));
                     inputDataToAmin();
+                    if(myRank==1) LOGGER.info("after inputDataToAmin " + (System.currentTimeMillis()-DispThread.executeTime));
                 }
             }
         }

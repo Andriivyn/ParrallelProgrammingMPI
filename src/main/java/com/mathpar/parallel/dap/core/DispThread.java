@@ -26,7 +26,7 @@ public class DispThread {
 
     ArrayList<Amin> pine;
     long sleepTime;
-    long executeTime;
+   static long executeTime;
     static Integer myRank;
     public CalcThread counter;
     Thread disp;
@@ -335,7 +335,7 @@ public class DispThread {
             curTask.fullDrop = drop.fullDrop;
             long time = System.currentTimeMillis();
             Transport.sendObject(curTask, destination, Transport.Tag.TASK);
-            LOGGER.info("time all send = " + (System.currentTimeMillis()-time));
+           // LOGGER.info("time all send = " + (System.currentTimeMillis()-time));
 
             //LOGGER.info("time = "+(System.currentTimeMillis()-time)+"send drop to = " + destination + ", list of free = " + freeProcs.toString());
         }
@@ -381,7 +381,7 @@ public class DispThread {
 
                 int procToSend;
                 if (freeProcs.size() > vokzalSize) {
-                    LOGGER.info("freeProcs.size() > vokzalSize");
+                   // LOGGER.info("freeProcs.size() > vokzalSize");
                     for (int i = 0; i < freeProcs.size() && counter.vokzal[myLevel].size() != 0; i++) {
                         procToSend = (int) freeProcs.toArray()[i];
                        if(sendDropOrRequest(procToSend)){
@@ -397,7 +397,7 @@ public class DispThread {
                        }
                     }
                 } else {
-                    LOGGER.info("freeProcs.size() < vokzalSize");
+                   // LOGGER.info("freeProcs.size() < vokzalSize");
                     int dropsnum = ((vokzalSize + counter.takenMyLowLevelDrops) / (freeProcs.size() + 1));
                     int remainder = ((vokzalSize + counter.takenMyLowLevelDrops) % (freeProcs.size() + 1)) - 1;
                     LOGGER.info("dropsnum = " + dropsnum + ", remainder = " + remainder);
