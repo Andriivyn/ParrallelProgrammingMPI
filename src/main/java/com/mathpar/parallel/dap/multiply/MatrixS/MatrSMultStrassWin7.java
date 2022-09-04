@@ -1,14 +1,18 @@
 package com.mathpar.parallel.dap.multiply.MatrixS;
 
+import com.mathpar.log.MpiLogger;
 import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
 import com.mathpar.parallel.dap.core.Amin;
+import com.mathpar.parallel.dap.core.CalcThread;
+import com.mathpar.parallel.dap.core.DispThread;
 import com.mathpar.parallel.dap.core.Drop;
 
 import java.util.ArrayList;
 
 public class MatrSMultStrassWin7 extends Drop {
+    private final static MpiLogger LOGGER = MpiLogger.getLogger(MatrSMultStrassWin7.class);
     private final static int[][] _arcs = {
             {       3, 0, 0,    4, 1, 0,    2, 2, 1,    5, 3, 1,
                     1, 4, 0,    1, 5, 1,    2, 6, 0,    3, 7, 1,
@@ -52,7 +56,12 @@ public class MatrSMultStrassWin7 extends Drop {
     public void sequentialCalc(Ring r) {
         MatrixS A = (MatrixS) inData[0];
         MatrixS B = (MatrixS) inData[1];
+
+        LOGGER.info("bef multiplyRecursive " + (System.currentTimeMillis()- DispThread.executeTime));
+
         MatrixS C = A.multiplyRecursive(B, r);
+
+        LOGGER.info("after multiplyRecursive " + (System.currentTimeMillis()- DispThread.executeTime));
 
         switch (key){
             case(0): outData[0] =C; break;

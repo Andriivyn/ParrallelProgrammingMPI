@@ -26,7 +26,7 @@ public class DispThread {
 
     ArrayList<Amin> pine;
     long sleepTime;
-   static long executeTime;
+   public static long executeTime;
     static Integer myRank;
     public CalcThread counter;
     Thread disp;
