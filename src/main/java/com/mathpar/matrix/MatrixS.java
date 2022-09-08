@@ -1632,13 +1632,19 @@ public class MatrixS extends Element {// implements Serializable {
         if (b.M.length <= ring.SMALLESTBLOCK) {
             return multiplySmallBlock(b, ring);
         }
+        long a = System.currentTimeMillis();
         MatrixS[] A = split();
+       System.out.println("split a = " + (System.currentTimeMillis()-a) +" size = " +size);
+        a = System.currentTimeMillis();
         MatrixS[] B = b.split();
+        System.out.println("split b = " + (System.currentTimeMillis()-a+" size = " +size));
         MatrixS[] R = new MatrixS[4];
+        a = System.currentTimeMillis();
         R[0] = scalarMultiply(A[0], A[1], B[0], B[2], ring);
         R[1] = scalarMultiply(A[0], A[1], B[1], B[3], ring);
         R[2] = scalarMultiply(A[2], A[3], B[0], B[2], ring);
         R[3] = scalarMultiply(A[2], A[3], B[1], B[3], ring);
+      // System.out.println("scalarMultiply 4 times = " + (System.currentTimeMillis()-a));
         return join(R);
     }
 
