@@ -8,6 +8,7 @@ import com.mathpar.number.Array;
 import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
 import com.mathpar.parallel.dap.core.Amin;
+import com.mathpar.parallel.dap.core.DispThread;
 import com.mathpar.parallel.dap.core.Drop;
 import com.mathpar.parallel.dap.ldumw.LdumwDto;
 
@@ -216,7 +217,9 @@ public class MatrSMult4 extends Drop {
             case(7713): {
                 MatrixS A = (MatrixS) inData[0];
                 MatrixS B = (MatrixS) inData[1];
+                LOGGER.info("bef multiplyRecursive " + (System.currentTimeMillis()- DispThread.executeTime));
                 outData[0] =A.multiplyRecursive(B, ring);
+                LOGGER.info("after multiplyRecursive " + (System.currentTimeMillis()- DispThread.executeTime));
                 //LOGGER.info("7713 mult = " + outData[0]);
                 break;
             }

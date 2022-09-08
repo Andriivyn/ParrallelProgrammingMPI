@@ -5,6 +5,7 @@ import com.mathpar.matrix.MatrixS;
 import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
 import com.mathpar.parallel.dap.core.Amin;
+import com.mathpar.parallel.dap.core.DispThread;
 import com.mathpar.parallel.dap.core.Drop;
 
 import java.util.ArrayList;
@@ -56,7 +57,9 @@ public class MatrSMultiplyScalar extends Drop {
         MatrixS B = (MatrixS) inData[1];
         MatrixS C = (MatrixS) inData[2];
         MatrixS D = (MatrixS) inData[3];
+        LOGGER.info("bef multiplyRecursive+multiplyRecursive " + (System.currentTimeMillis()- DispThread.executeTime));
         MatrixS R = A.multiplyRecursive(B, ring).add(C.multiplyRecursive(D, ring), ring);
+        LOGGER.info("after multiplyRecursive+multiplyRecursive " + (System.currentTimeMillis()- DispThread.executeTime));
 
         outData[0] = R;
     }
