@@ -28,13 +28,13 @@ public class TransportTest {
         for (int i = 0; i < iterations; i++) {
 
             if (rank == 0) {
-                Transport.sendObject(matrix(i), 1,  Transport.Tag.RESULT);
+                Transport.sendObject(matrix(i), 1,MPI.COMM_WORLD ,  Transport.Tag.RESULT);
 
             }
 
             if (rank == 1) {
 
-                Object result = Transport.recvObject(0,  Transport.Tag.RESULT);
+                Object result = Transport.recvObject(0,MPI.COMM_WORLD,  Transport.Tag.RESULT);
 
                 if(result == null)
                     LOGGER.error("result is null, i="+i);

@@ -7,6 +7,7 @@ import com.mathpar.number.Element;
 import com.mathpar.number.Ring;
 import com.mathpar.parallel.dap.core.DispThread;
 import com.mathpar.parallel.dap.core.Drop;
+import mpi.Intracomm;
 import mpi.MPI;
 import mpi.MPIException;
 import org.javatuples.Pair;
@@ -69,6 +70,7 @@ public abstract class DAPTest {
     protected boolean sequential = false;
 
     protected int sleepTime = 1;
+    protected int comm = 1;
     private int taskType = 0;
     private int key = 0;
 
@@ -98,23 +100,35 @@ public abstract class DAPTest {
         List<Test> tests = getTests(args);
 
         MPI.Init(args);
-        rank = MPI.COMM_WORLD.getRank();
-        poolSize = MPI.COMM_WORLD.getSize();
-        DispThread disp = new DispThread(sleepTime, args, ring);
 
-        tests.forEach(test -> runTest(disp, test, args));
+       // int [] pool = new int[comm];
+
+        int size = MPI.COMM_WORLD.getSize();
+
+        if(comm>size) comm = size;
+        List<Integer> pool = new ArrayList<>(comm);
+        for(int i=0; i<comm; i++)  pool.add(i);
+        mpi.Group g = MPI.COMM_WORLD.getGroup().incl(pool.stream().mapToInt(i -> i).toArray());
+            Intracomm COMM = MPI.COMM_WORLD.create(g);
+        rank = MPI.COMM_WORLD.getRank();
+
+        if(pool.contains(rank)){
+
+            poolSize = COMM.getSize();
+        DispThread disp = new DispThread(sleepTime, args, COMM, ring);
+
+        tests.forEach(test -> runTest(disp, test, COMM, args));
 
         disp.counter.DoneThread();
         disp.counter.thread.join();
-        //LOGGER.info("bef end");
+        }
         MPI.Finalize();
     }
 
-    private void runTest(DispThread disp, Test test, String[] args) {
+    private void runTest(DispThread disp, Test test, Intracomm COMM, String[] args) {
         Element[] data = new Element[0];
         setLeafSize(test.leaf);
         setLeafDensity(test.leafdensity);
-
         long m = System.currentTimeMillis();
         if (rank == root) {
             LOGGER.info("bef initData + " + m);
@@ -157,7 +171,7 @@ public abstract class DAPTest {
 //                    System.gc();
 
                     try {
-                        MPI.COMM_WORLD.barrier();
+                        COMM.barrier();
                     } catch (MPIException e) {
                         e.printStackTrace();
                     }
@@ -251,6 +265,7 @@ public abstract class DAPTest {
         final String ringZ = "-z";
         final String sleepTimeArg = "-sleeptime=";
         final String leafDensity = "-leafdensity=";
+        final String newComm = "-comm=";
 
         List<Integer> sizes = new LinkedList<>();
         List<Integer> leaves = new LinkedList<>();
@@ -321,6 +336,13 @@ public abstract class DAPTest {
                 if (value != null) {
                     leafdensity = Double.parseDouble(value);
                 }
+            }else if (arg.startsWith(newComm)) {
+                String value = getValue(arg);
+                if (value != null) {
+                    int val = Integer.parseInt(value);
+                    if(val>0) comm = val;
+                    else comm=1;
+                }
             }
         });
 
@@ -338,7 +360,7 @@ public abstract class DAPTest {
 //                .collect(Collectors.toList());
 
         sizes.forEach(size -> leaves.forEach(leaf -> density.forEach(dens -> maxBits.forEach(maxB ->
-                tests.add(new Test(size, leaf, leafdensity, dens, maxB, testsPerDataSize, checkResult, ring))
+                tests.add(new Test(size, leaf, leafdensity, dens, maxB, testsPerDataSize, checkResult, comm, ring))
         ))));
 
         return tests;
@@ -589,6 +611,7 @@ public abstract class DAPTest {
     private static class Test {
         int size;
         int leaf;
+        int comm;
         double density;
         int maxBits;
         int count;
@@ -603,7 +626,7 @@ public abstract class DAPTest {
         boolean isCorrect;
         Element precision;
 
-        public Test(int size, int leaf, double leafdensity, double density, int maxBits, int count, boolean checkResult, Ring ring) {
+        public Test(int size, int leaf, double leafdensity, double density, int maxBits, int count, boolean checkResult, int commnew, Ring ring) {
             this.size = size;
             this.leaf = leaf;
             this.density = density;
@@ -612,6 +635,7 @@ public abstract class DAPTest {
             this.checkResult = checkResult;
             this.ring = ring;
             this.leafdensity = leafdensity;
+            this.comm = commnew;
         }
     }
 }

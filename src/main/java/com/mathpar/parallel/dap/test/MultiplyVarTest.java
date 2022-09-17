@@ -25,7 +25,7 @@ public class MultiplyVarTest {
     public static void main(String[] args) throws MPIException, InterruptedException, IOException, ClassNotFoundException {
         MPI.Init(args);
 
-        DispThread disp = new DispThread( 1, args, ring);
+        DispThread disp = new DispThread( 1, args,MPI.COMM_WORLD, ring);
 
         test1(args, disp);
         test2(args, disp);

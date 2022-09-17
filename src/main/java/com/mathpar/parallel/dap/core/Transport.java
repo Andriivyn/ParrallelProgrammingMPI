@@ -1,6 +1,7 @@
 package com.mathpar.parallel.dap.core;
 
 import com.mathpar.log.MpiLogger;
+import mpi.Intracomm;
 import mpi.MPI;
 import mpi.MPIException;
 import mpi.Status;
@@ -31,21 +32,21 @@ public class Transport {
 
 
 
-    public static Status probeAny() throws MPIException {
-        return MPI.COMM_WORLD.iProbe(MPI.ANY_SOURCE, MPI.ANY_TAG);
+    public static Status probeAny(Intracomm COMM) throws MPIException {
+        return COMM.iProbe(MPI.ANY_SOURCE, MPI.ANY_TAG);
     }
 
 
-    public static void sendIntArray(int[] data, int destination, Tag tag) throws MPIException {
+    public static void sendIntArray(int[] data, int destination, Intracomm COMM, Tag tag) throws MPIException {
         startsend = System.currentTimeMillis();
 
-        MPI.COMM_WORLD.send(data, data.length, MPI.INT, destination, tag.ordinal());
+        COMM.send(data, data.length, MPI.INT, destination, tag.ordinal());
 
         endsend = System.currentTimeMillis();
         //DispThread.sleepSendTime += endsend - startsend;
     }
 
-    public static void iSendIntArray(int[] data, int destination, Tag tag) throws MPIException {
+    public static void iSendIntArray(int[] data, int destination,Intracomm COMM, Tag tag) throws MPIException {
         IntBuffer b = MPI.newIntBuffer(data.length);
         for (int i = 0; i < data.length; i++){
             b.put(data[i]);
@@ -53,15 +54,15 @@ public class Transport {
 
         startsend = System.currentTimeMillis();
 
-        MPI.COMM_WORLD.iSend(b, data.length, MPI.INT, destination, tag.ordinal());
+        COMM.iSend(b, data.length, MPI.INT, destination, tag.ordinal());
 
         endsend = System.currentTimeMillis();
        // DispThread.sleepSendTime += endsend - startsend;
     }
 
-    public static int[] receiveIntArray(int size, int source, Tag tag) throws MPIException {
+    public static int[] receiveIntArray(int size, int source, Intracomm COMM, Tag tag) throws MPIException {
         int[] array = new int[size];
-        MPI.COMM_WORLD.recv(array, size, MPI.INT, source, tag.ordinal());
+        COMM.recv(array, size, MPI.INT, source, tag.ordinal());
         return array;
     }
 
@@ -77,7 +78,7 @@ public class Transport {
         return arr;
     }*/
 
-    public static void sendObject(Object a, int proc, Tag tag) throws MPIException, IOException {
+    public static void sendObject(Object a, int proc,Intracomm COMM, Tag tag) throws MPIException, IOException {
         //LOGGER.info("in sendObject ");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -89,7 +90,7 @@ public class Transport {
         startsend = System.currentTimeMillis();
 
         //LOGGER.info("bef send ");
-        MPI.COMM_WORLD.send(tmp, tmp.length, MPI.BYTE, proc, tag.ordinal());
+        COMM.send(tmp, tmp.length, MPI.BYTE, proc, tag.ordinal());
 
         endsend = System.currentTimeMillis();
 
@@ -99,13 +100,13 @@ public class Transport {
 
 
 
-    public static Object recvObject(int proc, Tag tag) throws MPIException, IOException {
-        Status st = MPI.COMM_WORLD.probe(proc, tag.ordinal());
+    public static Object recvObject(int proc,Intracomm COMM, Tag tag) throws MPIException, IOException {
+        Status st = COMM.probe(proc, tag.ordinal());
         int size = st.getCount(MPI.BYTE);
 
         byte[] arr = new byte[size];
        // ByteBuffer buff = MPI.newByteBuffer(size);
-        MPI.COMM_WORLD.recv(arr, size, MPI.BYTE, proc, tag.ordinal());
+        COMM.recv(arr, size, MPI.BYTE, proc, tag.ordinal());
        // buff.get(arr, 0, size);
         LOGGER.trace(String.format("receive from=%d bytes=%d tag=%s", proc, arr.length, tag));
         ByteArrayInputStream bis = new ByteArrayInputStream(arr);
@@ -122,7 +123,7 @@ public class Transport {
         return res;
     }
 
-    public static void sendObjects(Object[] a, int proc, Tag tag) throws MPIException {
+    public static void sendObjects(Object[] a, int proc,Intracomm COMM, Tag tag) throws MPIException {
         byte[] tempBytes = new byte[0];
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -137,20 +138,20 @@ public class Transport {
         buf.put(tempBytes);
         startsend = System.currentTimeMillis();
 
-        MPI.COMM_WORLD.send(buf, tempBytes.length, MPI.BYTE, proc, tag.ordinal());
+        COMM.send(buf, tempBytes.length, MPI.BYTE, proc, tag.ordinal());
 
         endsend = System.currentTimeMillis();
         //DispThread.sleepSendTime += endsend - startsend;
     }
 
-    public static Object[] recvObjects(int m, int proc, Tag tag) throws MPIException, IOException {
+    public static Object[] recvObjects(int m, int proc, Intracomm COMM, Tag tag) throws MPIException, IOException {
         ObjectInputStream ois = null;
-        Status s = MPI.COMM_WORLD.probe(proc, tag.ordinal());
+        Status s = COMM.probe(proc, tag.ordinal());
         int n = s.getCount(MPI.BYTE);
 
         byte[] arr = new byte[n];
         ByteBuffer buffer = MPI.newByteBuffer(n);
-        MPI.COMM_WORLD.recv(buffer, n, MPI.BYTE, proc, tag.ordinal());
+        COMM.recv(buffer, n, MPI.BYTE, proc, tag.ordinal());
         buffer.get(arr, 0, n);
         LOGGER.trace(String.format(" receive array from=%d bytes=%d tag=%s", proc, arr.length, tag));
         Object[] res = new Object[m];

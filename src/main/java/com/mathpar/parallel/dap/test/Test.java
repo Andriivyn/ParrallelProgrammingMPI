@@ -29,7 +29,7 @@ public class Test {
         Ring ring = new Ring("Z[]");
 
         MatrixS res2 = null;
-        DispThread disp = new DispThread(1, args, ring);
+        DispThread disp = new DispThread(1, args,MPI.COMM_WORLD, ring);
 
         for (int i = 0; i < numberOfMatrixes; i++) {
             MatrixS A = null;
