@@ -1634,10 +1634,10 @@ public class MatrixS extends Element {// implements Serializable {
         }
         long a = System.currentTimeMillis();
         MatrixS[] A = split();
-        System.out.println("split a = " + (System.currentTimeMillis()-a) +" size = " +size);
+        //System.out.println("split a = " + (System.currentTimeMillis()-a) +" size = " +size);
         a = System.currentTimeMillis();
         MatrixS[] B = b.split();
-        System.out.println("split b = " + (System.currentTimeMillis()-a+" size = " +size));
+        //System.out.println("split b = " + (System.currentTimeMillis()-a+" size = " +size));
         MatrixS[] R = new MatrixS[4];
        // a = System.currentTimeMillis();
         R[0] = scalarMultiply(A[0], A[1], B[0], B[2], ring);

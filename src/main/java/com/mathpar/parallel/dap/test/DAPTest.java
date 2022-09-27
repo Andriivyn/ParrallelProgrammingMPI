@@ -101,26 +101,37 @@ public abstract class DAPTest {
 
         MPI.Init(args);
 
-       // int [] pool = new int[comm];
+        // int [] pool = new int[comm];
 
         int size = MPI.COMM_WORLD.getSize();
 
-        if(comm>size) comm = size;
+        if (comm > size) comm = size;
+
         List<Integer> pool = new ArrayList<>(comm);
-        for(int i=0; i<comm; i++)  pool.add(i);
+        for (int i = 0; i < comm; i++) pool.add(i);
         mpi.Group g = MPI.COMM_WORLD.getGroup().incl(pool.stream().mapToInt(i -> i).toArray());
-            Intracomm COMM = MPI.COMM_WORLD.create(g);
+        Intracomm COMM = MPI.COMM_WORLD.create(g);
+        Intracomm COMM2;
         rank = MPI.COMM_WORLD.getRank();
 
-        if(pool.contains(rank)){
+        if (size != comm) {
+            int rest = size - comm;
+            List<Integer> secondcomm = new ArrayList<>(rest);
+            for (int i = 0; i < rest; i++) secondcomm.add(comm + i);
+            mpi.Group g2 = MPI.COMM_WORLD.getGroup().incl(secondcomm.stream().mapToInt(i -> i).toArray());
+            COMM2 = MPI.COMM_WORLD.create(g2);
+            //if(secondcomm.contains(rank)) LOGGER.info("myproc in COMM2 = " + COMM2.getRank());
+        }
+
+        if (pool.contains(rank)) {
 
             poolSize = COMM.getSize();
-        DispThread disp = new DispThread(sleepTime, args, COMM, ring);
+            DispThread disp = new DispThread(sleepTime, args, COMM, ring);
 
-        tests.forEach(test -> runTest(disp, test, COMM, args));
+            tests.forEach(test -> runTest(disp, test, COMM, args));
 
-        disp.counter.DoneThread();
-        disp.counter.thread.join();
+            disp.counter.DoneThread();
+            disp.counter.thread.join();
         }
         MPI.Finalize();
     }
